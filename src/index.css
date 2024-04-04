@@ -1,13 +1,74 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.b24-widget-button-pulse {
+    display: none;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+div[data-b24-crm-button-icon="crmform"] {
+    display: none;
 }
+
+div[data-b24-crm-button-icon="openline"] {
+    opacity: 1 !important;
+}
+
+.b24-widget-button-inner-container {
+    transform: scale(0.7) !important;
+}
+
+.b24-widget-button-inner-mask {
+    display: none;
+}
+
+.bx-livechat-copyright {
+    display: none !important;
+}
+
+.bx-livechat-textarea {
+    flex: 0 0 0px !important;
+}
+
+.b24-widget-button-wrapper {
+    display: none !important;
+}
+
+.bx-livechat-position-bottom-right {
+    right: 50px !important;
+}
+.bx-livechat-control-btn::before {
+  display: none !important;
+}
+@media only screen and (min-width: 600px) {
+    .bx-livechat-position-bottom-right {
+        bottom: 50px !important;
+    }
+}
+
+.bx-livechat-user-position {
+    display: none !important;
+}
+
+.bx-livechat-control-box-active {
+    display: none !important;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+@import 'bootstrap/dist/css/bootstrap.min.css';
+
+@import '@syncfusion/ej2-base/styles/material.css';
+@import '@syncfusion/ej2-icons/styles/material.css';
+@import '@syncfusion/ej2-inputs/styles/material.css';
+@import '@syncfusion/ej2-popups/styles/material.css';
+@import '@syncfusion/ej2-buttons/styles/material.css';
+@import '@syncfusion/ej2-splitbuttons/styles/material.css';
+@import '@syncfusion/ej2-navigations/styles/material.css';
+@import '@syncfusion/ej2-layouts/styles/material.css';
+@import '@syncfusion/ej2-grids/styles/material.css';
+@import "@syncfusion/ej2-react-filemanager/styles/material.css";
