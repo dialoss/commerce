@@ -28,20 +28,11 @@ const ProductCard = ({data}: {data: Product}) => {
               size="sm"
               variant="outlined">
             <div>
-                <Typography level="title-lg">{data.summary}</Typography>
-                <Typography level="body-sm">April 24 to May 02, 2021</Typography>
-                <IconButton
-                    aria-label="bookmark Bahamas Islands"
-                    variant="plain"
-                    color="neutral"
-                    size="sm"
-                    sx={{ position: 'absolute', top: '0.875rem', right: '0.5rem' }}
-                >
-                    <BookmarkAdd />
-                </IconButton>
+                <Typography level="title-lg">{data.type.name.name + " " + data.type.model}</Typography>
             </div>
-            <AspectRatio minHeight="120px" maxHeight="200px">
+            <AspectRatio minHeight="200px" maxHeight="300px">
                 <img
+                    style={{objectFit:'contain'}}
                     src={data.cover}
                     loading="lazy"
                     alt=""
@@ -49,7 +40,7 @@ const ProductCard = ({data}: {data: Product}) => {
             </AspectRatio>
             <CardContent orientation="horizontal">
                 <div>
-                    <Typography level="body-xs">Цена: </Typography>
+                    <Typography level={'body-md'}>{data.summary}</Typography>
                     <Typography fontSize="lg" fontWeight="lg">
                         {rub.format(data.price)}
                     </Typography>

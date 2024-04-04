@@ -5,11 +5,15 @@
 .b24-widget-button-pulse {
     display: none;
 }
-
+.bx-livechat-head {
+    background-color: #1976D2 !important;
+}
 div[data-b24-crm-button-icon="crmform"] {
     display: none;
 }
-
+.bx-ui-smiles-set:first-child {
+    display: none !important;
+}
 div[data-b24-crm-button-icon="openline"] {
     opacity: 1 !important;
 }

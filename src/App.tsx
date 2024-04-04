@@ -1,14 +1,14 @@
-import React, {useEffect} from 'react';
-import Windows from "./Window";
+import React from 'react';
 import Bar from "./Bar";
 import {AppRouter} from "./pages/AppRouter";
 import {BrowserRouter} from 'react-router-dom';
 import FileManager from "./modules/FileManager";
 import DataForm from './modules/DataForm';
 import Chat from "./modules/Chat";
-import {MyModal} from "./components/MyModal";
-import Auth from "./modules/Auth";
 import AuthContainer from "./modules/AuthContainer";
+import Images from './components/Photos';
+import Footer from "./ui/Footer/Footer";
+import {Container} from "./ui/Container";
 
 interface IFilemanager {
     getFiles: () => Promise<any>;
@@ -19,10 +19,15 @@ interface IAuth {
 
 }
 
+interface ImagesViewer {
+    open: (data: any) => any;
+}
+
 interface IApp {
     update?: (data: any) => void;
     filemanager?: IFilemanager;
     auth?: IAuth;
+    images?: ImagesViewer;
 }
 
 declare global {
@@ -45,28 +50,25 @@ const pages = {
     'gallery': "Галерея",
 }
 
-function Container({children}: {children: React.ReactElement}) {
-    return (
-        <div style={{maxWidth: 1200, width: '95%', margin:'0 auto'}}>
-            {children}
-        </div>
-    )
-}
-
 function App() {
     return (
         <div className="App">
             <BrowserRouter>
                 <Bar tabs={Object.values(pages)} onChange={t => window.navigate(Object.keys(pages)[t])}></Bar>
+                <div style={{minHeight:'100vh', display:'flex', flexDirection:'column'}}>
+                    <div style={{height: 70}}></div>
+                    <Container>
+                        <AppRouter></AppRouter>
+                    </Container>
+                    <div style={{flexGrow: 1}}></div>
+                    <Footer/>
+                </div>
                 <FileManager></FileManager>
                 <Chat></Chat>
                 <DataForm></DataForm>
-                <Container>
-                    <AppRouter></AppRouter>
-                </Container>
                 <AuthContainer></AuthContainer>
+                <Images></Images>
             </BrowserRouter>
-
         </div>
     );
 }

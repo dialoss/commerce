@@ -19,13 +19,12 @@ function Bar({
                  tabs, onChange = () => {
     }
              }: { tabs: string[], onChange?: (tab: number) => void }) {
-    // const tab = useSelector(state => state.storage.tab);
     const [open, setOpen] = React.useState(false);
     const [tab, setTab] = React.useState(0);
 
     return (
         <>
-            <AppBar position="static">
+            <AppBar position="fixed">
                 <Container maxWidth="xl">
                     <Stack direction={'row'}>
                         <IconButton color="inherit" onClick={() => setOpen(o => !o)}>
