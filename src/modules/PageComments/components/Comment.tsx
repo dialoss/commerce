@@ -20,14 +20,14 @@ const Comment = ({data, depth}) => {
         ref.current.classList.remove('visible');
         setTimeout(() => setReply(r => !r), 180)
     }
-
+    console.log(data.time)
     return (
         <div className={"comment item"} data-id={data.id} data-type={'comment'}>
             <div className="comment-block">
                 <Avatar user={user} src={user.picture}></Avatar>
                 <div className="comment-block__text">
                     <p className={"comment-username"}>{user.name || 'Гость'}</p>
-                    <p className={"comment-date"}>{dayjs(data.timeSent).format("HH:mm DD.MM.YYYY")}</p>
+                    <p className={"comment-date"}>{dayjs(new Date(data.time).getTime()).format("HH:mm DD.MM.YYYY")}</p>
                 </div>
             </div>
             {data.text && <div id={data.id} type={'comment'} dangerouslySetInnerHTML={{__html: data.text}}></div>}

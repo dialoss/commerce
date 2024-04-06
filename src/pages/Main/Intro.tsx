@@ -7,10 +7,9 @@ import Pay from "../../components/Pay";
 const Intro = () => {
     return (
         <div className="intro">
-            <Pay></Pay>
             <div className="intro__inner">
-                <div className="intro__img-wrapper position-relative">
-                    <img className="intro__img-self max-w-none w-[180px] top-1/2 left-1/2 position-absolute -translate-x-1/2 -translate-y-1/2" src={selfImg} alt=""/>
+                <div className="intro__img-wrapper">
+                    <img className="intro__img-self " src={selfImg} alt=""/>
                 </div>
                 <div className="intro__block">
                     <h1 className="intro__title fw-bold">Приветствую!</h1>

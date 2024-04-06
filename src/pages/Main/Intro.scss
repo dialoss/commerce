@@ -7,6 +7,15 @@
             border-radius: 50%;
             overflow: hidden;
             box-shadow: 0 0 7px grey;
+            position: relative;
+        }
+        &-self {
+            max-width: none;
+            width: 180px;
+            top: 50%;
+            left: 50%;
+            position: absolute;
+            transform: translate(-50%, -50%);
         }
     }
     &__block {

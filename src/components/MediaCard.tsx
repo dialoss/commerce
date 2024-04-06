@@ -21,6 +21,7 @@ function Likes({data}) {
 const MediaCard = ({data}: { data: Media }) => {
     return (
         <BaseCard>
+            <>
             {!!data.title && <div>
                 <Typography level="title-lg">{data.title}</Typography>
             </div>}
@@ -34,7 +35,7 @@ const MediaCard = ({data}: { data: Media }) => {
                 justifyContent: 'center'
             }}
                         level={'body-md'}>{data.text}</Typography>
-
+            </>
         </BaseCard>
     );
 };

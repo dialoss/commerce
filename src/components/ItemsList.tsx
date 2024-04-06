@@ -52,7 +52,13 @@ const ItemsList = ({
             </Stack>
             {all > 1 && <Pagination count={all}
                         onChange={(e, a) => setPage(a)}
-                        color="primary" sx={{'ul': {justifyContent: 'center'}, padding: '10px 0', position:'sticky',bottom:0}}/>}
+                        color="primary" sx={{'ul':
+                    {justifyContent: 'center'},
+                padding: '10px 0',
+                backgroundColor:'#fff',
+                width: 'initial',
+                position:'sticky',
+                bottom:0}}/>}
         </>
     );
 };

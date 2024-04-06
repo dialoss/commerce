@@ -17,11 +17,11 @@ import Button from "@mui/material/Button";
 import Userfront from "@userfront/toolkit/react";
 
 function Bar({
-                 tabs, onChange = () => {
+                 tabs, current, onChange = () => {
     }
              }: { tabs: string[], onChange?: (tab: number) => void }) {
     const [open, setOpen] = React.useState(false);
-    const [tab, setTab] = React.useState(0);
+    const [tab, setTab] = React.useState(current);
 
     return (
         <>
@@ -43,8 +43,8 @@ function Bar({
                                 }} key={t} label={t}></Tab>)
                             }
                         </Tabs>
-                        <MyTooltip sx={{marginLeft: 'auto'}}
-                                   element={({onClick}) => <IconButton onClick={onClick} sx={{height:'100%'}} color="inherit">
+                        <MyTooltip sx={{marginLeft: 'auto',display:'flex',alignItems:'center'}}
+                                   element={({onClick}) => <IconButton onClick={onClick} color="inherit">
                                        <ChatIcon/>
                                    </IconButton>}
                                    title={'Связаться со мной'} fields={[
@@ -145,7 +145,7 @@ function UserInfo() {
                         {
                             name: "Мои заказы",
                             callback: () => {
-                                window.navigate("orders")
+                                window.navigate("profile")
                             }
                         },
                         {

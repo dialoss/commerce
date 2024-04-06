@@ -1,19 +1,13 @@
 @import 'bootstrap/dist/css/bootstrap.min.css';
-@import '@syncfusion/ej2-splitbuttons/styles/material.css';
 
-@import '@syncfusion/ej2-base/styles/material.css';
-@import '@syncfusion/ej2-icons/styles/material.css';
-@import '@syncfusion/ej2-inputs/styles/material.css';
-@import '@syncfusion/ej2-popups/styles/material.css';
-@import '@syncfusion/ej2-buttons/styles/material.css';
-@import '@syncfusion/ej2-navigations/styles/material.css';
-@import '@syncfusion/ej2-layouts/styles/material.css';
-@import '@syncfusion/ej2-grids/styles/material.css';
-@import "@syncfusion/ej2-react-filemanager/styles/material.css";
 
-@tailwind base;
+/*@tailwind base;*/
 @tailwind components;
 @tailwind utilities;
+
+p {
+    margin-bottom: 0;
+}
 
 .b24-widget-button-pulse {
     display: none;

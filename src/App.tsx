@@ -2,7 +2,7 @@
 import React, {useEffect} from 'react';
 import Bar from "./Bar";
 import {AppRouter} from "./pages/AppRouter";
-import {BrowserRouter} from 'react-router-dom';
+import {BrowserRouter, useNavigate} from 'react-router-dom';
 import FileManager from "./modules/FileManager";
 import DataForm from './modules/DataForm';
 import Chat from "./modules/Chat";
@@ -55,7 +55,7 @@ function App() {
     return (
         <div className="App">
             <BrowserRouter>
-                <Bar tabs={Object.values(pages)} onChange={t => window.navigate(Object.keys(pages)[t])}></Bar>
+                <Bar current={0} tabs={Object.values(pages)} onChange={t => window.navigate(Object.keys(pages)[t])}></Bar>
                 <div style={{minHeight: '100vh', display: 'flex', flexDirection: 'column'}}>
                     <div style={{height: 70}}></div>
                     <Container>

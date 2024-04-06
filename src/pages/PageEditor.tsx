@@ -13,6 +13,7 @@ import {api} from "../index";
 import Button from "@mui/material/Button";
 import { connectField } from 'uniforms';
 import {MediaField} from "../components/Form";
+import HTMLEditor from "../ui/HTMLEditor";
 
 const generateClassName = createGenerateClassName({
     disableGlobal: true,
@@ -55,9 +56,38 @@ const modelPlugin: CellPlugin<Data> = {
             required: ['model'],
         },
     },
+    cellPlugins: [slate, image],
 };
 
-const cellPlugins = [slate(), image, modelPlugin, spacer];
+const textPlugin: CellPlugin<Data> = {
+    Renderer: ({data}) => (
+        <div style={{minHeight:20}} dangerouslySetInnerHTML={{__html: data.html}}>
+        </div>
+    ),
+    id: 'textPlugin',
+    title: 'Text editor',
+    description: '',
+    version: 1,
+    controls: {
+        type: 'autoform',
+        schema: {
+            properties: {
+                html: {
+                    type: 'string',
+                    uniforms: {
+                        component: connectField(({ value, onChange }) => {
+                            return <HTMLEditor setHTML={onChange}></HTMLEditor>
+                        }),
+                    },
+                },
+            },
+            required: ['html'],
+        },
+    },
+};
+
+
+const cellPlugins = [slate, image, modelPlugin, spacer, textPlugin];
 
 
 const PageEditor = ({id, data}: { id: number; data: object }) => {
@@ -69,7 +99,7 @@ const PageEditor = ({id, data}: { id: number; data: object }) => {
     }
 
     return (
-        <Editor cellPlugins={cellPlugins} value={value} onChange={update}/>
+        <Editor readOnly={false} cellPlugins={cellPlugins} value={value} onChange={update}/>
     );
 };
 

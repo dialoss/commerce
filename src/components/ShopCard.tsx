@@ -8,41 +8,27 @@ import store from "../store";
 import {actions} from "../store/app";
 import {rub} from '../ui/tools';
 import {Button} from "@mui/material";
+import CardImage from "./CardImage";
+import BaseCard from "./BaseCard";
+import Pay from "./Pay";
 
 const ShopCard = ({data}: { data: Product }) => {
-    function buy() {
-
-    }
     return (
-        <div
-            className={"p-1 item-card md:w-1/2 lg:w-1/3 hover:cursor-pointer"}>
-            <Card
-                color="neutral"
-                invertedColors={false}
-                orientation="vertical"
-                size="sm"
-                variant="outlined">
+        <BaseCard style={"md:w-100 lg:w-1/2"}>
+            <>
+            {!!data.name && <div>
+                <Typography level="title-lg">{data.name}</Typography>
+            </div>}
+            <CardImage id={data.id} url={data.cover}></CardImage>
                 <div>
-                    <Typography level="title-lg">{data.name + " " + data.model}</Typography>
-                </div>
-                <AspectRatio minHeight="200px" maxHeight="300px">
-                    <img
-                        style={{objectFit: 'contain'}}
-                        src={data.cover}
-                        loading="lazy"
-                        alt=""
-                    />
-                </AspectRatio>
-                <CardContent orientation="horizontal">
-
                     <Typography level={'body-md'}>{data.summary}</Typography>
                     <Typography fontSize="lg" fontWeight="lg">
-                        {data.price ? rub.format(data.price) : "Под заказ"}
+                        {rub.format(data.price || 0)}
                     </Typography>
-                    <Button variant={'contained'} onClick={buy}>Купить</Button>
-                </CardContent>
-            </Card>
-        </div>
+                </div>
+                <Pay text={"Купить"} product={data}></Pay>
+            </>
+        </BaseCard>
     );
 };
 

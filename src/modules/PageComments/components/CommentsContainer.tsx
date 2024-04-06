@@ -6,20 +6,17 @@ import CommentsTools from "./CommentsTools";
 import {createCommentsTree, sortFunction} from "./helpers";
 import Button from "@mui/material/Button";
 import {api} from "../../../index";
-import {Editor} from 'react-draft-wysiwyg';
-import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
-import draftToHtml from 'draftjs-to-html';
-import {EditorState} from 'draft-js';
+import HTMLEditor from "../../../ui/HTMLEditor";
+import Userfront from "@userfront/toolkit/react";
 
 export const CommentsInput = ({callback, parent = null}: { parent?: number }) => {
-    const [editor, setEditor] = useState(EditorState.createEmpty())
     const [message, setMessage] = useState('');
 
     function send() {
         const comment = {
             id: new Date().getTime(),
-            page: "/models/mt-90/",
-            user: 1,
+            page: decodeURI(window.location.pathname + "/"),
+            user: Userfront.user.userId,
             text: message,
             parent,
         };
@@ -28,16 +25,13 @@ export const CommentsInput = ({callback, parent = null}: { parent?: number }) =>
         })
         callback(comment)
         setMessage('')
-        setEditor(EditorState.createEmpty())
     }
 
     return (
         <div className="input-wrapper">
             <div className={"input-field"}>
                 <div className="editor-wrapper">
-                    <Editor onContentStateChange={e => setMessage(draftToHtml(e))}
-                            editorState={editor}
-                            onEditorStateChange={setEditor}/>
+                    <HTMLEditor setHTML={setMessage}></HTMLEditor>
                 </div>
             </div>
             <Button onClick={send}>Отправить</Button>
@@ -54,8 +48,7 @@ const CommentsContainer = ({page}) => {
     const [sorting, setSorting] = useState(() => sortFunction('default'));
 
     useLayoutEffect(() => {
-        if (!page) return;
-        api.apiCommentList({page}).then(d => setComments([...d]));
+        api.apiCommentList({page}).then(d => setComments([...d.results]));
     }, [page]);
 
     useEffect(() => {
@@ -66,7 +59,6 @@ const CommentsContainer = ({page}) => {
     useEffect(() => {
         setCommentsTree(createCommentsTree(comments, sorting, search, limit));
     }, [sorting, search, limit]);
-    console.log(commentsTree, comments)
 
     function addComment(comment) {
         setComments(c => [...c, comment]);
