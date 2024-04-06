@@ -3,7 +3,7 @@ import React from 'react';
 import './Footer.scss';
 import {Container} from "../Container";
 
-const Footer = () => {
+const Footer = ({totalViews, currentViews}) => {
     return (
         <footer className="footer">
             <div className="footer__wrapper">
@@ -23,10 +23,10 @@ const Footer = () => {
                         <div className="footer__info">
                             <div className="footer__counter">
                                 <p className="footer__text footer__total">
-                                    {0}
+                                    {totalViews}
                                 </p>
                                 <p className="footer__text footer__current">
-                                    {0}
+                                    {currentViews}
                                 </p>
                             </div>
                         </div>

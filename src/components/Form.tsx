@@ -1,9 +1,8 @@
 // @ts-nocheck
 import {useForm} from "react-hook-form";
-import Typography from "@mui/joy/Typography";
 import Box from "@mui/material/Box";
-import {Button, capitalize, TextField} from "@mui/material";
-import React, {useLayoutEffect} from "react";
+import {Button, TextField} from "@mui/material";
+import React from "react";
 import {Uploader} from "./uploader";
 
 interface Field {
@@ -26,14 +25,11 @@ export function Form({
     const {
         register, handleSubmit, setValue, reset
     } = useForm();
-    useLayoutEffect(() => {
-        reset();
-    }, [fields]);
+    // useLayoutEffect(() => {
+    //     reset();
+    // }, [fields]);
     return (
         <>
-            <Typography component="h1">
-                {caption}
-            </Typography>
             <Box component="form" onSubmit={handleSubmit((data) => onSubmit(data))} sx={{mt: 3}}>
                 {fields.map(f => getFormField(f, register, setValue))}
                 {children}
@@ -61,12 +57,20 @@ const MediaField = ({field, setValue}) => {
 
     function select() {
         window.app.filemanager?.getFiles().then(files => {
-            files = files.map(f => ({
-                url: f.url,
-                type: f.resource_type,
-                width: f.width,
-                height: f.height,
-            }))
+            files = files.map(f => {
+                let url = f.url;
+                let type = f.resource_type;
+                if (f.tags.length > 0) {
+                    url = f.tags[0];
+                    type = 'model';
+                }
+                return {
+                    url,
+                    type,
+                    width: f.width,
+                    height: f.height,
+                }
+            })
             set(files);
         });
     }
@@ -89,7 +93,7 @@ function getFormField(field, register, setValue) {
         size={'small'}
         sx={{marginBottom: 2}}
         {...register(field.name, {value: field.value})}
-        label={capitalize(field.name)}
+        label={field.label || field.name}
         autoFocus
     />
 }

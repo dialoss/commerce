@@ -9,13 +9,12 @@ import {Button} from "@mui/material";
 import {api} from "../index"
 
 const DataForm = () => {
-    const data: Product = useAppSelector(state => state.app.selected);
+    const data = useAppSelector(state => state.app.selected);
 
     function submit(newData) {
         newData = {...data, ...newData}
         console.log(newData)
         api.apiProductUpdate({id: data.id, product: newData}).then(d => window.app.update(d));
-
     }
     return (
         <>

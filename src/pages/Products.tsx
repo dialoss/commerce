@@ -5,7 +5,6 @@ import {Stack} from "@mui/material";
 import {api} from "../index";
 import ItemsList from "../components/ItemsList";
 
-
 const Products = () => {
     return (
         <Stack direction={'row'} flexWrap={'wrap'}>

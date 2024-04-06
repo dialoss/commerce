@@ -1,4 +1,5 @@
-import React from 'react';
+//@ts-nocheck
+import React, {useEffect} from 'react';
 import Bar from "./Bar";
 import {AppRouter} from "./pages/AppRouter";
 import {BrowserRouter} from 'react-router-dom';
@@ -7,8 +8,9 @@ import DataForm from './modules/DataForm';
 import Chat from "./modules/Chat";
 import AuthContainer from "./modules/AuthContainer";
 import Images from './components/Photos';
-import Footer from "./ui/Footer/Footer";
 import {Container} from "./ui/Container";
+import FooterContainer from './modules/Footer/components/FooterContainer';
+import PageComments from "./modules/PageComments/PageComments";
 
 interface IFilemanager {
     getFiles: () => Promise<any>;
@@ -33,7 +35,6 @@ interface IApp {
 declare global {
     interface Window {
         cloudinary: any;
-        ml: any;
         navigate: any;
         app: IApp;
     }
@@ -55,13 +56,14 @@ function App() {
         <div className="App">
             <BrowserRouter>
                 <Bar tabs={Object.values(pages)} onChange={t => window.navigate(Object.keys(pages)[t])}></Bar>
-                <div style={{minHeight:'100vh', display:'flex', flexDirection:'column'}}>
+                <div style={{minHeight: '100vh', display: 'flex', flexDirection: 'column'}}>
                     <div style={{height: 70}}></div>
                     <Container>
                         <AppRouter></AppRouter>
                     </Container>
+                    <PageComments></PageComments>
                     <div style={{flexGrow: 1}}></div>
-                    <Footer/>
+                    <FooterContainer/>
                 </div>
                 <FileManager></FileManager>
                 <Chat></Chat>

@@ -1,16 +1,25 @@
+//@ts-nocheck
+
 import React, {useEffect} from 'react';
+import {md5} from "js-md5";
+import Userfront from "@userfront/toolkit/react";
+
 
 window.addEventListener('onBitrixLiveChat', function (event) {
     // @ts-ignore
     let widget = event.detail.widget;
+    const user = Userfront.user;
+
+    md5(user.userUuid + "mymountmt.ru" + process.env.USER_SALT);
+    let hash = md5.create().hex();
+    let name = user.name;
+    console.log(user, hash)
     widget.setUserRegisterData({
-        'hash': '12b42ebcec7e3c26a313272c26efddbd',
-        'name': 'Виктор',
-        'lastName': 'Иванов',
-        'avatar': 'http://files.shelenkov.com/images/avatar-ivanov.jpg',
-        'email': 'victor@ivanov.ru',
-        'gender': 'M',
-        'position': 'Почетный пользователь'
+        'hash': hash,
+        'name': name.split(' ')[0],
+        'lastName': name.split(' ')[1] || '',
+        'avatar': user.image,
+        'email': user.email,
     });
     widget.mutateTemplateComponent('bx-livechat-form-welcome', { template: '<div></div>' });
     widget.setOption('checkSameDomain', false);
@@ -25,9 +34,8 @@ window.addEventListener('onBitrixLiveChat', function (event) {
 
 const Chat = () => {
     return (
-        <div>
-
-        </div>
+        <>
+        </>
     );
 };
 

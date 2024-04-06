@@ -4,11 +4,10 @@ $color-footer-text: white;
 
 .footer {
     width: 100%;
+    background-color: $color-footer-background;
     //padding-top: 50px;
-
     &__wrapper {
         height: 100px;
-        background-color: $color-footer-background;
     }
 
     &__inner {

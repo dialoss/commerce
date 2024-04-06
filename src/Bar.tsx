@@ -14,6 +14,7 @@ import MenuItem from '@mui/material/MenuItem';
 import {IUser} from "./store/app";
 import {useAppSelector} from "./store/redux";
 import Button from "@mui/material/Button";
+import Userfront from "@userfront/toolkit/react";
 
 function Bar({
                  tabs, onChange = () => {
@@ -24,7 +25,7 @@ function Bar({
 
     return (
         <>
-            <AppBar position="fixed">
+            <AppBar position="fixed" sx={{zIndex: 2}}>
                 <Container maxWidth="xl">
                     <Stack direction={'row'}>
                         <IconButton color="inherit" onClick={() => setOpen(o => !o)}>
@@ -43,13 +44,26 @@ function Bar({
                                 tabs.map(t => <Tab key={t} label={t}></Tab>)
                             }
                         </Tabs>
-                        <IconButton color="inherit" sx={{marginLeft: 'auto'}} onClick={() => {
-                            const chat: HTMLElement | null = document.querySelector(`a[data-b24-crm-button-widget="openline_livechat"]`);
-                            if (!chat) return;
-                            chat.click();
-                        }}>
-                            <ChatIcon/>
-                        </IconButton>
+                        <MyTooltip sx={{marginLeft: 'auto'}}
+                                   element={({onClick}) => <IconButton onClick={onClick} sx={{height:'100%'}} color="inherit">
+                                       <ChatIcon/>
+                                   </IconButton>}
+                                   title={'Связаться со мной'} fields={[
+                            {
+                                name: "Чат на сайте",
+                                callback: () => {
+                                    const chat: HTMLElement | null = document.querySelector(`a[data-b24-crm-button-widget="openline_livechat"]`);
+                                    if (!chat) return;
+                                    chat.click();
+                                }
+                            },
+                            {
+                                name: <p>Телеграм</p>,
+                                callback: () => {
+                                    window.open("https://t.me/mymount_bot")
+                                }
+                            }
+                        ]}></MyTooltip>
                         <UserInfo></UserInfo>
                     </Stack>
                 </Container>
@@ -63,8 +77,17 @@ export default Bar;
 
 const settings = ['Профиль', 'Выход'];
 
+interface TooltipField {
+    name: string;
+    callback: () => any;
+}
 
-function UserInfo() {
+function MyTooltip({
+                       title,
+                       fields,
+                       element,
+                       ...props
+                   }: { element: React.ReactElement; title: string; fields: TooltipField[] }) {
     const [anchorElUser, setAnchorElUser] = React.useState(null);
 
     const handleOpenUserMenu = (event: Event) => {
@@ -72,74 +95,72 @@ function UserInfo() {
         setAnchorElUser(event.currentTarget);
     };
 
-    const handleCloseUserMenu = (s: any) => {
+    const handleCloseUserMenu = (field: TooltipField) => {
         setAnchorElUser(null);
-        console.log(s)
-
+        field.callback && field.callback();
     };
+    return (
+        <Box {...props}>
+            <Tooltip title={title}>
+                {React.createElement(element, {onClick: handleOpenUserMenu})}
+            </Tooltip>
+            <Menu
+                anchorEl={anchorElUser}
+                anchorOrigin={{
+                    vertical: 'top',
+                    horizontal: 'right',
+                }}
+                keepMounted
+                transformOrigin={{
+                    vertical: 'top',
+                    horizontal: 'right',
+                }}
+                open={Boolean(anchorElUser)}
+                onClose={handleCloseUserMenu}
+            >
+                {fields.map((f) =>
+                    <MenuItem key={f.name} onClick={() => handleCloseUserMenu(f)}>
+                        <Typography textAlign="center">{f.name}</Typography>
+                    </MenuItem>
+                )}
+            </Menu>
+        </Box>
 
-    const user: IUser = useAppSelector(state => state.app.user);
+    );
+}
 
-
+function UserInfo() {
+    const user = Userfront.user;
     return (
         <>
-            {user.auth ? <Box>
-                <Box>
-                    <Tooltip title="Open settings">
-                        <IconButton onClick={handleOpenUserMenu} sx={{p: "5px"}}>
-                            <Avatar {...stringAvatar(user.login)}></Avatar>
-                        </IconButton>
-                    </Tooltip>
-                    <Menu
-                        id="menu-appbar"
-                        anchorEl={anchorElUser}
-                        anchorOrigin={{
-                            vertical: 'top',
-                            horizontal: 'right',
-                        }}
-                        keepMounted
-                        transformOrigin={{
-                            vertical: 'top',
-                            horizontal: 'right',
-                        }}
-                        open={Boolean(anchorElUser)}
-                        onClose={handleCloseUserMenu}
-                    >
-                        {settings.map((setting) => (
-                            <MenuItem key={setting} onClick={() => handleCloseUserMenu(setting)}>
-                                <Typography textAlign="center">{setting}</Typography>
-                            </MenuItem>
-                        ))}
-                    </Menu>
-                </Box>
-                <Typography mx={1} sx={{display: 'flex', alignItems: 'center'}}>{user.login}</Typography>
-            </Box> :
-                <Button variant={'outlined'} sx={{color:'#fff'}} mx={1} onClick={() => window.app.auth?.open()}>Вход</Button>
+            {user.userId ? <Stack direction={'row'}>
+                    <MyTooltip element={({onClick}) => <IconButton onClick={onClick} sx={{p: "5px"}}>
+                        <Avatar src={user.image}></Avatar>
+                    </IconButton>} title={'Пользователь'} fields={[
+                        {
+                            name: "Настройки",
+                            callback: () => {
+
+                            }
+                        },
+                        {
+                            name: "Мои заказы",
+                            callback: () => {
+                                window.navigate("orders")
+                            }
+                        },
+                        {
+                            name: "Выход",
+                            callback: () => {
+                                Userfront.logout({redirect: "/main/"});
+                            }
+                        }
+                    ]}></MyTooltip>
+                    <Typography mx={1} sx={{color: '#fff', display: 'flex', alignItems: 'center'}}>{user.name}</Typography>
+                </Stack> :
+                <Button variant={'outlined'} sx={{color: '#fff'}} mx={1}
+                        onClick={() => window.app.auth?.open()}>Вход</Button>
             }
         </>
     )
-}
-
-export function stringAvatar(name: string) {
-    return {
-        sx: {
-            bgcolor: stringToColor(name),
-        }, children: `${name.split(' ')[0][0].toUpperCase()}`,
-    };
-}
-
-function stringToColor(string: string) {
-    let hash = 0;
-    let i;
-    for (i = 0; i < string.length; i += 1) {
-        hash = string.charCodeAt(i) + ((hash << 5) - hash);
-    }
-
-    let color = '#';
-
-    for (i = 0; i < 3; i += 1) {
-        const value = (hash >> (i * 8)) & 0xff;
-        color += `00${value.toString(16)}`.slice(-2);
-    }
-    return color;
 }

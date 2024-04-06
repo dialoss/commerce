@@ -11,8 +11,7 @@
 }
 
 .pswp__bg {
-    //background: none !important;
-    background-color: rgba(220, 220, 220, 0.64);
+    background: none !important;
 }
 
 .swiper-pagination.swiper-pagination-fraction.swiper-pagination-horizontal {
@@ -29,8 +28,9 @@
 .images-viewer {
 
     .yarl__container, .yarl__thumbnails_container, .yarl__thumbnails_thumbnail {
-        background: none !important;
+        //background: none !important;
         padding: 0 !important;
+        background-color: rgba(0, 0, 0, 0.31);
     }
 
     .yarl__navigation_next {

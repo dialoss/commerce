@@ -11,6 +11,7 @@ export function MyModal({children,
         <Modal
             show={open}
             size="lg"
+            onEscapeKeyDown={onHide}
             aria-labelledby="contained-modal-title-vcenter"
             centered
         >

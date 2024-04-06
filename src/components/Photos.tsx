@@ -17,8 +17,7 @@ let itemID = null;
 function prepareImages(images) {
     return images.map((im, i) => {
         return {
-            src: im + "?w=2000",
-            thumb: im + "?w=400",
+            src: im,
             index: i,
         }
     });

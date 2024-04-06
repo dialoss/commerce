@@ -1,3 +1,16 @@
+@import 'bootstrap/dist/css/bootstrap.min.css';
+@import '@syncfusion/ej2-splitbuttons/styles/material.css';
+
+@import '@syncfusion/ej2-base/styles/material.css';
+@import '@syncfusion/ej2-icons/styles/material.css';
+@import '@syncfusion/ej2-inputs/styles/material.css';
+@import '@syncfusion/ej2-popups/styles/material.css';
+@import '@syncfusion/ej2-buttons/styles/material.css';
+@import '@syncfusion/ej2-navigations/styles/material.css';
+@import '@syncfusion/ej2-layouts/styles/material.css';
+@import '@syncfusion/ej2-grids/styles/material.css';
+@import "@syncfusion/ej2-react-filemanager/styles/material.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -5,15 +18,19 @@
 .b24-widget-button-pulse {
     display: none;
 }
+
 .bx-livechat-head {
     background-color: #1976D2 !important;
 }
+
 div[data-b24-crm-button-icon="crmform"] {
     display: none;
 }
+
 .bx-ui-smiles-set:first-child {
     display: none !important;
 }
+
 div[data-b24-crm-button-icon="openline"] {
     opacity: 1 !important;
 }
@@ -41,9 +58,11 @@ div[data-b24-crm-button-icon="openline"] {
 .bx-livechat-position-bottom-right {
     right: 50px !important;
 }
+
 .bx-livechat-control-btn::before {
-  display: none !important;
+    display: none !important;
 }
+
 @media only screen and (min-width: 600px) {
     .bx-livechat-position-bottom-right {
         bottom: 50px !important;
@@ -64,15 +83,9 @@ div[data-b24-crm-button-icon="openline"] {
     box-sizing: border-box;
 }
 
-@import 'bootstrap/dist/css/bootstrap.min.css';
+@media only screen and (max-width: 600px) {
+    .item-card {
+        width: 100%;
+    }
+}
 
-@import '@syncfusion/ej2-base/styles/material.css';
-@import '@syncfusion/ej2-icons/styles/material.css';
-@import '@syncfusion/ej2-inputs/styles/material.css';
-@import '@syncfusion/ej2-popups/styles/material.css';
-@import '@syncfusion/ej2-buttons/styles/material.css';
-@import '@syncfusion/ej2-splitbuttons/styles/material.css';
-@import '@syncfusion/ej2-navigations/styles/material.css';
-@import '@syncfusion/ej2-layouts/styles/material.css';
-@import '@syncfusion/ej2-grids/styles/material.css';
-@import "@syncfusion/ej2-react-filemanager/styles/material.css";
