@@ -25,7 +25,7 @@ function Bar({
 
     return (
         <>
-            <AppBar position="fixed" sx={{zIndex: 2}}>
+            <AppBar position="fixed" sx={{zIndex: 10}}>
                 <Container maxWidth="xl">
                     <Stack direction={'row'}>
                         <IconButton color="inherit" onClick={() => setOpen(o => !o)}>
@@ -35,13 +35,12 @@ function Bar({
                               variant={'scrollable'}
                               indicatorColor="secondary"
                               textColor="inherit"
-                              onChange={(e, v) => {
-                                  onChange(v);
-                                  setTab(v)
-                              }}
                         >
                             {
-                                tabs.map(t => <Tab key={t} label={t}></Tab>)
+                                tabs.map((t, i) => <Tab onClick={() => {
+                                    onChange(i);
+                                    setTab(i);
+                                }} key={t} label={t}></Tab>)
                             }
                         </Tabs>
                         <MyTooltip sx={{marginLeft: 'auto'}}

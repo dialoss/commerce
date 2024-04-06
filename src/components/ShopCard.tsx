@@ -23,7 +23,7 @@ const ShopCard = ({data}: { data: Product }) => {
                 size="sm"
                 variant="outlined">
                 <div>
-                    <Typography level="title-lg">{data.name.name + " " + data.model}</Typography>
+                    <Typography level="title-lg">{data.name + " " + data.model}</Typography>
                 </div>
                 <AspectRatio minHeight="200px" maxHeight="300px">
                     <img

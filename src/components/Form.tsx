@@ -18,6 +18,14 @@ export interface IForm {
     children?: React.ReactElement;
 }
 
+function InnerForm({fields, register, setValue}) {
+    return (
+        <>
+            {fields.map(f => getFormField(f, register, setValue))}
+        </>
+    )
+}
+
 export function Form({
                          caption, button = "Submit", fields, onSubmit = () => {
     }, children
@@ -31,7 +39,7 @@ export function Form({
     return (
         <>
             <Box component="form" onSubmit={handleSubmit((data) => onSubmit(data))} sx={{mt: 3}}>
-                {fields.map(f => getFormField(f, register, setValue))}
+                <InnerForm fields={fields} register={register} setValue={setValue}></InnerForm>
                 {children}
                 <Button
                     type="submit"
@@ -47,7 +55,7 @@ export function Form({
     )
 }
 
-const MediaField = ({field, setValue}) => {
+export const MediaField = ({field, setValue}) => {
     const [files, setFiles] = React.useState(field.media);
 
     function set(files) {
@@ -60,8 +68,8 @@ const MediaField = ({field, setValue}) => {
             files = files.map(f => {
                 let url = f.url;
                 let type = f.resource_type;
-                if (f.tags.length > 0) {
-                    url = f.tags[0];
+                if (f.context.custom) {
+                    url = f.context.custom.model;
                     type = 'model';
                 }
                 return {
@@ -84,7 +92,11 @@ const MediaField = ({field, setValue}) => {
 }
 
 function getFormField(field, register, setValue) {
-
+    if (typeof field.value === 'object') {
+        console.log(field)
+        // return <InnerForm
+        //     fields={Object.keys(field).map(k => ({name: k, value: field[k]}))} register={register} setValue={setValue}></InnerForm>
+    }
     if (FormMap[field.name]) return React.createElement(FormMap[field.name], {setValue, field});
     else return <TextField
         required

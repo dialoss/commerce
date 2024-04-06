@@ -27,6 +27,8 @@ export const CommentsInput = ({callback, parent = null}: { parent?: number }) =>
             comment
         })
         callback(comment)
+        setMessage('')
+        setEditor(EditorState.createEmpty())
     }
 
     return (

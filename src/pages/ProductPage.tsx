@@ -7,14 +7,15 @@ import Button from "@mui/material/Button";
 import {Typography} from "@mui/material";
 import {rub} from "../ui/tools";
 import PageEditor from "./PageEditor";
+import store from "../store";
+import {actions} from "../store/app";
 
 const ProductPage = () => {
-    const data = useAppSelector(state => state.app.selected);
-    const [info, setInfo] = React.useState<Product>();
+    const [data, setData] = React.useState<Product | null>(null);
     useLayoutEffect(() => {
-        api.apiProductRetrieve({id: data.id}).then(d => setInfo(d))
+        let p = window.location.pathname.split('/').slice(-1)[0].split('-')[0];
+        api.apiProductRetrieve({id: +p}).then(d => setData(d))
     }, [])
-    console.log(info)
 
     function order() {
 
@@ -22,10 +23,11 @@ const ProductPage = () => {
 
     return (
         <div>
-            {info && info.id}
+            {data && <>
             <Typography>Цена: {rub.format(data.price || 0)}</Typography>
             <Button onClick={order}>Заказать изготовление</Button>
             <PageEditor id={data.id} data={JSON.parse(data.page || '{}')}></PageEditor>
+                </>}
         </div>
     );
 };

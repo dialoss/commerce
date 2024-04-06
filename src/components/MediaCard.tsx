@@ -1,14 +1,22 @@
 // @ts-nocheck
 import React from 'react';
 import {Media} from "../api";
-import AspectRatio from '@mui/joy/AspectRatio';
 import Typography from '@mui/joy/Typography';
-import store from "../store";
 import FavoriteIcon from '@material-ui/icons/Favorite';
 import BaseCard from "./BaseCard";
 import CardImage from "./CardImage";
+import {Stack} from "@mui/material";
 
-
+function Likes({data}) {
+    return (
+        <>
+            {data.likes > 0 && <Stack direction={'row'} sx={{position:'absolute', right:1, top:1, zIndex:2}}>
+                {data.likes}
+                <FavoriteIcon></FavoriteIcon>
+            </Stack>}
+        </>
+    )
+}
 
 const MediaCard = ({data}: { data: Media }) => {
     return (
@@ -16,6 +24,7 @@ const MediaCard = ({data}: { data: Media }) => {
             {!!data.title && <div>
                 <Typography level="title-lg">{data.title}</Typography>
             </div>}
+            <Likes data={data}></Likes>
             <CardImage carousel={true} id={data.id} url={data.url}></CardImage>
             <Typography sx={{
                 flexGrow: 1,
@@ -25,7 +34,7 @@ const MediaCard = ({data}: { data: Media }) => {
                 justifyContent: 'center'
             }}
                         level={'body-md'}>{data.text}</Typography>
-            {data.likes > 0 && <>{data.likes}<FavoriteIcon></FavoriteIcon></>}
+
         </BaseCard>
     );
 };

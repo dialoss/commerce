@@ -2,18 +2,12 @@
 
 import React, {useEffect, useLayoutEffect, useState} from 'react';
 import Windows from "../Window";
-import {DetailsView, FileManagerComponent, Inject, NavigationPane, Toolbar} from '@syncfusion/ej2-react-filemanager';
 import {uploadAutodeskFile} from "../components/Model/Autodesk/api/api";
 
-let inited = false;
-
 const FileManager = () => {
-    const ref = React.useRef<HTMLDivElement>(null);
     const [opened, setOpened] = useState(false);
     useEffect(() => {
         const int = setInterval(() => {
-            if (inited) return;
-            inited = true;
             const config = {
                 cloud_name: 'drlljn0sj',
                 api_key: '421485169161565',
@@ -22,15 +16,26 @@ const FileManager = () => {
                 remove_header: true,
                 inline_container: '.filemanager',
                 language: 'ru',
+                text: {
+                    "ru": {
+                        "queue": {
+                            "title": "Файлы для загрузки",
+                            "title_uploading_with_counter": "Загружается {{num}} файлов"
+                        },
+                    }
+                },
             }
             window.app.filemanager = {
                 getFiles: () => {
                     setOpened(true);
                     return new Promise((resolve) => {
-                        window.addEventListener("files:selected", (e) => {
+                        function selected(e) {
                             resolve(e.detail);
                             setOpened(false);
-                        });
+                            window.removeEventListener("files:selected", this);
+                        }
+
+                        window.addEventListener("files:selected", selected);
                     })
                 }
             }
@@ -42,18 +47,26 @@ const FileManager = () => {
             })
             ml.show();
 
-            ml.on("upload", (data) => {
-                console.log(data)
-                if (data.event === "upload-added") {
-                    let file = data.info.file;
-                    if (file.name.split('.').slice(-1)[0].toLowerCase() === 'sldprt') {
-                        uploadAutodeskFile(file).then(id => {
+            function checkModel(name) {
+                return name.split('.').slice(-1)[0].toLowerCase() === 'sldprt';
+            }
 
-                        })
-                    }
+            const files = {};
+            ml.on("upload", (data) => {
+                const file = data.info.file;
+                if (data.event === "upload-added" && checkModel(file.name)) {
+                    files[data.info.id] = file;
                 }
                 if (data.event === "queues-end") {
                     console.log(data.info.files);
+                    for (const file of data.info.files) {
+                        if (checkModel(file.name)) {
+                            uploadAutodeskFile(files[file.id]).then(id => {
+                                fetch(process.env.REACT_APP_BASE_PATH + `/add_tag/?file=${file.uploadInfo.public_id}&tag=${id}`)
+                                    .then(() => ml.show());
+                            })
+                        }
+                    }
                 }
             });
 
@@ -76,7 +89,7 @@ const FileManager = () => {
     }, []);
 
     return (
-        <Windows title={'Файлы'} open={opened}>
+        <Windows title={'Файлы'} open={opened} callback={setOpened}>
             <div className="filemanager"></div>
         </Windows>
     );

@@ -12,12 +12,12 @@ const ProductCard = ({data}: { data: Product }) => {
     return (
         <BaseCard
             onClick={() => {
-                window.navigate('models/' + data.model);
+                window.navigate(`models/${data.id}-${data.model}`);
                 store.dispatch(actions.setSelected(data))
             }}>
             <>
                 <div>
-                    <Typography level="title-lg">{data.name.name + " " + data.model}</Typography>
+                    <Typography level="title-lg">{data.name + " " + data.model}</Typography>
                 </div>
                 <CardImage carousel={false} id={data.id} url={data.cover}></CardImage>
                 <CardContent orientation="horizontal">

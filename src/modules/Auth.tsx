@@ -13,7 +13,7 @@ import {Form} from "../components/Form";
 import Userfront from "@userfront/toolkit/react";
 import GoogleButton from "./GoogleButton/AuthButton";
 import Typography from "@mui/joy/Typography";
-
+window.x = Userfront
 interface IFields {
     [key: number]: string[];
 }
@@ -67,9 +67,6 @@ export default function Auth() {
                 <Avatar sx={{m: 1, bgcolor: 'secondary.main'}}>
                     <LockOutlinedIcon/>
                 </Avatar>
-                <Typography component="h1">
-                    {caption}
-                </Typography>
                 <GoogleButton callback={() =>
                     auth(Userfront.login({method: "google"}))}>Войти с Google</GoogleButton>
                 или

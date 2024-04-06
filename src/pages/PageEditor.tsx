@@ -4,11 +4,15 @@ import React from 'react';
 import type {CellPlugin} from '@react-page/editor';
 import Editor from '@react-page/editor';
 import slate from '@react-page/plugins-slate';
+import spacer from '@react-page/plugins-spacer';
 import image from '@react-page/plugins-image';
 import {createGenerateClassName} from '@material-ui/core/styles';
 import '@react-page/editor/lib/index.css'
 import Viewer from "../components/Model/Viewer";
 import {api} from "../index";
+import Button from "@mui/material/Button";
+import { connectField } from 'uniforms';
+import {MediaField} from "../components/Form";
 
 const generateClassName = createGenerateClassName({
     disableGlobal: true,
@@ -21,10 +25,10 @@ type Data = {
 
 const modelPlugin: CellPlugin<Data> = {
     Renderer: ({data}) => (
-        <div className={'h-96'}>
+        <div className={'h-[400px]'}>
             <Viewer data={{
                 show_ui: true,
-                urn: 'dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6ZGlhbG9zczEzMzc3NS8lRDAlOTMlRDAlQjglRDAlQkIlRDElOEMlRDAlQjclRDAlQjAuU0xEUFJU',
+                urn: data.model,
                 id: 1,
                 rotation: true
             }}></Viewer>
@@ -38,18 +42,22 @@ const modelPlugin: CellPlugin<Data> = {
         type: 'autoform',
         schema: {
             properties: {
-                title: {
+                model: {
                     type: 'string',
-                    default: 'someDefaultValue',
+                    uniforms: {
+                        component: connectField(({ value, onChange }) => {
+                            console.log(value)
+                            return <MediaField field={{media: []}} setValue={(_, files) => onChange(files[0].url)}></MediaField>
+                        }),
+                    },
                 },
             },
-            required: ['title'],
+            required: ['model'],
         },
     },
 };
 
-
-const cellPlugins = [slate(), image, modelPlugin];
+const cellPlugins = [slate(), image, modelPlugin, spacer];
 
 
 const PageEditor = ({id, data}: { id: number; data: object }) => {

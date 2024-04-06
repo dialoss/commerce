@@ -1,14 +1,18 @@
 // @ts-ignore
 
-import React from 'react';
+import React, {useLayoutEffect} from 'react';
 import {Navigate, Route, Routes, useNavigate} from "react-router-dom";
 import {routes} from "../constants/routes";
+import {useCurrentPath} from "../../../tools/routes";
 
 const AppRouter = () => {
+    const page = useCurrentPath();
     const navigate = useNavigate();
-    let p = window.location.href.split('/').slice(-1)[0]
-    document.title = p.toUpperCase() + ' | MyMount';
+
     window.navigate = (url: string) => navigate("/" + url);
+    useLayoutEffect(() => {
+        document.title = "" + ' | MyMount';
+    }, [navigate])
     return (
         <Routes>
             {
@@ -18,7 +22,7 @@ const AppRouter = () => {
                            key={route.path}/>
                 )
             }
-            {/*<Route path={'*'} element={<Navigate to={'/main/'}/>}/>*/}
+            <Route path={'*'} element={<Navigate to={'/main/'}/>}/>
         </Routes>
     );
 };

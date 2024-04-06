@@ -71,6 +71,7 @@ function App() {
                 <AuthContainer></AuthContainer>
                 <Images></Images>
             </BrowserRouter>
+            <div className="windows"></div>
         </div>
     );
 }

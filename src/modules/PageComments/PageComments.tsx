@@ -1,17 +1,16 @@
 //@ts-nocheck
-import React, {useLayoutEffect, useRef, useState} from 'react';
+import React from 'react';
 import Comments from "./components/CommentsContainer";
 import {Container} from "../../ui/Container";
-import { useLocation } from 'react-router-dom'
+import {useCurrentPath} from "../../tools/routes";
 
 const PageComments = () => {
-    const location = useLocation();
-    const page = location.pathname + '/';
+    const page = useCurrentPath();
     return (
-        <div className={"comments"} id={'comments'} style={{marginTop:50, display: 'block'}}>
+        <div className={"comments"} id={'comments'} style={{marginTop: 50, display: page ? 'block' : 'none'}}>
             <Container>
                 <div className="comments__inner">
-                    <Comments page={page}></Comments>
+                    {page && <Comments page={page}></Comments>}
                 </div>
             </Container>
         </div>

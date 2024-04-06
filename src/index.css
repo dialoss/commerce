@@ -89,3 +89,22 @@ div[data-b24-crm-button-icon="openline"] {
     }
 }
 
+.public-DraftStyleDefault-block {
+    margin: 0 !important;
+}
+.rdw-editor-main {
+    border: 1px solid grey;
+    padding: 4px;
+}
+
+.windows {
+    z-index: 99;
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    display: flex;
+}
+.winbox.min {
+    width: 100px !important;
+    position: initial;
+}

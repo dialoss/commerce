@@ -70,27 +70,10 @@ const Images = () => {
         setOpen(false);
     }
 
-    function set() {
-        let cont = document.querySelector('.yarl__carousel');
-        if (!cont) return;
-        let preview = document.querySelector('.preview');
-        cont.addEventListener('mousedown', e => {
-            preview.style.zIndex = -1;
-            const elements = document.elementsFromPoint(e.clientX, e.clientY);
-            for (const el of elements) {
-                if (el.classList.contains('preview')) {
-                    preview.style.zIndex = 1;
-                    return;
-                }
-            }
-        })
-    }
-
     return (
         <Lightbox
             className={'images-viewer'}
             index={current}
-            on={{entered: set}}
             setCurrent={setCurrent}
             open={open}
             plugins={[Zoom, Counter]}

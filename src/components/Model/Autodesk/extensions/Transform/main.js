@@ -246,7 +246,7 @@ Autodesk.ADN.Viewing.Extension.TransformTool =  function (viewer, options) {
         };
 
         ///////////////////////////////////////////////////////////////////////////
-        // activates tool
+        // activates tools
         //
         ///////////////////////////////////////////////////////////////////////////
         this.activate = function() {
@@ -282,7 +282,7 @@ Autodesk.ADN.Viewing.Extension.TransformTool =  function (viewer, options) {
         };
 
         ///////////////////////////////////////////////////////////////////////////
-        // deactivate tool
+        // deactivate tools
         //
         ///////////////////////////////////////////////////////////////////////////
         this.deactivate = function() {

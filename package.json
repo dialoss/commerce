@@ -14,6 +14,7 @@
     "@react-page/editor": "^5.4.4",
     "@react-page/plugins-image": "^5.4.4",
     "@react-page/plugins-slate": "^5.4.4",
+    "@react-page/plugins-spacer": "^5.4.4",
     "@reduxjs/toolkit": "^2.2.3",
     "@syncfusion/ej2-react-filemanager": "^25.1.38",
     "@types/jest": "^27.5.2",
