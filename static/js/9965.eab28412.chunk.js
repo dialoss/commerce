@@ -1,0 +1,2 @@
+"use strict";(self.webpackChunkcommerce=self.webpackChunkcommerce||[]).push([[9965],{79965:(e,a,t)=>{var c=t(24994);Object.defineProperty(a,"__esModule",{value:!0}),a.default=void 0;var h=c(t(40039)),m=t(70579);a.default=(0,h.default)((0,m.jsx)("path",{d:"M11 17h10v-2H11zm-8-5 4 4V8zm0 9h18v-2H3zM3 3v2h18V3zm8 6h10V7H11zm0 4h10v-2H11z"}),"FormatIndentDecrease")}}]);
+//# sourceMappingURL=9965.eab28412.chunk.js.map
