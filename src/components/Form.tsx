@@ -8,13 +8,14 @@ import {Uploader} from "./uploader";
 interface Field {
     name: string;
     value: any;
+    autocomplete?: string;
 }
 
 export interface IForm {
     caption: string;
     button?: string;
     fields: Field[];
-    onSubmit?: (data: any) => any;
+    onSubmit?: (data: any, e: any) => any;
     children?: React.ReactElement;
 }
 
@@ -36,9 +37,13 @@ export function Form({
     // useLayoutEffect(() => {
     //     reset();
     // }, [fields]);
+    console.log(fields)
     return (
         <>
-            <Box component="form" onSubmit={handleSubmit((data) => onSubmit(data))} sx={{mt: 3}}>
+            <Box component="form" onSubmit={e => {
+                e.preventDefault();
+                handleSubmit(data => onSubmit(data, e))(e)
+            }} sx={{mt: 3}}>
                 <InnerForm fields={fields} register={register} setValue={setValue}></InnerForm>
                 {children}
                 <Button
@@ -55,34 +60,65 @@ export function Form({
     )
 }
 
-export const MediaField = ({field, setValue}) => {
-    const [files, setFiles] = React.useState(field.media);
+export const MediaField = ({field, setValue, simple = false}) => {
+    const [files, setFiles] = React.useState(field.value);
 
     function set(files) {
         setValue("media", files);
         setFiles(files);
     }
 
-    function select() {
-        window.app.filemanager?.getFiles().then(files => {
-            files = files.map(f => {
-                let url = f.url;
-                let type = f.resource_type;
-                if (f.context.custom) {
+    function setRaw(files) {
+        files = files.map(f => {
+            let url = f.public_id;
+            let type = f.resource_type;
+            if (type === "raw") {
+                if (f.context && f.context.custom) {
                     url = f.context.custom.model;
                     type = 'model';
+                } else {
+                    type = 'file';
                 }
-                return {
-                    url,
-                    type,
-                    width: f.width,
-                    height: f.height,
-                }
-            })
-            set(files);
+            }
+            return {
+                url,
+                type,
+                filename: url.split('/').slice(-1)[0],
+                width: f.width,
+                height: f.height,
+            }
+        })
+        setFiles(f => {
+            let newFiles = [...f, ...files];
+            setValue("media", newFiles)
+            return newFiles
         });
     }
 
+    function select() {
+        if (simple) {
+            let widget = cloudinary.createUploadWidget({
+                    cloudName: 'drlljn0sj',
+                    uploadPreset: 'hwub8goj',
+                    maxFiles: 3,
+                    maxFileSize: 5000000
+                }, (error, result) => {
+                    if (!error && result) {
+                        console.log(result)
+                        if (result.event === "success") setRaw([result.info]);
+                        if (result.event === "upload-added") {
+                            console.log(result)
+                        }
+                    }
+                }
+            )
+            widget.open();
+        } else {
+            window.app.filemanager?.getFiles().then(files => {
+                setRaw(files)
+            });
+        }
+    }
     return (
         <>
             <Button onClick={select}>Выбрать файлы</Button>
@@ -101,6 +137,7 @@ function getFormField(field, register, setValue) {
     else return <TextField
         required
         fullWidth
+        autoComplete={field.autocomplete || ''}
         variant="standard"
         size={'small'}
         sx={{marginBottom: 2}}

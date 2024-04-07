@@ -6,11 +6,14 @@ import {BrowserRouter, useNavigate} from 'react-router-dom';
 import FileManager from "./modules/FileManager";
 import DataForm from './modules/DataForm';
 import Chat from "./modules/Chat";
-import AuthContainer from "./modules/AuthContainer";
 import Images from './components/Photos';
 import {Container} from "./ui/Container";
 import FooterContainer from './modules/Footer/components/FooterContainer';
 import PageComments from "./modules/PageComments/PageComments";
+import AuthContainer from "./modules/Auth/AuthContainer";
+import Alerts from "./ui/Alerts";
+import Auth from "./modules/Auth/Auth";
+import {LoginForm} from "@userfront/toolkit/react";
 
 interface IFilemanager {
     getFiles: () => Promise<any>;
@@ -30,6 +33,7 @@ interface IApp {
     filemanager?: IFilemanager;
     auth?: IAuth;
     images?: ImagesViewer;
+    alert: (data: object) => any;
 }
 
 declare global {
@@ -54,8 +58,9 @@ const pages = {
 function App() {
     return (
         <div className="App">
+            <div style={{display:'none'}}><LoginForm></LoginForm></div>
+            <Bar current={0} tabs={Object.values(pages)} onChange={t => window.navigate(Object.keys(pages)[t])}></Bar>
             <BrowserRouter>
-                <Bar current={0} tabs={Object.values(pages)} onChange={t => window.navigate(Object.keys(pages)[t])}></Bar>
                 <div style={{minHeight: '100vh', display: 'flex', flexDirection: 'column'}}>
                     <div style={{height: 70}}></div>
                     <Container>
@@ -65,12 +70,13 @@ function App() {
                     <div style={{flexGrow: 1}}></div>
                     <FooterContainer/>
                 </div>
-                <FileManager></FileManager>
-                <Chat></Chat>
-                <DataForm></DataForm>
-                <AuthContainer></AuthContainer>
-                <Images></Images>
             </BrowserRouter>
+            <FileManager></FileManager>
+            <Chat></Chat>
+            <DataForm></DataForm>
+            <AuthContainer></AuthContainer>
+            <Images></Images>
+            <Alerts></Alerts>
             <div className="windows"></div>
         </div>
     );

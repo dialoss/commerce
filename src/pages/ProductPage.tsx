@@ -24,8 +24,8 @@ const ProductPage = () => {
     return (
         <div>
             {data && <>
-            <Typography>Цена: {rub.format(data.price || 0)}</Typography>
-            <Button onClick={order}>Заказать изготовление</Button>
+            {/*<Typography>Цена: {rub.format(data.price || 0)}</Typography>*/}
+            {/*<Button onClick={order}>Заказать изготовление</Button>*/}
             <PageEditor id={data.id} data={JSON.parse(data.page || '{}')}></PageEditor>
                 </>}
         </div>

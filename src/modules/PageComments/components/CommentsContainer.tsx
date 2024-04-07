@@ -8,16 +8,22 @@ import Button from "@mui/material/Button";
 import {api} from "../../../index";
 import HTMLEditor from "../../../ui/HTMLEditor";
 import Userfront from "@userfront/toolkit/react";
+import {MediaField} from "../../../components/Form";
 
 export const CommentsInput = ({callback, parent = null}: { parent?: number }) => {
     const [message, setMessage] = useState('');
+    const [media, setMedia] = useState([]);
+    const clear = React.useRef(false);
 
     function send() {
+        if (!message && !media.length) return;
+        console.log(media)
         const comment = {
             id: new Date().getTime(),
             page: decodeURI(window.location.pathname + "/"),
             user: Userfront.user.userId,
             text: message,
+            media: JSON.stringify(media),
             parent,
         };
         api.apiCommentCreate({
@@ -25,16 +31,18 @@ export const CommentsInput = ({callback, parent = null}: { parent?: number }) =>
         })
         callback(comment)
         setMessage('')
+        setMedia([]);
+        clear.current = true;
     }
-
     return (
         <div className="input-wrapper">
             <div className={"input-field"}>
                 <div className="editor-wrapper">
-                    <HTMLEditor setHTML={setMessage}></HTMLEditor>
+                    <HTMLEditor clear={clear} value={message} setHTML={setMessage}></HTMLEditor>
                 </div>
             </div>
             <Button onClick={send}>Отправить</Button>
+            <MediaField simple={true} field={{value: media}} setValue={(_, files) => setMedia(files)}></MediaField>
         </div>
     );
 };

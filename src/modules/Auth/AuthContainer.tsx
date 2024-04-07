@@ -1,11 +1,8 @@
 //@ts-nocheck
 import React, {useState} from 'react';
-import {MyModal} from "../components/MyModal";
 import Userfront, {LoginForm, LogoutButton, SignupForm} from "@userfront/toolkit/react";
 import Auth from "./Auth";
-
-Userfront.addInitCallback((d)=>console.log(Userfront.user))
-Userfront.init("8nwwwmpn");
+import {MyModal} from "../../ui/MyModal";
 
 const AuthContainer = () => {
     const [open, setOpen] = useState(false);
@@ -17,7 +14,7 @@ const AuthContainer = () => {
     }
     return (
         <>
-            <MyModal title={'Авторизация'} open={open} onHide={() => setOpen(false)}>
+            <MyModal style={{padding: 0}} title={'Авторизация'} open={open} onHide={() => setOpen(false)}>
                 <Auth></Auth>
             </MyModal>
         </>

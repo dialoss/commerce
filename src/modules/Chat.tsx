@@ -3,13 +3,14 @@
 import React, {useEffect} from 'react';
 import {md5} from "js-md5";
 import Userfront from "@userfront/toolkit/react";
+import {checkUser} from "./Auth/helpers";
 
 
 window.addEventListener('onBitrixLiveChat', function (event) {
     // @ts-ignore
     let widget = event.detail.widget;
     const user = Userfront.user;
-
+    if (!user.userId) return;
     md5(user.userUuid + "mymountmt.ru" + process.env.USER_SALT);
     let hash = md5.create().hex();
     let name = user.name;

@@ -8,7 +8,7 @@ import ItemsList from "../components/ItemsList";
 
 const Products = () => {
     return (
-        <ItemsList component={ProductCard} getItems={(page) => api.apiProductList(page)}></ItemsList>
+        <ItemsList key={'products'} cacheKey={'products'} component={ProductCard} getItems={(page) => api.apiProductList(page)}></ItemsList>
     );
 };
 

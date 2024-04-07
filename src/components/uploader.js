@@ -8,7 +8,7 @@ export function Uploader({files, setFiles}) {
     const onChange = (imageList, addUpdateIndex) => {
         setFiles(imageList);
     };
-
+    console.log(files)
     return (
         <ImageUploading
             multiple
@@ -22,14 +22,16 @@ export function Uploader({files, setFiles}) {
                   onImageRemoveAll,
                   onImageRemove,
               }) => (
-                <Stack alignItems={'center'} rowGap={2} marginTop={10}>
-                    <Button size={'small'} variant={'contained'} onClick={onImageRemoveAll}>Убрать все
-                        файлы</Button>
+                <Stack alignItems={'center'} rowGap={2}>
+                    {files.length > 0 && <Button size={'small'} variant={'contained'} onClick={onImageRemoveAll}>Убрать все
+                        файлы</Button>}
                     <Stack direction={'row'} flexWrap={'wrap'} alignItems={'center'} justifyContent={'center'}
                            style={{width: "80%"}}>
                         {imageList.map((image, index) => (
                             <div key={index} style={{margin: 5}}>
-                                <img src={image.url} alt="" width="100"/>
+                                {/*<p>{image}</p>*/}
+                                {/*<img src={image.url} alt="" width="100"/>*/}
+                                {image.filename}
                                 <Stack rowGap={1} mx={1}>
                                     <Button size={'small'} variant={'outlined'}
                                             onClick={() => onImageRemove(index)}>Удалить</Button>

@@ -3,6 +3,7 @@
 import React, {useEffect, useLayoutEffect, useState} from 'react';
 import Windows from "../Window";
 import {uploadAutodeskFile} from "../components/Model/Autodesk/api/api";
+import {BASE_PATH} from "../index";
 
 const FileManager = () => {
     const [opened, setOpened] = useState(false);
@@ -62,7 +63,7 @@ const FileManager = () => {
                     for (const file of data.info.files) {
                         if (checkModel(file.name)) {
                             uploadAutodeskFile(files[file.id]).then(id => {
-                                fetch(process.env.REACT_APP_BASE_PATH + `/add_tag/?file=${file.uploadInfo.public_id}&tag=${id}`)
+                                fetch(BASE_PATH + `/add_tag/?file=${file.uploadInfo.public_id}&tag=${id}`)
                                     .then(() => ml.show());
                             })
                         }

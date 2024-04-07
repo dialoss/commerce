@@ -10,24 +10,26 @@ import ShopCard from "../../../components/ShopCard";
 import UserPage from "../../UserPage";
 
 export const routes = [
+    {path: "/blueprints/", element: <div></div>},
+    {path: "/login/", element: null},
     {path: "/main/", element: <Intro></Intro>},
     {path: "/models/", element: <Products></Products>},
     {path: "/models/:id/", element: <ProductPage></ProductPage>},
     {path: "/orders/:id/", element: <ProductPage></ProductPage>},
     {
         path: "/orders/",
-        element: <ItemsList key={'orders'} getItems={(page) => api.apiOrderList(page)}
+        element: <ItemsList key={'orders'} cacheKey={'orders'} getItems={(page) => api.apiOrderList(page)}
                             component={MediaCard}></ItemsList>
     },
 
     {
         path: "/gallery/",
-        element: <ItemsList key={'gallery'} getItems={(page) => api.apiGalleryList(page)}
+        element: <ItemsList key={'gallery'} cacheKey={'gallery'} getItems={(page) => api.apiGalleryList(page)}
                             component={MediaCard}></ItemsList>
     },
     {
         path: "/shop/",
-        element: <ItemsList key={'shop'} getItems={(page) => api.apiShopList(page)} component={ShopCard}></ItemsList>
+        element: <ItemsList key={'shop'} cacheKey={'shop'} getItems={(page) => api.apiShopList(page)} component={ShopCard}></ItemsList>
     },
     {
         path: "/profile/",

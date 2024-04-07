@@ -11,18 +11,20 @@ import Drawer from "./Drawer";
 import Typography from '@mui/material/Typography';
 import Box from "@mui/material/Box";
 import MenuItem from '@mui/material/MenuItem';
-import {IUser} from "./store/app";
+import {actions, IUser} from "./store/app";
 import {useAppSelector} from "./store/redux";
 import Button from "@mui/material/Button";
 import Userfront from "@userfront/toolkit/react";
+import {checkUser} from "./modules/Auth/helpers";
+import store from "./store";
 
 function Bar({
                  tabs, current, onChange = () => {
     }
-             }: { tabs: string[], onChange?: (tab: number) => void }) {
+             }: {tabs: string[], onChange?: (tab: number) => void }) {
     const [open, setOpen] = React.useState(false);
     const [tab, setTab] = React.useState(current);
-
+    const drawer = tabs.concat(['Редактор', "Файлы"])
     return (
         <>
             <AppBar position="fixed" sx={{zIndex: 10}}>
@@ -51,6 +53,7 @@ function Bar({
                             {
                                 name: "Чат на сайте",
                                 callback: () => {
+                                    if (!checkUser()) return;
                                     const chat: HTMLElement | null = document.querySelector(`a[data-b24-crm-button-widget="openline_livechat"]`);
                                     if (!chat) return;
                                     chat.click();
@@ -67,14 +70,19 @@ function Bar({
                     </Stack>
                 </Container>
             </AppBar>
-            <Drawer tabs={tabs} open={open} setOpen={setOpen}></Drawer>
+            <Drawer tab={tab} callback={i => {
+                if (drawer[i] === "Редактор") store.dispatch(actions.setEditor());
+                else if (drawer[i] === "Файлы") window.app.filemanager?.getFiles();
+                else {
+                    onChange(i);
+                    setTab(i);
+                }
+            }} tabs={drawer} open={open} setOpen={setOpen}></Drawer>
         </>
     );
 }
 
 export default Bar;
-
-const settings = ['Профиль', 'Выход'];
 
 interface TooltipField {
     name: string;

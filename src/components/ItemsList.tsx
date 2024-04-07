@@ -6,10 +6,13 @@ import {actions} from "../store/app";
 
 const limit = 30;
 
+const cache = {}
+
 const ItemsList = ({
                        component,
-                       getItems
-                   }: { component: React.JSXElementConstructor<any>; getItems: () => Promise<any> }) => {
+                       getItems,
+                        cacheKey="",
+                   }: { cacheKey:string; component: React.JSXElementConstructor<any>; getItems: () => Promise<any> }) => {
     const [items, setItems] = useState([]);
 
     function set(newItems) {
@@ -21,15 +24,25 @@ const ItemsList = ({
     const [all, setAll] = React.useState(1);
 
     useLayoutEffect(() => {
-        getItems({limit, offset: limit * (page - 1)}).then(d => {
-            console.log(d)
+        const pagination = {limit, offset: limit * (page - 1)};
+        const cachePage = cache[cacheKey];
+        if (cachePage) {
+            const cacheItems = cachePage[pagination.offset];
+            if (cacheItems) {
+                set(cacheItems);
+                setAll(Math.ceil(cachePage.count / limit))
+                return;
+            }
+        }
+        getItems(pagination).then(d => {
             set(d.results);
             setAll(Math.ceil(d.count / limit));
+            if (!cache[cacheKey]) cache[cacheKey] = {count: d.count}
+            cache[cacheKey][pagination.offset] = d.results;
         })
     }, [page]);
 
     window.app.update = (data) => {
-        console.log(data)
         let newItems = [...items];
         let i = 0;
         while (true) {
@@ -51,14 +64,16 @@ const ItemsList = ({
                 }
             </Stack>
             {all > 1 && <Pagination count={all}
-                        onChange={(e, a) => setPage(a)}
-                        color="primary" sx={{'ul':
+                                    onChange={(e, a) => setPage(a)}
+                                    color="primary" sx={{
+                'ul':
                     {justifyContent: 'center'},
                 padding: '10px 0',
-                backgroundColor:'#fff',
+                backgroundColor: '#fff',
                 width: 'initial',
-                position:'sticky',
-                bottom:0}}/>}
+                position: 'sticky',
+                bottom: 0
+            }}/>}
         </>
     );
 };

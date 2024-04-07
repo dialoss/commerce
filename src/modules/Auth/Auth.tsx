@@ -3,17 +3,17 @@ import * as React from 'react';
 import {useState} from 'react';
 import Avatar from '@mui/material/Avatar';
 import CssBaseline from '@mui/material/CssBaseline';
-import Link from '@mui/material/Link';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import {useForm} from "react-hook-form";
-import {Checkbox, FormControlLabel} from "@mui/material";
-import {Form} from "../components/Form";
-import Userfront from "@userfront/toolkit/react";
 import GoogleButton from "./GoogleButton/AuthButton";
 import Typography from "@mui/joy/Typography";
-window.x = Userfront
+import Userfront from "@userfront/toolkit/react";
+import {Form} from "../../components/Form";
+import {LoginForm} from "@userfront/toolkit/react";
+
+Userfront.init("7n8ddmqn");
+
 interface IFields {
     [key: number]: string[];
 }
@@ -22,6 +22,18 @@ const ru = {
     name: "Имя Фамилия",
     password: "Пароль",
     email: "Почта"
+}
+
+const autocomplete = {
+    0: {
+        'password': 'password',
+        'email': 'username',
+    },
+    1: {
+        "name": '',
+        'password': 'new-password',
+        'email': 'username'
+    }
 }
 
 export default function Auth() {
@@ -35,20 +47,24 @@ export default function Auth() {
     const text = stage === 0 ? "Нет аккаунта? Зарегистрироваться" : "Уже есть аккаунт? Войти"
 
     function auth(response: Promise<any>) {
-        response.catch(er => console.log(er));
+        response.catch(er => {
+            window.app.alert({type: 'error', message: er.message})
+        });
     }
 
-    function submit(data: any) {
-        if (stage === 1) auth(Userfront.signup({
-            method: 'password',
-            email: data.email,
-            name: data.name,
-            password: data.password,
-            data: {
-                customData: "Some custom information",
-            },
-        }))
-        else auth(Userfront.login({
+    function submit(data: any, e: any) {
+        if (stage === 1) {
+            if (window.PasswordCredential) {
+                let c = new PasswordCredential(e.target);
+                navigator.credentials.store(c);
+            }
+            auth(Userfront.signup({
+                method: 'password',
+                email: data.email,
+                name: data.name,
+                password: data.password,
+            }));
+        } else auth(Userfront.login({
             method: "password",
             email: data.email,
             password: data.password,
@@ -72,16 +88,22 @@ export default function Auth() {
                 или
                 <Form
                     caption={caption}
-                    fields={fields[stage].map((f: string) => ({name: f, label: ru[f], value: ""}))}
+                    fields={fields[stage].map((f: string) => ({
+                        name: f,
+                        autocomplete: autocomplete[stage][f],
+                        label: ru[f],
+                        value: ""
+                    }))}
                     button={caption}
                     onSubmit={submit}>
                 </Form>
 
                 {text && <Grid container justifyContent="flex-end">
                     <Grid item>
-                        <Link onClick={() => setStage(s => 1 - s)} variant="caption">
+                        <Typography sx={{textDecoration: "underline"}} className={"hover:cursor-pointer"}
+                                    onClick={() => setStage(s => 1 - s)}>
                             {text}
-                        </Link>
+                        </Typography>
                     </Grid>
                 </Grid>}
             </Box>

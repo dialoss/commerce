@@ -6,7 +6,8 @@ export function MyModal({children,
                             title,
                             onHide,
                             open = false,
-                        }: { children: React.ReactElement; title: string; open?: boolean; onHide?: () => any }) {
+                            style={}
+                        }: { children: React.ReactElement; style?: object; title: string; open?: boolean; onHide?: () => any }) {
     return (
         <Modal
             show={open}
@@ -20,7 +21,7 @@ export function MyModal({children,
                     {title}
                 </Modal.Title>
             </Modal.Header>
-            <Modal.Body>
+            <Modal.Body style={style}>
                 {children}
             </Modal.Body>
             <Modal.Footer>

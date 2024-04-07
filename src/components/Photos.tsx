@@ -83,6 +83,7 @@ const Images = () => {
                 padding: 0,
                 spacing: 0,
                 preload: 50,
+                finite: images.length < 2
             }}
             controller={{closeOnPullDown: true, closeOnPullUp: true}}
             close={onClose}

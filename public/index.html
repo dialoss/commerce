@@ -10,6 +10,14 @@
     <script src="https://developer.api.autodesk.com/modelderivative/v2/viewers/7.*/viewer3D.js"></script>
     <script src="https://media-editor.cloudinary.com/all.js" type="text/javascript">
     </script>
+    <script type="text/javascript">!function (n) {
+        if ("/" === n.search[1]) {
+            var a = n.search.slice(1).split("&").map((function (n) {
+                return n.replace(/~and~/g, "&")
+            })).join("?");
+            window.history.replaceState(null, null, n.pathname.slice(0, -1) + a + n.hash)
+        }
+    }(window.location)</script>
 </head>
 <body>
 <div id="root"></div>

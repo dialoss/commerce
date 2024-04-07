@@ -7,11 +7,11 @@ import BaseCard from "./BaseCard";
 import CardImage from "./CardImage";
 import {Stack} from "@mui/material";
 
-function Likes({data}) {
+function Likes({likes}) {
     return (
         <>
-            {data.likes > 0 && <Stack direction={'row'} sx={{position:'absolute', right:1, top:1, zIndex:2}}>
-                {data.likes}
+            {likes > 0 && <Stack direction={'row'} sx={{position:'absolute', right:1, top:1, zIndex:2}}>
+                {likes}
                 <FavoriteIcon></FavoriteIcon>
             </Stack>}
         </>
@@ -25,7 +25,7 @@ const MediaCard = ({data}: { data: Media }) => {
             {!!data.title && <div>
                 <Typography level="title-lg">{data.title}</Typography>
             </div>}
-            <Likes data={data}></Likes>
+            <Likes likes={data.likes || 0}></Likes>
             <CardImage carousel={true} id={data.id} url={data.url}></CardImage>
             <Typography sx={{
                 flexGrow: 1,

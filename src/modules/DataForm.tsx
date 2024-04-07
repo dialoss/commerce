@@ -13,21 +13,26 @@ import {useForm} from "react-hook-form";
 import MenuItem from "@mui/material/MenuItem";
 
 const map = {
-    'Галерея': '',
-    'Продукт': ''
+    'Галерея': {
+        create: data => api.apiGalleryCreate({gallery: data})
+    },
+    'Продукт': {
+        create: data => api.apiProductCreate({product: data})
+    }
 }
+let form = "";
 
 const DataForm = () => {
-    const data = useAppSelector(state => state.app.selected);
+    // const data = useAppSelector(state => state.app.selected);
+    const [data, setData] = React.useState({});
 
     function submit(newData) {
         newData = {...data, ...newData}
-        console.log(newData)
         api.apiProductUpdate({id: data.id, product: newData}).then(d => window.app.update(d));
     }
 
-    function clear() {
-
+    function create() {
+        map[form].create(data);
 
     }
 
@@ -41,8 +46,7 @@ const DataForm = () => {
                         style={{width: 200}}
                         onChange={e => {
                             let t = e.target.value;
-                            console.log(map[t])
-                            store.dispatch(actions.setSelected({}));
+                            form = t;
                         }}
                     >
                         {
@@ -51,7 +55,7 @@ const DataForm = () => {
                             )
                         }
                     </TextField>
-                    <Button onClick={clear}>Создать новый</Button>
+                    <Button onClick={create}>Создать новый</Button>
                     <Form caption={"Форма"}
                           fields={Object.keys(data).map(k => ({name: k, value: data[k]}))}
                           onSubmit={submit}
