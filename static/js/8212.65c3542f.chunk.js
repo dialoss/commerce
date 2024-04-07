@@ -1,2 +1,0 @@
-"use strict";(self.webpackChunkcommerce=self.webpackChunkcommerce||[]).push([[8212],{8212:(e,c,h)=>{var s=h(24994);Object.defineProperty(c,"__esModule",{value:!0}),c.default=void 0;var a=s(h(40039)),u=h(70579);c.default=(0,a.default)((0,u.jsx)("path",{d:"M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1M8 13h8v-2H8zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5"}),"Link")}}]);
-//# sourceMappingURL=8212.65c3542f.chunk.js.map

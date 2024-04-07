@@ -1,2 +1,0 @@
-"use strict";(self.webpackChunkcommerce=self.webpackChunkcommerce||[]).push([[2508],{22508:(e,c,s)=>{s.r(c),s.d(c,{default:()=>u});const u=s(88595).A}}]);
-//# sourceMappingURL=2508.88a0cb6a.chunk.js.map
