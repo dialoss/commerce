@@ -18,6 +18,7 @@ import {useAppSelector} from "../store/redux";
 import MenuItem from "@mui/material/MenuItem";
 import Pay from "../components/Pay";
 import {BusinessLogic} from "../modules/BusinessLogic";
+import {OrderToJSON} from "../api";
 
 const generateClassName = createGenerateClassName({
     disableGlobal: true,
@@ -81,7 +82,8 @@ const buttonPlugin: CellPlugin<EditorData> = {
                                 }
                             </TextField>
                         )
-                    }
+                    },
+                    default: "order"
                 },
             },
         },
@@ -270,14 +272,20 @@ const cellPlugins = [buttonPlugin, mediaPlugin, spacerPlugin, textPlugin, backgr
 
 let updates = 0;
 
-const PageEditor = ({id, data}: { id: number; data: object }) => {
+const PageEditor = ({id, data, endpoint}: { id: number; data: object; endpoint: string }) => {
     const [value, setValue] = React.useState(data);
     const editor = useAppSelector(state => state.app.editor);
 
-    // window.x = d => useRemoveCell(d);
     function update(data) {
         updates++;
-        window.api.apiProductUpdate({id, product: {page: JSON.stringify(data)}})
+        window.api.request({
+            path: `/api/${endpoint}/${id}/`,
+            method: 'PUT',
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: {page: JSON.stringify(data)}
+        })
         setValue(data);
     }
 
@@ -315,7 +323,8 @@ const PageEditor = ({id, data}: { id: number; data: object }) => {
                     "inline": null
                 })
             }
-            setValue(value => ({...value, rows: [...value.rows, {
+            setValue(value => ({
+                ...value, rows: [...value.rows, {
                     "id": x++,
                     "cells": items,
                 }]

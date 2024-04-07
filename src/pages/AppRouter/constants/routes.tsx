@@ -3,7 +3,6 @@
 import Intro from "../../Main/Intro";
 import ItemsList from "../../../components/ItemsList";
 import MediaCard from "../../../components/MediaCard";
-import OrderCard from "../../../components/OrderCard";
 
 import ProductPage from "../../ProductPage";
 import ShopCard from "../../../components/ShopCard";
@@ -14,11 +13,20 @@ import Orders from "../../Orders";
 import OrderPage from "../../OrderPage";
 
 export const routes = [
-    {path: "/blueprints/", element: <div></div>},
+    {
+        path: "/blueprints/", element: <div></div>
+            // <ItemsList customPagination={{type: "Чертёж"}}
+            //                                       key={'products'}
+            //                                       key_={'product'}
+            //                                       component={ProductCard}></ItemsList>
+    },
     {path: "/login/", element: null},
     {path: "/main/", element: <Intro></Intro>},
     {
-        path: "/models/", element: <ItemsList key={'products'} key_={'product'} component={ProductCard}></ItemsList>
+        path: "/models/", element: <ItemsList customPagination={{type: "Монтировка"}}
+                                              key={'products'}
+                                              key_={'product'}
+                                              component={ProductCard}></ItemsList>
     },
     {path: "/models/:id/", element: <ProductPage></ProductPage>},
     {path: "/orders/:id/", element: <OrderPage></OrderPage>},

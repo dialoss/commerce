@@ -18,7 +18,7 @@ const ProductPage = () => {
     return (
         <div>
             {data && <>
-            <PageEditor id={data.id} data={JSON.parse(data.page || '{}')}></PageEditor>
+            <PageEditor endpoint={'product'} id={data.id} data={JSON.parse(data.page || '{}')}></PageEditor>
                 </>}
         </div>
     );

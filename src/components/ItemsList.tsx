@@ -18,8 +18,9 @@ interface TabsProps {
 const ItemsList = ({
                        component,
                        key_ = "",
-                       tabs = {names: [], filter: () => true}
-                   }: { tabs: TabsProps; key_: string; component: React.JSXElementConstructor<any>; }) => {
+                       tabs = {names: [], filter: () => true},
+                       customPagination = {}
+                   }: { tabs: TabsProps; customPagination: object; key_: string; component: React.JSXElementConstructor<any>; }) => {
     const [items, setItems] = useState([]);
 
     function set(newItems) {
@@ -49,7 +50,7 @@ const ItemsList = ({
         window.api.request({
             path,
             method: 'GET',
-            query: pagination,
+            query: {...pagination, ...customPagination},
         }).then(r => r.json()).then(d => {
             set(d.results);
             setAll(Math.ceil(d.count / limit));

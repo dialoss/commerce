@@ -21,7 +21,7 @@ const OrderPage = () => {
         <div>
             {data && <>
                 <Typography variant={'h6'} textAlign={'center'}>Дата начала изготовления: {window.formatDate(data.dateCreated)}</Typography>
-                <PageEditor id={data.id} data={JSON.parse( '{}')}></PageEditor>
+                <PageEditor endpoint={'order'} id={data.id} data={JSON.parse(data.page || '{}')}></PageEditor>
             </>}
         </div>
     );

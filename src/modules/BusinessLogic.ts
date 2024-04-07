@@ -1,6 +1,7 @@
 //@ts-nocheck
 import store from "store";
 import Userfront from "@userfront/toolkit/react";
+import {Product} from "../api";
 
 export class BusinessLogic {
     static order() {
@@ -13,7 +14,12 @@ export class BusinessLogic {
         });
     }
 
-    static buy() {
-
+    static buy(data: Product) {
+        window.api.apiOrderCreate({
+            order: {
+                user: Userfront.user.userId,
+                product: data.id,
+            }
+        });
     }
 }

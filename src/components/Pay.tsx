@@ -4,6 +4,7 @@ import Button from "@mui/material/Button";
 import Userfront from "@userfront/toolkit/react";
 import Tooltip from '@mui/material/Tooltip';
 import {CLIENT_PATH} from "../config";
+import {BusinessLogic} from "../modules/BusinessLogic";
 
 const Pay = ({text, product}) => {
     const fields = [
@@ -19,7 +20,10 @@ const Pay = ({text, product}) => {
     ]
     return (
         <>
-            <form action="https://yoomoney.ru/quickpay/confirm" method={"POST"} target={'_blank'}>
+            <form action="https://yoomoney.ru/quickpay/confirm"
+                  method={"POST"}
+                  target={'_blank'}
+                  onSubmit={() => BusinessLogic.buy(product)}>
                 {fields.map(f => <input type="text" hidden value={f.value} name={f.name}/>)}
                 <Tooltip title="После оплаты заказ появится на странице вашего профиля">
                     <Button size={'small'} variant={'contained'} type={'submit'}>

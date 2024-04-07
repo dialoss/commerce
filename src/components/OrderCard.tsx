@@ -20,7 +20,7 @@ const OrderCard = ({data, detailed}: {detailed: boolean; data: Order }) => {
             }}>
             <>
                 <div>
-                    <Typography level="title-lg">{data.product.name + " " + data.product.model}</Typography>
+                    <Typography level="title-lg">{data.product.type + " " + data.product.model}</Typography>
                 </div>
                 <CardImage carousel={false} id={data.product.id} url={data.cover || data.product.cover}></CardImage>
                 <CardContent orientation="horizontal">
@@ -30,7 +30,7 @@ const OrderCard = ({data, detailed}: {detailed: boolean; data: Order }) => {
                             {rub.format(data.product.price || 0)}
                         </Typography>
                         <p>Статус: {data.status.step}</p>
-                        <p>Дата заказа: {}</p>
+                        <p>Дата заказа: {window.formatDate(data.date_created)}</p>
                         <a href={`models/${data.product.id}-${data.product.model}`}>Продукт</a>
                     </div>
                 </CardContent>

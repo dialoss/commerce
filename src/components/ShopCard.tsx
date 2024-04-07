@@ -16,8 +16,8 @@ const ShopCard = ({data}: { data: Product }) => {
     return (
         <BaseCard data={data} style={"md:w-100 lg:w-1/2"}>
             <>
-            {!!data.name && <div>
-                <Typography level="title-lg">{data.name}</Typography>
+            {!!data.type && <div>
+                <Typography level="title-lg">{data.type}</Typography>
             </div>}
             <CardImage id={data.id} url={data.cover}></CardImage>
                 <div>

@@ -12,7 +12,8 @@ const Orders = () => {
 
     return (
         <>
-            <ItemsList tabs={{names: ['Выполненные', "В работе / новые"], filter}} key={'orders'} key_={'order'}
+            <ItemsList customPagination={{type: "Монтировка"}}
+                       tabs={{names: ['Выполненные', "В работе / новые"], filter}} key={'orders'} key_={'order'}
                        component={OrderCard}></ItemsList>
         </>
 

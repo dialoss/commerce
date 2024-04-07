@@ -16,7 +16,7 @@ const ProductCard = ({data, children}: {children: React.ReactElement; data: Prod
             }}>
             <>
                 <div>
-                    <Typography level="title-lg">{data.name + " " + data.model}</Typography>
+                    <Typography level="title-lg">{data.type + " " + data.model}</Typography>
                 </div>
                 <CardImage carousel={false} id={data.id} url={data.cover}></CardImage>
                 <CardContent orientation="horizontal">
