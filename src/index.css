@@ -114,3 +114,10 @@ div[data-b24-crm-button-icon="openline"] {
         max-width: 70vw !important;
     }
 }
+
+.rdw-editor-toolbar {
+    position: sticky;
+    top: 0;
+    background-color: #fff;
+    z-index: 2;
+}

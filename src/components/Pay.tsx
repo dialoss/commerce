@@ -2,27 +2,31 @@
 import React from 'react';
 import Button from "@mui/material/Button";
 import Userfront from "@userfront/toolkit/react";
+import Tooltip from '@mui/material/Tooltip';
+import {CLIENT_PATH} from "../config";
 
 const Pay = ({text, product}) => {
     const fields = [
         {name: "billNumber", value: "11TNPCU54FQ.240405"},
         {name: "targets", value: "сбор"},
         {name: "receiver", value: "4100118386566825"},
-        {name: "referer", value: "http://localhost:3000"},
+        {name: "referer", value: CLIENT_PATH},
         {name: "is-inner-form", value: "true"},
         {name: "sum", value: product.price},
         {name: "quickpay-form", value: "button"},
         {name: "label", value: Userfront.user.userId + "." + product.id},
-        {name: "successURL", value: "https://mymountmt.ru/pay"},
+        {name: "successURL", value: CLIENT_PATH + "/profile"},
     ]
     return (
         <>
-        <form action="https://yoomoney.ru/quickpay/confirm" method={"POST"} target={'_blank'}>
-            {fields.map(f => <input type="text" hidden value={f.value} name={f.name}/>)}
-            <Button variant={'contained'} type={'submit'}>
-                {text}
-            </Button>
-        </form>
+            <form action="https://yoomoney.ru/quickpay/confirm" method={"POST"} target={'_blank'}>
+                {fields.map(f => <input type="text" hidden value={f.value} name={f.name}/>)}
+                <Tooltip title="После оплаты заказ появится на странице вашего профиля">
+                    <Button size={'small'} variant={'contained'} type={'submit'}>
+                        {text}
+                    </Button>
+                </Tooltip>
+            </form>
 
         </>
     );

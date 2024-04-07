@@ -6,12 +6,12 @@ import {CommentsContext, CommentsInput} from "./CommentsContainer";
 import Avatar from "../../../ui/Avatar/Avatar";
 import CardImage from "../../../components/CardImage";
 import ItemFile from "../../../components/Items/File/ItemFile";
+import {useAppSelector} from "../../../store/redux";
 
 const Comment = ({data, depth}) => {
-    // const users = useAppSelector(state => state.users.users);
+    const users = useAppSelector(state => state.app.users);
     const [reply, setReply] = useState(false);
-    const user = {};
-    // users[data.user] || data.user;
+    const user = users[data.user] || {};
     const addComment = useContext(CommentsContext);
     const ref = useRef();
     useEffect(() => {
@@ -23,14 +23,13 @@ const Comment = ({data, depth}) => {
         setTimeout(() => setReply(r => !r), 180)
     }
 
-    console.log(data.time)
     return (
         <div className={"comment item"} data-id={data.id} data-type={'comment'}>
             <div className="comment-block">
-                <Avatar user={user} src={user.picture}></Avatar>
-                <div className="comment-block__text">
-                    <p className={"comment-username"}>{user.name || 'Гость'}</p>
-                    <p className={"comment-date"}>{dayjs(new Date(data.time).getTime()).format("HH:mm DD.MM.YYYY")}</p>
+                <Avatar user={user} src={user.image}></Avatar>
+                <div className="comment-block__text ">
+                    <a href={"/profile/" + user.userId} className={"comment-username hover:cursor-pointer text-decoration-none"}>{user.name || 'Гость'}</a>
+                    <p className={"comment-date"}>{window.formatDate(data.time)}</p>
                 </div>
             </div>
 

@@ -2,8 +2,10 @@
 
 import React, {useEffect, useLayoutEffect, useState} from 'react';
 import Windows from "../Window";
-import {uploadAutodeskFile} from "../components/Model/Autodesk/api/api";
-import {BASE_PATH} from "../index";
+import {formatCloudFiles} from "../components/Form";
+import axios from 'axios';
+
+let manager = null;
 
 const FileManager = () => {
     const [opened, setOpened] = useState(false);
@@ -26,6 +28,8 @@ const FileManager = () => {
                     }
                 },
             }
+            const eventName = "files:selected";
+            let hasCallback = false;
             window.app.filemanager = {
                 getFiles: () => {
                     setOpened(true);
@@ -33,44 +37,85 @@ const FileManager = () => {
                         function selected(e) {
                             resolve(e.detail);
                             setOpened(false);
-                            window.removeEventListener("files:selected", this);
+                            hasCallback = false;
+                            window.removeEventListener(eventName, this);
                         }
 
-                        window.addEventListener("files:selected", selected);
+                        hasCallback = true;
+                        window.addEventListener(eventName, selected);
                     })
                 }
             }
-            const ml = window.cloudinary.createMediaLibrary(config, {
+            manager = window.cloudinary.createMediaLibrary(config, {
                 insertHandler: (d: any) => {
                     console.log(d.assets)
-                    window.dispatchEvent(new CustomEvent("files:selected", {detail: d.assets}));
+                    if (!hasCallback) {
+                        window.app.editor.insert(formatCloudFiles(d.assets))
+                    } else window.dispatchEvent(new CustomEvent(eventName, {detail: d.assets}));
                 }
             })
-            ml.show();
+            manager.show();
 
             function checkModel(name) {
                 return name.split('.').slice(-1)[0].toLowerCase() === 'sldprt';
             }
 
             const files = {};
-            ml.on("upload", (data) => {
+            manager.on("upload", (data) => {
                 const file = data.info.file;
                 if (data.event === "upload-added" && checkModel(file.name)) {
                     files[data.info.id] = file;
                 }
-                if (data.event === "queues-end") {
-                    console.log(data.info.files);
-                    for (const file of data.info.files) {
-                        if (checkModel(file.name)) {
-                            uploadAutodeskFile(files[file.id]).then(id => {
-                                fetch(BASE_PATH + `/add_tag/?file=${file.uploadInfo.public_id}&tag=${id}`)
-                                    .then(() => ml.show());
-                            })
-                        }
-                    }
-                }
+
             });
 
+            const widgetEvent = "files:upload";
+            let widget = window.cloudinary.createUploadWidget({
+                    cloudName: 'drlljn0sj',
+                    uploadPreset: 'hwub8goj',
+                    maxFiles: 3,
+                    maxFileSize: 10000000,
+                    prepareUploadParams: (cb, params) => {
+                        params = [].concat(params);
+                        Promise.all(params.map((req) => {
+                                console.log(req)
+                                return Object.assign({
+                                    // signature: response.signature,
+                                    // apiKey: response.api_key,
+                                }, {})
+                                // if (checkModel(file.name)) {
+                                //     uploadAutodeskFile(files[file.id]).then(id =>
+                                //         Object.assign({
+                                //             signature: response.signature,
+                                //             apiKey: response.api_key,
+                                //         }, response.upload_params)
+                                //     )
+                                // }
+                            }
+                        )).then((results) =>
+                            cb(results.length === 1 ? results[0] : results));
+                    }
+                },
+                (error, result) => {
+                    if (!error && result) {
+                        console.log(result)
+                        if (result.event === "success")
+                            window.dispatchEvent(new CustomEvent(widgetEvent, {detail: [result.info]}));
+                    }
+                }
+            )
+            window.app.filemanager.uploadWidget = () => {
+                widget.open();
+                return new Promise((resolve) => {
+                    function selected(e) {
+                        resolve(e.detail);
+                        window.removeEventListener(widgetEvent, this);
+                    }
+
+                    window.addEventListener(widgetEvent, selected);
+                })
+            }
+            window.widget = widget;
             clearInterval(int);
         }, 1000);
     }, [])
@@ -87,9 +132,36 @@ const FileManager = () => {
                 }
             }
         }, 50);
+
+        const url = "https://api.cloudinary.com/v1_1/drlljn0sj/image/upload";
+
+        function ondrop(e) {
+            let files = e.dataTransfer.files;
+            let uploaded = [];
+            const config = {
+                onUploadProgress: progressEvent => {
+                    console.log(progressEvent)
+                    window.app.toast(progressEvent.progress);
+                }
+            }
+            Promise.all([...files].map(file => {
+                const formData = new FormData();
+                formData.append("file", file);
+                formData.append("upload_preset", "hwub8goj");
+                return axios.post(url, formData, config).then(r => r.data);
+            })).then(uploaded => {
+                console.log('UPLOADED', uploaded)
+                window.app.editor.insert(formatCloudFiles(uploaded));
+            })
+        }
+
+        window.addEventListener("drop", ondrop);
+        return () => window.removeEventListener("drop", ondrop);
     }, []);
 
+
     return (
+
         <Windows title={'Файлы'} open={opened} callback={setOpened}>
             <div className="filemanager"></div>
         </Windows>

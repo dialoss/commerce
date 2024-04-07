@@ -20,7 +20,7 @@ function Likes({likes}) {
 
 const MediaCard = ({data}: { data: Media }) => {
     return (
-        <BaseCard>
+        <BaseCard data={data}>
             <>
             {!!data.title && <div>
                 <Typography level="title-lg">{data.title}</Typography>

@@ -14,7 +14,7 @@ import Pay from "./Pay";
 
 const ShopCard = ({data}: { data: Product }) => {
     return (
-        <BaseCard style={"md:w-100 lg:w-1/2"}>
+        <BaseCard data={data} style={"md:w-100 lg:w-1/2"}>
             <>
             {!!data.name && <div>
                 <Typography level="title-lg">{data.name}</Typography>

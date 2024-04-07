@@ -5,7 +5,7 @@ import "./Comments.scss";
 import CommentsTools from "./CommentsTools";
 import {createCommentsTree, sortFunction} from "./helpers";
 import Button from "@mui/material/Button";
-import {api} from "../../../index";
+
 import HTMLEditor from "../../../ui/HTMLEditor";
 import Userfront from "@userfront/toolkit/react";
 import {MediaField} from "../../../components/Form";
@@ -17,16 +17,16 @@ export const CommentsInput = ({callback, parent = null}: { parent?: number }) =>
 
     function send() {
         if (!message && !media.length) return;
-        console.log(media)
         const comment = {
             id: new Date().getTime(),
+            time: new Date().getTime(),
             page: decodeURI(window.location.pathname + "/"),
             user: Userfront.user.userId,
             text: message,
             media: JSON.stringify(media),
             parent,
         };
-        api.apiCommentCreate({
+        window.api.apiCommentCreate({
             comment
         })
         callback(comment)
@@ -56,7 +56,7 @@ const CommentsContainer = ({page}) => {
     const [sorting, setSorting] = useState(() => sortFunction('default'));
 
     useLayoutEffect(() => {
-        api.apiCommentList({page}).then(d => setComments([...d.results]));
+        window.api.apiCommentList({page}).then(d => setComments([...d.results]));
     }, [page]);
 
     useEffect(() => {

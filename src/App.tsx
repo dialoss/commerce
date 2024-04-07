@@ -14,9 +14,14 @@ import AuthContainer from "./modules/Auth/AuthContainer";
 import Alerts from "./ui/Alerts";
 import Auth from "./modules/Auth/Auth";
 import {LoginForm} from "@userfront/toolkit/react";
+import ContextMenu from "./components/ContextMenu";
+import {ApiApi, Configuration} from "./api";
+import {BASE_PATH} from "./config";
+import "tools/date"
 
 interface IFilemanager {
     getFiles: () => Promise<any>;
+    uploadWidget: () => Promise<any>;
 }
 
 interface IAuth {
@@ -28,12 +33,22 @@ interface ImagesViewer {
     open: (data: any) => any;
 }
 
+interface PageEditor {
+    insert: (files: any) => any;
+}
+
 interface IApp {
     update?: (data: any) => void;
+    remove?: (data: any) => void;
+    create?: (data: any) => void;
+    dataForm?: () => void;
+    editor: PageEditor;
+
     filemanager?: IFilemanager;
     auth?: IAuth;
     images?: ImagesViewer;
     alert: (data: object) => any;
+    contextMenu: (event: any) => any;
 }
 
 declare global {
@@ -41,10 +56,15 @@ declare global {
         cloudinary: any;
         navigate: any;
         app: IApp;
+        api: ApiApi;
+        formatDate: (date: any) => any;
     }
 }
 
 window.app = {};
+window.api = new ApiApi(new Configuration({
+    basePath: BASE_PATH
+}));
 
 const pages = {
     'main': "Главная",
@@ -59,7 +79,9 @@ function App() {
     return (
         <div className="App">
             <div style={{display:'none'}}><LoginForm></LoginForm></div>
-            <Bar current={0} tabs={Object.values(pages)} onChange={t => window.navigate(Object.keys(pages)[t])}></Bar>
+            <Bar current={Object.keys(pages).indexOf(window.location.pathname.replace('/',''))}
+                 tabs={Object.values(pages)}
+                 onChange={t => window.navigate(Object.keys(pages)[t])}></Bar>
             <BrowserRouter>
                 <div style={{minHeight: '100vh', display: 'flex', flexDirection: 'column'}}>
                     <div style={{height: 70}}></div>
@@ -77,6 +99,7 @@ function App() {
             <AuthContainer></AuthContainer>
             <Images></Images>
             <Alerts></Alerts>
+            <ContextMenu></ContextMenu>
             <div className="windows"></div>
         </div>
     );

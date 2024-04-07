@@ -1,18 +1,25 @@
 //@ts-nocheck
 import React, {useLayoutEffect, useState} from 'react';
-import {Pagination, Stack} from "@mui/material";
+import {Pagination, Stack, Tab} from "@mui/material";
 import store from "../store";
 import {actions} from "../store/app";
+import Tabs from '@mui/material/Tabs';
+
 
 const limit = 30;
 
 const cache = {}
 
+interface TabsProps {
+    filter: (tab: number, item: object) => boolean;
+    names: string[];
+}
+
 const ItemsList = ({
                        component,
-                       getItems,
-                        cacheKey="",
-                   }: { cacheKey:string; component: React.JSXElementConstructor<any>; getItems: () => Promise<any> }) => {
+                       key_ = "",
+                       tabs = {names: [], filter: () => true}
+                   }: { tabs: TabsProps; key_: string; component: React.JSXElementConstructor<any>; }) => {
     const [items, setItems] = useState([]);
 
     function set(newItems) {
@@ -22,10 +29,15 @@ const ItemsList = ({
 
     const [page, setPage] = React.useState(1);
     const [all, setAll] = React.useState(1);
+    const path = `/api/${key_}/`
+
+    useLayoutEffect(() => {
+        store.dispatch(actions.setPage(key_));
+    }, [])
 
     useLayoutEffect(() => {
         const pagination = {limit, offset: limit * (page - 1)};
-        const cachePage = cache[cacheKey];
+        const cachePage = cache[key_];
         if (cachePage) {
             const cacheItems = cachePage[pagination.offset];
             if (cacheItems) {
@@ -34,15 +46,48 @@ const ItemsList = ({
                 return;
             }
         }
-        getItems(pagination).then(d => {
+        window.api.request({
+            path,
+            method: 'GET',
+            query: pagination,
+        }).then(r => r.json()).then(d => {
             set(d.results);
             setAll(Math.ceil(d.count / limit));
-            if (!cache[cacheKey]) cache[cacheKey] = {count: d.count}
-            cache[cacheKey][pagination.offset] = d.results;
+            if (!cache[key_]) cache[key_] = {count: d.count}
+            cache[key_][pagination.offset] = d.results;
         })
     }, [page]);
 
+    window.app.remove = data => {
+        window.api.request({
+            path: path + data.id,
+            method: 'DELETE',
+        })
+    }
+
+    window.app.create = (data) => {
+        window.api.request({
+            path,
+            method: 'POST',
+            query: pagination,
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+    }
+
     window.app.update = (data) => {
+        window.api.request({
+            path,
+            method: 'PUT',
+            query: pagination,
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({id: data.id, [key_]: data})
+        })
+
         let newItems = [...items];
         let i = 0;
         while (true) {
@@ -56,11 +101,26 @@ const ItemsList = ({
         set(newItems)
     }
 
+    const [tab, setTab] = useState(0);
+    let filteredItems = items.filter(it => tabs.filter(tab, it));
+    console.log(tab)
     return (
         <>
+            {tabs.names.length > 0 && <Tabs
+                value={tab}
+                centered
+                sx={{marginBottom: 2}}
+                onChange={setTab}
+                textColor="secondary"
+                indicatorColor="secondary"
+            >
+                {
+                    tabs.names.map((t, i) => <Tab onClick={() => setTab(i)} label={t}/>)
+                }
+            </Tabs>}
             <Stack direction={'row'} flexWrap={'wrap'}>
                 {
-                    items.map(it => React.createElement(component, {data: it}))
+                    filteredItems.map(it => React.createElement(component, {data: it}))
                 }
             </Stack>
             {all > 1 && <Pagination count={all}

@@ -10,8 +10,9 @@ window.addEventListener('onBitrixLiveChat', function (event) {
     // @ts-ignore
     let widget = event.detail.widget;
     const user = Userfront.user;
+    console.log(user)
     if (!user.userId) return;
-    md5(user.userUuid + "mymountmt.ru" + process.env.USER_SALT);
+    md5(user.userUuid + "mymountmt.ru" + 'aaa');
     let hash = md5.create().hex();
     let name = user.name;
     console.log(user, hash)

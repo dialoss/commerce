@@ -7,6 +7,8 @@ interface IState {
     items: any[];
     editor: boolean;
     page: string;
+    users: object;
+    pageData: object;
 }
 
 export const appSlice = createSlice({
@@ -15,6 +17,8 @@ export const appSlice = createSlice({
         selected: {},
         items: [],
         page: '',
+        users: {},
+        pageData: {},
         editor: true
     } as IState,
     reducers: {
@@ -26,6 +30,17 @@ export const appSlice = createSlice({
         },
         setEditor: (state) => {
             state.editor = !state.editor;
+        },
+        setPage: (state, {payload: page}) => {
+            state.page = page;
+        },
+        setPageData: (state, {payload: data}) => {
+            state.pageData = data;
+        },
+        setUsers: (state, {payload: users}) => {
+            for (const user of users) {
+                state.users[user.userId] = user;
+            }
         },
     }
 });

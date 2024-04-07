@@ -12,6 +12,7 @@ const HtmlEditor = ({clear, value, setHTML}) => {
     const [editor, setEditor] = useState(EditorState.createEmpty())
 
     useLayoutEffect(() => {
+        if (!value) return;
         const contentBlock = htmlToDraft(value);
         if (contentBlock) {
             const contentState = ContentState.createFromBlockArray(contentBlock.contentBlocks);
@@ -26,7 +27,7 @@ const HtmlEditor = ({clear, value, setHTML}) => {
     }
 
     return (
-        <Editor onContentStateChange={e => setHTML(draftToHtml(e))}
+        <Editor placeholder={"Напишите комментарий"} onContentStateChange={e => setHTML(draftToHtml(e))}
                 editorState={editor}
                 onEditorStateChange={setEditor}/>
     );

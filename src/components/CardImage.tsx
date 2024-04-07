@@ -5,7 +5,7 @@ import store from "../store";
 
 const sizes = {
     1: "400",
-    2: '1200'
+    2: '1500'
 }
 
 export function scaleImage(url, size, custom=null) {

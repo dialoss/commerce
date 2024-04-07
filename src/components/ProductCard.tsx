@@ -8,12 +8,11 @@ import {rub} from "../ui/tools";
 import BaseCard from "./BaseCard";
 import CardImage from "./CardImage";
 
-const ProductCard = ({data}: { data: Product }) => {
+const ProductCard = ({data, children}: {children: React.ReactElement; data: Product }) => {
     return (
-        <BaseCard
+        <BaseCard data={data}
             onClick={() => {
                 window.navigate(`models/${data.id}-${data.model}`);
-                store.dispatch(actions.setSelected(data))
             }}>
             <>
                 <div>
@@ -26,6 +25,7 @@ const ProductCard = ({data}: { data: Product }) => {
                         <Typography fontSize="lg" fontWeight="lg">
                             {rub.format(data.price || 0)}
                         </Typography>
+                        {children}
                     </div>
                 </CardContent>
             </>

@@ -4,60 +4,75 @@ import React from 'react';
 import {Form} from "../components/Form";
 import Windows from "../Window";
 import {useAppSelector} from "../store/redux";
-import {api} from "../index"
-import {actions} from "../store/app";
+
 import store from "../store";
-import Button from "@mui/material/Button";
 import {TextField} from "@mui/material";
-import {useForm} from "react-hook-form";
 import MenuItem from "@mui/material/MenuItem";
 
+const schema = require("../api/schema.json");
+
 const map = {
-    'Галерея': {
-        create: data => api.apiGalleryCreate({gallery: data})
+    'gallery': {
+        name: 'Галерея',
+        create: data => window.api.apiGalleryCreate({gallery: data})
     },
-    'Продукт': {
-        create: data => api.apiProductCreate({product: data})
+    'product': {
+        name: "Продукт",
+        create: data => window.api.apiProductCreate({product: data})
+    },
+    'order': {
+        name: "Заказ",
+        create: data => window.api.apiProductCreate({product: data})
     }
 }
-let form = "";
+
+function getFields(page) {
+    let d = [];
+    for (const p of schema[page]) {
+        if (p.name && p.name != 'id') d.push({...p, value: ''})
+    }
+    return d;
+}
 
 const DataForm = () => {
-    // const data = useAppSelector(state => state.app.selected);
-    const [data, setData] = React.useState({});
+    const [fields, setFields] = React.useState([]);
+    const page = useAppSelector(state => state.app.page);
 
-    function submit(newData) {
-        newData = {...data, ...newData}
-        api.apiProductUpdate({id: data.id, product: newData}).then(d => window.app.update(d));
+    function submit(data) {
+        console.log(data)
+        map[form].create(data).then(d => console.log(d));
+        window.app.update(data);
     }
 
-    function create() {
-        map[form].create(data);
+    const [open, setOpen] = React.useState(false);
 
+    window.app.dataForm = (create) => {
+        if (create) {
+            setFields(getFields(page));
+        } else {
+            setFields(store.getState().app.selected)
+        }
+        setOpen(true);
     }
 
     return (
         <>
-            <Windows title={'Форма'} open={false} defaultOpened={false}>
+            <Windows title={'Форма'} open={open} defaultOpened={false}>
                 <div style={{padding: 10}}>
                     <TextField
                         label="Что добавить"
                         select
                         style={{width: 200}}
-                        onChange={e => {
-                            let t = e.target.value;
-                            form = t;
-                        }}
+                        onChange={e => setFields(getFields(e.target.value))}
                     >
                         {
-                            ['Галерея', "Продукт", "Заказ"].map(name =>
-                                <MenuItem key={name} value={name}>{name}</MenuItem>
+                            Object.keys(map).map(form =>
+                                <MenuItem key={form} value={form}>{map[form].name}</MenuItem>
                             )
                         }
                     </TextField>
-                    <Button onClick={create}>Создать новый</Button>
                     <Form caption={"Форма"}
-                          fields={Object.keys(data).map(k => ({name: k, value: data[k]}))}
+                          fields={fields}
                           onSubmit={submit}
                     ></Form>
                 </div>

@@ -9,16 +9,15 @@ import {connectField} from 'uniforms';
 import HTMLEditor from "../ui/HTMLEditor";
 import Typography from "@mui/joy/Typography";
 import {scaleImage} from "../components/CardImage";
-import MuiInput from '@mui/material/Input';
-import {Button, TextField} from "@mui/material";
+import {Button, Slider, TextField} from "@mui/material";
 
 import Viewer from "../components/Model/Viewer";
 import background, {ModeEnum} from "@react-page/plugins-background";
 import {MediaField} from "../components/Form";
 import {useAppSelector} from "../store/redux";
-import {api} from "../index";
-import {Slider} from "@mui/material";
-import store from "../store";
+import MenuItem from "@mui/material/MenuItem";
+import Pay from "../components/Pay";
+import {BusinessLogic} from "../modules/BusinessLogic";
 
 const generateClassName = createGenerateClassName({
     disableGlobal: true,
@@ -29,17 +28,79 @@ type EditorData = {
     html: string;
 }
 
+const buttonPlugin: CellPlugin<EditorData> = {
+    Renderer: ({data}) => (
+        <>
+            {data.type === "buy" && <Pay product={{}} text={"Купить"}></Pay>}
+            {data.type === "order" && <Button onClick={() => BusinessLogic.order()}>
+                заказать изготовление
+            </Button>
+            }
+        </>
+    ),
+    id: 'buttonPlugin',
+    title: 'Кнопка',
+    description: 'Цена/заказ/действие',
+    version: 1,
+    controls: {
+        type: 'autoform',
+        columnCount: 1,
+        schema: {
+            properties: {
+                text: {
+                    type: 'string',
+                    default: ""
+                },
+                action: {
+                    type: 'string',
+                    uniforms: {
+                        component: connectField(({value, onChange}) => {
+                            const [v, setV] = React.useState(value);
+                            return <div><TextField
+                                label="Действие"
+                                onChange={e => setV(e.target.value)}
+                            >
+                            </TextField><Button onClick={() => onChange(v)}>OK</Button></div>
+                        })
+                    }
+                },
+                type: {
+                    type: 'string',
+                    uniforms: {
+                        component: connectField(({value, onChange}) =>
+                            <TextField
+                                label="Тип"
+                                select
+                                style={{width: 200}}
+                                onChange={e => onChange(e.target.value)}
+                            >
+                                {
+                                    [{n: "Покупка", t: 'buy'}, {n: "Заказ", t: 'order'}].map(f =>
+                                        <MenuItem key={f.n} value={f.t}>{f.n}</MenuItem>
+                                    )
+                                }
+                            </TextField>
+                        )
+                    }
+                },
+            },
+        },
+    },
+};
+
+
 const textPlugin: CellPlugin<EditorData> = {
     Renderer: ({data}) => (
         <div style={{minHeight: 20, padding: 10}} dangerouslySetInnerHTML={{__html: data.html}}>
         </div>
     ),
     id: 'textPlugin',
-    title: 'Редактор текста',
-    description: '',
+    title: 'Редактор',
+    description: 'HTML редактор текста',
     version: 1,
     controls: {
         type: 'autoform',
+        columnCount: 1,
         schema: {
             properties: {
                 html: {
@@ -58,12 +119,12 @@ const textPlugin: CellPlugin<EditorData> = {
 
 const spacerPlugin: CellPlugin = {
     Renderer: ({data}) => (
-        <div style={{minHeight: data.height}}>
+        <div style={{minHeight: data.height || 30}}>
         </div>
     ),
     id: 'spacerPlugin',
-    title: 'Добавляет пространство',
-    description: '',
+    title: 'Пространство',
+    description: "Разделитель",
     version: 1,
     controls: {
         type: 'autoform',
@@ -74,6 +135,7 @@ const spacerPlugin: CellPlugin = {
                     uniforms: {
                         component: connectField(({value, onChange}) => {
                             const [v, setValue] = React.useState(30);
+
                             function change(v) {
                                 setValue(v);
                                 onChange(v)
@@ -123,10 +185,15 @@ const mediaPlugin: CellPlugin<MediaData> = {
                                 window.app.images.open({
                                     images: [scaleImage(data.files[0].url, 2)],
                                     start: 0,
-                                    id:1
+                                    id: 1
                                 })
                             }}
-                                style={{width: '100%', height: '100%', borderRadius: 5, boxShadow: data.border ? '0 0 2px 0 grey' : ''}}
+                                 style={{
+                                     width: '100%',
+                                     height: '100%',
+                                     borderRadius: 5,
+                                     boxShadow: data.border ? '0 0 2px 0 grey' : ''
+                                 }}
                                  src={scaleImage(data.files[0].url, 0, data.quality)} alt=""/>
                         </div> :
                         <div className={'h-[400px] w-100'}>
@@ -186,7 +253,7 @@ const mediaPlugin: CellPlugin<MediaData> = {
                 },
                 quality: {
                     type: 'number',
-                    default: 400,
+                    default: 800,
                 },
             },
             required: ['files'],
@@ -194,7 +261,7 @@ const mediaPlugin: CellPlugin<MediaData> = {
     },
 };
 
-const cellPlugins = [mediaPlugin, spacerPlugin, textPlugin, background({
+const cellPlugins = [buttonPlugin, mediaPlugin, spacerPlugin, textPlugin, background({
     enabledModes:
         ModeEnum.COLOR_MODE_FLAG |
         ModeEnum.IMAGE_MODE_FLAG |
@@ -210,7 +277,7 @@ const PageEditor = ({id, data}: { id: number; data: object }) => {
     // window.x = d => useRemoveCell(d);
     function update(data) {
         updates++;
-        if (updates % 10 === 0) api.apiProductUpdate({id, product: {page: JSON.stringify(data)}})
+        window.api.apiProductUpdate({id, product: {page: JSON.stringify(data)}})
         setValue(data);
     }
 
@@ -222,8 +289,41 @@ const PageEditor = ({id, data}: { id: number; data: object }) => {
         })
     }, [])
 
-    console.log(value)
+    window.app.editor = {
+        insert: files => {
+            let x = new Date().getTime();
+            let items = [];
+            for (const f of files) {
+                items.push({
+                    "id": x++,
+                    "size": 12 / files.length,
+                    "plugin": {
+                        "id": "mediaPlugin",
+                        "version": 1
+                    },
+                    "dataI18n": {
+                        "default": {
+                            "files": [f],
+                            "title": "",
+                            "text": "",
+                            "width": false,
+                            "border": true,
+                            "quality": 800
+                        }
+                    },
+                    "rows": [],
+                    "inline": null
+                })
+            }
+            setValue(value => ({...value, rows: [...value.rows, {
+                    "id": x++,
+                    "cells": items,
+                }]
+            }))
+        }
+    }
 
+    console.log(value)
     return (
         <Editor readOnly={!editor} cellPlugins={cellPlugins} value={value} onChange={update}/>
     );

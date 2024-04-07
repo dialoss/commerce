@@ -28,7 +28,7 @@ function Bar({
     return (
         <>
             <AppBar position="fixed" sx={{zIndex: 10}}>
-                <Container maxWidth="xl">
+                <Container maxWidth="xl" sx={{paddingRight:'5px !important'}}>
                     <Stack direction={'row'}>
                         <IconButton color="inherit" onClick={() => setOpen(o => !o)}>
                             <MenuIcon/>
@@ -46,12 +46,12 @@ function Bar({
                             }
                         </Tabs>
                         <MyTooltip sx={{marginLeft: 'auto',display:'flex',alignItems:'center'}}
-                                   element={({onClick}) => <IconButton onClick={onClick} color="inherit">
-                                       <ChatIcon/>
-                                   </IconButton>}
+                                   element={({onClick}) => <Button startIcon={<ChatIcon/>} onClick={onClick} color="inherit">
+                                       чат
+                                   </Button>}
                                    title={'Связаться со мной'} fields={[
                             {
-                                name: "Чат на сайте",
+                                name: "На сайте",
                                 callback: () => {
                                     if (!checkUser()) return;
                                     const chat: HTMLElement | null = document.querySelector(`a[data-b24-crm-button-widget="openline_livechat"]`);
@@ -60,7 +60,7 @@ function Bar({
                                 }
                             },
                             {
-                                name: <p>Телеграм</p>,
+                                name: <p>Telegram</p>,
                                 callback: () => {
                                     window.open("https://t.me/mymount_bot")
                                 }

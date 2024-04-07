@@ -28,7 +28,7 @@ function InnerForm({fields, register, setValue}) {
 }
 
 export function Form({
-                         caption, button = "Submit", fields, onSubmit = () => {
+                         caption, button = "Подтвердить", fields, onSubmit = () => {
     }, children
                      }: IForm) {
     const {
@@ -60,34 +60,38 @@ export function Form({
     )
 }
 
+export function formatCloudFiles(files) {
+    return files.map(f => {
+        let url = f.public_id;
+        let type = f.resource_type;
+        if (type === "raw") {
+            if (f.context && f.context.custom) {
+                url = f.context.custom.model;
+                type = 'model';
+            } else {
+                type = 'file';
+            }
+        }
+        return {
+            url,
+            type,
+            filename: url.split('/').slice(-1)[0],
+            width: f.width,
+            height: f.height,
+        }
+    })
+}
+
 export const MediaField = ({field, setValue, simple = false}) => {
     const [files, setFiles] = React.useState(field.value);
 
     function set(files) {
-        setValue("media", files);
+        setValue(field.name, files);
         setFiles(files);
     }
 
     function setRaw(files) {
-        files = files.map(f => {
-            let url = f.public_id;
-            let type = f.resource_type;
-            if (type === "raw") {
-                if (f.context && f.context.custom) {
-                    url = f.context.custom.model;
-                    type = 'model';
-                } else {
-                    type = 'file';
-                }
-            }
-            return {
-                url,
-                type,
-                filename: url.split('/').slice(-1)[0],
-                width: f.width,
-                height: f.height,
-            }
-        })
+        files = formatCloudFiles(files);
         setFiles(f => {
             let newFiles = [...f, ...files];
             setValue("media", newFiles)
@@ -97,28 +101,12 @@ export const MediaField = ({field, setValue, simple = false}) => {
 
     function select() {
         if (simple) {
-            let widget = cloudinary.createUploadWidget({
-                    cloudName: 'drlljn0sj',
-                    uploadPreset: 'hwub8goj',
-                    maxFiles: 3,
-                    maxFileSize: 5000000
-                }, (error, result) => {
-                    if (!error && result) {
-                        console.log(result)
-                        if (result.event === "success") setRaw([result.info]);
-                        if (result.event === "upload-added") {
-                            console.log(result)
-                        }
-                    }
-                }
-            )
-            widget.open();
+            window.app.filemanager?.uploadWidget().then(files => setRaw(files));
         } else {
-            window.app.filemanager?.getFiles().then(files => {
-                setRaw(files)
-            });
+            window.app.filemanager?.getFiles().then(files => setRaw(files));
         }
     }
+
     return (
         <>
             <Button onClick={select}>Выбрать файлы</Button>
@@ -128,14 +116,9 @@ export const MediaField = ({field, setValue, simple = false}) => {
 }
 
 function getFormField(field, register, setValue) {
-    if (typeof field.value === 'object') {
-        console.log(field)
-        // return <InnerForm
-        //     fields={Object.keys(field).map(k => ({name: k, value: field[k]}))} register={register} setValue={setValue}></InnerForm>
-    }
-    if (FormMap[field.name]) return React.createElement(FormMap[field.name], {setValue, field});
+    if (FormMap[field.type]) return React.createElement(FormMap[field.type], {setValue, field});
     else return <TextField
-        required
+        // required
         fullWidth
         autoComplete={field.autocomplete || ''}
         variant="standard"

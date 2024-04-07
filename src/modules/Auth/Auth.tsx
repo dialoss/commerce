@@ -10,9 +10,14 @@ import GoogleButton from "./GoogleButton/AuthButton";
 import Typography from "@mui/joy/Typography";
 import Userfront from "@userfront/toolkit/react";
 import {Form} from "../../components/Form";
-import {LoginForm} from "@userfront/toolkit/react";
+import store from "../../store";
+import {actions} from "../../store/app";
+import {BASE_PATH} from "../../config";
 
 Userfront.init("7n8ddmqn");
+
+fetch(BASE_PATH + "/user/").then(r => r.json()).then(d =>
+    store.dispatch(actions.setUsers(d.results)))
 
 interface IFields {
     [key: number]: string[];
