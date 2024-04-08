@@ -11,14 +11,15 @@ import CardImage from "./CardImage";
 const ProductCard = ({data, children}: {children: React.ReactElement; data: Product }) => {
     return (
         <BaseCard data={data}
-            onClick={() => {
+            onClick={e => {
+                if (e.button === 2) return;
                 window.navigate(`models/${data.id}-${data.model}`);
             }}>
             <>
                 <div>
-                    <Typography level="title-lg">{data.type + " " + data.model}</Typography>
+                    <Typography level="title-lg" mb={1}>{data.type + " " + data.model}</Typography>
                 </div>
-                <CardImage carousel={false} id={data.id} url={data.cover}></CardImage>
+                <CardImage carousel={false} id={data.id} url={data.mediaUrl}></CardImage>
                 <CardContent orientation="horizontal">
                     <div>
                         <Typography level={'body-md'}>{data.summary}</Typography>

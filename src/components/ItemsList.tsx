@@ -64,29 +64,29 @@ const ItemsList = ({
             path: path + data.id,
             method: 'DELETE',
         })
+        set(items.filter(it => it.id != data.id));
     }
 
     window.app.create = (data) => {
         window.api.request({
             path,
             method: 'POST',
-            query: pagination,
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(data)
+            body: data
         })
+        set([...items, data])
     }
 
     window.app.update = (data) => {
         window.api.request({
-            path,
+            path: path + data.id + '/',
             method: 'PUT',
-            query: pagination,
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({id: data.id, [key_]: data})
+            body: data,
         })
 
         let newItems = [...items];

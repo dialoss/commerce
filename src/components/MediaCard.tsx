@@ -6,35 +6,27 @@ import FavoriteIcon from '@material-ui/icons/Favorite';
 import BaseCard from "./BaseCard";
 import CardImage from "./CardImage";
 import {Stack} from "@mui/material";
+import Likes from "../ui/Likes/Likes";
 
-function Likes({likes}) {
-    return (
-        <>
-            {likes > 0 && <Stack direction={'row'} sx={{position:'absolute', right:1, top:1, zIndex:2}}>
-                {likes}
-                <FavoriteIcon></FavoriteIcon>
-            </Stack>}
-        </>
-    )
-}
 
 const MediaCard = ({data}: { data: Media }) => {
     return (
         <BaseCard data={data}>
             <>
-            {!!data.title && <div>
-                <Typography level="title-lg">{data.title}</Typography>
-            </div>}
-            <Likes likes={data.likes || 0}></Likes>
-            <CardImage carousel={true} id={data.id} url={data.url}></CardImage>
-            <Typography sx={{
-                flexGrow: 1,
-                display: 'flex',
-                textAlign: 'center',
-                alignItems: 'center',
-                justifyContent: 'center'
-            }}
-                        level={'body-md'}>{data.text}</Typography>
+                <CardImage carousel={true} id={data.id} url={data.mediaUrl}></CardImage>
+                {!!data.mediaTitle && <div>
+                    <Typography textAlign={"center"} level="title-lg">{data.mediaTitle}</Typography>
+                </div>}
+                <Typography sx={{
+                    flexGrow: 1,
+                    minHeight: 20,
+                    display: 'flex',
+                    textAlign: 'center',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                }}
+                            level={'body-md'}>{data.mediaText}</Typography>
+                <Likes likes={data.likes || 0}></Likes>
             </>
         </BaseCard>
     );

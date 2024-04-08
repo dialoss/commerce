@@ -25,7 +25,7 @@ const Pay = ({text, product}) => {
                   target={'_blank'}
                   onSubmit={() => BusinessLogic.buy(product)}>
                 {fields.map(f => <input type="text" hidden value={f.value} name={f.name}/>)}
-                <Tooltip title="После оплаты заказ появится на странице вашего профиля">
+                <Tooltip title={<p style={{fontSize:13}}>После оплаты заказ появится на странице вашего профиля</p>}>
                     <Button size={'small'} variant={'contained'} type={'submit'}>
                         {text}
                     </Button>

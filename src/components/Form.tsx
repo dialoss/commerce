@@ -1,10 +1,12 @@
 // @ts-nocheck
 import {useForm} from "react-hook-form";
 import Box from "@mui/material/Box";
-import {Button, TextField} from "@mui/material";
-import React from "react";
+import {Button, Checkbox, FormControlLabel, FormGroup, TextField} from "@mui/material";
+import React, {useEffect} from "react";
 import {Uploader} from "./uploader";
-
+import MenuItem from "@mui/material/MenuItem";
+import Typography from "@mui/material/Typography";
+import {Stack} from "@mui/material";
 interface Field {
     name: string;
     value: any;
@@ -34,10 +36,13 @@ export function Form({
     const {
         register, handleSubmit, setValue, reset
     } = useForm();
-    // useLayoutEffect(() => {
-    //     reset();
-    // }, [fields]);
+
     console.log(fields)
+    useEffect(() => {
+        for (const f of fields) {
+            setValue(f.name, f.value);
+        }
+    }, [fields])
     return (
         <>
             <Box component="form" onSubmit={e => {
@@ -64,10 +69,13 @@ export function formatCloudFiles(files) {
     return files.map(f => {
         let url = f.public_id;
         let type = f.resource_type;
+        let name = url.split('/').slice(-1)[0];
         if (type === "raw") {
             if (f.context && f.context.custom) {
                 url = f.context.custom.model;
                 type = 'model';
+            } else if (['mp4', 'avi'].includes(name.split('.').slice(-1)[0].toLowerCase())) {
+                type = 'video';
             } else {
                 type = 'file';
             }
@@ -75,7 +83,7 @@ export function formatCloudFiles(files) {
         return {
             url,
             type,
-            filename: url.split('/').slice(-1)[0],
+            filename: name,
             width: f.width,
             height: f.height,
         }
@@ -83,20 +91,20 @@ export function formatCloudFiles(files) {
 }
 
 export const MediaField = ({field, setValue, simple = false}) => {
-    const [files, setFiles] = React.useState(field.value);
+    const [files, setFiles] = React.useState(() => {
+        if (field.name === 'mediaUrl') return [{url: field.value}];
+        return field.value;
+    });
 
     function set(files) {
-        setValue(field.name, files);
+        if (field.name === 'mediaUrl') setValue(files.length ? files[0].url : '');
+        else setValue(files);
         setFiles(files);
     }
 
     function setRaw(files) {
         files = formatCloudFiles(files);
-        setFiles(f => {
-            let newFiles = [...f, ...files];
-            setValue("media", newFiles)
-            return newFiles
-        });
+        set(files);
     }
 
     function select() {
@@ -109,16 +117,21 @@ export const MediaField = ({field, setValue, simple = false}) => {
 
     return (
         <>
-            <Button onClick={select}>Выбрать файлы</Button>
+            <Stack direction={'row'} alignItems={'center'}>
+                <Typography>Медиа</Typography>
+                <Button onClick={select}>Выбрать файлы</Button>
+            </Stack>
             <Uploader files={files} setFiles={set}></Uploader>
         </>
     )
 }
 
 function getFormField(field, register, setValue) {
-    if (FormMap[field.type]) return React.createElement(FormMap[field.type], {setValue, field});
+    if (FormMap[field.type]) return React.createElement(FormMap[field.type], {
+        setValue: data => setValue(field.name, data),
+        field
+    });
     else return <TextField
-        // required
         fullWidth
         autoComplete={field.autocomplete || ''}
         variant="standard"
@@ -130,6 +143,58 @@ function getFormField(field, register, setValue) {
     />
 }
 
-const FormMap = {
-    "media": MediaField,
+function SelectField({label, setValue, fields = [], defaultValue = ""}) {
+    const [v, setV] = React.useState(defaultValue);
+    return (
+        <TextField
+            label={label}
+            select
+            style={{width: '100%'}}
+            value={v}
+            onChange={e => {
+                setV(e.target.value)
+                setValue(e.target.value)
+            }}
+        >
+            {
+                fields.map(t =>
+                    <MenuItem key={t.name} value={t.value}>{t.name}</MenuItem>
+                )
+            }
+        </TextField>
+    )
 }
+
+const FormMap = {
+    "boolean": ({field, setValue}) => <FormGroup>
+        <FormControlLabel control={<Checkbox checked={field.value || false} onChange={e =>
+            setValue(e.target.checked)
+        }/>} label={field.label}/>
+    </FormGroup>,
+    "media": MediaField,
+    'productType': ({field, setValue}) =>
+        <SelectField defaultValue={field.value || 'Монтировка'}
+                     fields={[{name: "Монтировка", value: "Монтировка"}, {name: "Чертёж", value: "Чертёж"}]}
+                     setValue={setValue}
+                     label={"Тип продукта"}></SelectField>,
+    "status": ({field, setValue}) =>
+        <SelectField defaultValue={field.value || ""}
+                     fields={statuses}
+                     setValue={setValue}
+                     label={"Статус заказа"}></SelectField>,
+}
+
+const statuses = [
+    {
+        name: "Принят - Ожидает оплаты", value: 1
+    },
+    {
+        name: "Принят - Начало изготовления", value: 3
+    },
+    {
+        name: "Подготовка материала - Ожидание доставки", value: 4
+    },
+    {
+        name: "Завершён", value: 2
+    }
+]

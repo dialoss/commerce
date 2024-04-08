@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import ImageUploading from 'react-images-uploading';
 import {Button, Checkbox, FormControlLabel, MenuItem, Stack, TextField, Typography} from "@mui/material";
+import {scaleImage} from "./CardImage";
 
 export function Uploader({files, setFiles}) {
     const maxNumber = 69;
@@ -23,15 +24,15 @@ export function Uploader({files, setFiles}) {
                   onImageRemove,
               }) => (
                 <Stack alignItems={'center'} rowGap={2}>
-                    {files.length > 0 && <Button size={'small'} variant={'contained'} onClick={onImageRemoveAll}>Убрать все
+                    {files.length > 1 && <Button size={'small'} variant={'contained'} onClick={onImageRemoveAll}>Убрать все
                         файлы</Button>}
                     <Stack direction={'row'} flexWrap={'wrap'} alignItems={'center'} justifyContent={'center'}
                            style={{width: "80%"}}>
                         {imageList.map((image, index) => (
-                            <div key={index} style={{margin: 5}}>
+                            <div key={index} style={{margin: 5, display:'flex',flexDirection:'column', alignItems:'center'}}>
                                 {/*<p>{image}</p>*/}
-                                {/*<img src={image.url} alt="" width="100"/>*/}
-                                {image.filename}
+                                <img src={scaleImage(image.url, 0, 200)} alt="" width="100"/>
+                                <p>{image.filename}</p>
                                 <Stack rowGap={1} mx={1}>
                                     <Button size={'small'} variant={'outlined'}
                                             onClick={() => onImageRemove(index)}>Удалить</Button>

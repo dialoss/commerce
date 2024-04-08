@@ -20,7 +20,7 @@ const CardImage = ({one = false, carousel = false, id=1, url}) => {
             <img
                 onClick={() => {
                     if (!carousel) return
-                    let images = store.getState().app.items.map(it => scaleImage(it.url, 2));
+                    let images = store.getState().app.items.map(it => scaleImage(it.mediaUrl, 2));
                     if (one) images = [scaleImage(url, 2)];
                     window.app.images.open({
                         images,

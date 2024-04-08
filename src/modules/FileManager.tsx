@@ -137,6 +137,7 @@ const FileManager = () => {
 
         function ondrop(e) {
             let files = e.dataTransfer.files;
+            if (!files.length) return;
             let uploaded = [];
             const config = {
                 onUploadProgress: progressEvent => {
@@ -159,11 +160,10 @@ const FileManager = () => {
         return () => window.removeEventListener("drop", ondrop);
     }, []);
 
-
     return (
 
         <Windows title={'Файлы'} open={opened} callback={setOpened}>
-            <div className="filemanager"></div>
+            <div className="filemanager w-100 h-100"></div>
         </Windows>
     );
 };

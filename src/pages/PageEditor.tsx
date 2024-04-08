@@ -9,7 +9,7 @@ import {connectField} from 'uniforms';
 import HTMLEditor from "../ui/HTMLEditor";
 import Typography from "@mui/joy/Typography";
 import {scaleImage} from "../components/CardImage";
-import {Button, Slider, TextField} from "@mui/material";
+import {Button, Checkbox, FormControlLabel, FormGroup, Slider, TextField} from "@mui/material";
 
 import Viewer from "../components/Model/Viewer";
 import background, {ModeEnum} from "@react-page/plugins-background";
@@ -18,7 +18,7 @@ import {useAppSelector} from "../store/redux";
 import MenuItem from "@mui/material/MenuItem";
 import Pay from "../components/Pay";
 import {BusinessLogic} from "../modules/BusinessLogic";
-import {OrderToJSON} from "../api";
+import ReactPlayer from 'react-player'
 
 const generateClassName = createGenerateClassName({
     disableGlobal: true,
@@ -93,12 +93,14 @@ const buttonPlugin: CellPlugin<EditorData> = {
 
 const textPlugin: CellPlugin<EditorData> = {
     Renderer: ({data}) => (
-        <div style={{minHeight: 20, padding: 10}} dangerouslySetInnerHTML={{__html: data.html}}>
+        <div style={{minHeight: 20, padding: 10}}>
+            {data.date && <p style={{fontWeight: 600}}>{window.formatDate(+data.date)}</p>}
+            <div dangerouslySetInnerHTML={{__html: data.html}}></div>
         </div>
     ),
     id: 'textPlugin',
-    title: 'Редактор',
-    description: 'HTML редактор текста',
+    title: 'Текст',
+    description: '',
     version: 1,
     controls: {
         type: 'autoform',
@@ -113,11 +115,46 @@ const textPlugin: CellPlugin<EditorData> = {
                         }),
                     },
                 },
+                date: {
+                    type: "string",
+                    uniforms: {
+                        component: connectField(({value, onChange}) => {
+                            return <FormGroup>
+                                <FormControlLabel control={<Checkbox onChange={e =>
+                                    onChange(e.target.checked ? new Date().getTime().toString() : "")
+                                }/>} label="Дата создания"/>
+                            </FormGroup>
+                        }),
+                    },
+                    default: ""
+                }
             },
             required: ['html'],
         },
     },
 };
+
+function SliderField({onChange, label, min, max, defaultValue, number = true}) {
+    const [v, setValue] = React.useState(defaultValue);
+
+    function change(v) {
+        setValue(v);
+        onChange(v)
+    }
+
+    return <div>{label}: {v} <Slider
+        value={v}
+        max={max}
+        min={min}
+        onChange={(e, n) => change(n)}
+    />
+        <TextField
+            value={v}
+            label={label}
+            onChange={e => change(+e.target.value)}
+            type={'number'}
+        /></div>
+}
 
 const spacerPlugin: CellPlugin = {
     Renderer: ({data}) => (
@@ -125,8 +162,8 @@ const spacerPlugin: CellPlugin = {
         </div>
     ),
     id: 'spacerPlugin',
-    title: 'Пространство',
-    description: "Разделитель",
+    title: 'Разделитель',
+    description: "Добавляет пространство между блоками",
     version: 1,
     controls: {
         type: 'autoform',
@@ -135,26 +172,8 @@ const spacerPlugin: CellPlugin = {
                 height: {
                     type: 'number',
                     uniforms: {
-                        component: connectField(({value, onChange}) => {
-                            const [v, setValue] = React.useState(30);
-
-                            function change(v) {
-                                setValue(v);
-                                onChange(v)
-                            }
-
-                            return <div>Высота: {v}px <Slider
-                                value={v}
-                                max={500}
-                                onChange={(e, n) => change(n)}
-                            />
-                                <TextField
-                                    value={v}
-                                    label={"Высота"}
-                                    onChange={e => change(+e.target.value)}
-                                    type={'number'}
-                                /></div>
-                        }),
+                        component: connectField(({value, onChange}) =>
+                            <SliderField onChange={onChange} label={'Высота'} max={500} min={30} defaultValue={30}></SliderField>),
                         default: 30,
                     },
                 },
@@ -169,47 +188,55 @@ type MediaData = {
     text: string;
 }
 
+function MediaWrapper({width, children}) {
+    return <div style={{
+        overflow: 'hidden',
+        maxWidth: '100%',
+        padding: 4,
+        maxHeight: '80vh',
+        width: width + "%",
+    }}>{children}</div>
+}
+
+const mediaStyle = {
+    width: '100%',
+    height: '100%',
+    borderRadius: 5,
+}
+
+const mediaItems = {
+    image: ({data}) =>
+        <img onClick={() => {
+            window.app.images.open({
+                images: [scaleImage(data.files[0].url, 2)],
+                start: 0,
+                id: 1
+            })
+        }}
+             style={{...mediaStyle, boxShadow: data.border ? '0 0 2px 0 grey' : ''}}
+             src={scaleImage(data.files[0].url, 0, data.quality)}
+             alt=""/>,
+    video: ({data}) => <ReactPlayer controls={true}
+                                    url={"https://res.cloudinary.com/drlljn0sj/video/upload/v1712582052/" + data.files[0].url}
+                                    style={mediaStyle}/>,
+    model: ({data}) => <div className={'h-[400px] w-100'}>
+        <Viewer data={{
+            show_ui: true,
+            urn: data.files[0].url,
+            id: 1,
+            rotation: true
+        }}></Viewer>
+    </div>
+}
+
 
 const mediaPlugin: CellPlugin<MediaData> = {
     Renderer: ({data}) => (
         <div style={{minHeight: 50, display: 'flex', alignItems: 'center', flexDirection: 'column'}}>
-            {data.files && data.files[0] &&
-                <>{
-                    data.files[0].type === 'image' ?
-                        <div style={{
-                            overflow: 'hidden',
-                            maxWidth: '100%',
-                            padding: 4,
-                            maxHeight: '80vh',
-                            width: data.width ? '100%' : 'auto'
-                        }}>
-                            <img onClick={() => {
-                                window.app.images.open({
-                                    images: [scaleImage(data.files[0].url, 2)],
-                                    start: 0,
-                                    id: 1
-                                })
-                            }}
-                                 style={{
-                                     width: '100%',
-                                     height: '100%',
-                                     borderRadius: 5,
-                                     boxShadow: data.border ? '0 0 2px 0 grey' : ''
-                                 }}
-                                 src={scaleImage(data.files[0].url, 0, data.quality)} alt=""/>
-                        </div> :
-                        <div className={'h-[400px] w-100'}>
-                            <Viewer data={{
-                                show_ui: true,
-                                urn: data.files[0].url,
-                                id: 1,
-                                rotation: true
-                            }}></Viewer>
-                        </div>
-                }
-                </>
+            {data.files && data.files[0] && <MediaWrapper width={data.width}>
+                {React.createElement(mediaItems[data.files[0].type], {data})}
+            </MediaWrapper>
             }
-            {/*<CardImage carousel={true} id={data.id} url={data.url}></CardImage>*/}
             {!!data.title && <Typography level="title-lg">{data.title}</Typography>}
             <Typography sx={{
                 flexGrow: 1,
@@ -232,7 +259,7 @@ const mediaPlugin: CellPlugin<MediaData> = {
                 files: {
                     uniforms: {
                         component: connectField(({value, onChange}) =>
-                            <MediaField field={{value}} setValue={(_, files) => onChange(files)}></MediaField>
+                            <MediaField field={{value}} setValue={files => onChange(files)}></MediaField>
                         ),
                     },
                     default: [],
@@ -246,8 +273,12 @@ const mediaPlugin: CellPlugin<MediaData> = {
                     default: '',
                 },
                 width: {
-                    type: 'boolean',
-                    default: false,
+                    type: 'string',
+                    uniforms: {
+                        component: connectField(({value, onChange}) =>
+                            <SliderField onChange={onChange} label={'Ширина'} max={100} min={10} defaultValue={80} number={false}></SliderField>),
+                        default: 'auto',
+                    },
                 },
                 border: {
                     type: 'boolean',
@@ -292,42 +323,15 @@ const PageEditor = ({id, data, endpoint}: { id: number; data: object; endpoint: 
     React.useEffect(() => {
         window.addEventListener("keydown", e => {
             if (e.key === "Delete") {
-                remove(focused)
+                // remove(focused)
             }
         })
     }, [])
 
     window.app.editor = {
         insert: files => {
-            let x = new Date().getTime();
-            let items = [];
-            for (const f of files) {
-                items.push({
-                    "id": x++,
-                    "size": 12 / files.length,
-                    "plugin": {
-                        "id": "mediaPlugin",
-                        "version": 1
-                    },
-                    "dataI18n": {
-                        "default": {
-                            "files": [f],
-                            "title": "",
-                            "text": "",
-                            "width": false,
-                            "border": true,
-                            "quality": 800
-                        }
-                    },
-                    "rows": [],
-                    "inline": null
-                })
-            }
             setValue(value => ({
-                ...value, rows: [...value.rows, {
-                    "id": x++,
-                    "cells": items,
-                }]
+                ...value, rows: [...value.rows, templateFiles(files)]
             }))
         }
     }
@@ -339,3 +343,34 @@ const PageEditor = ({id, data, endpoint}: { id: number; data: object; endpoint: 
 };
 
 export default PageEditor;
+
+function templateFiles(files) {
+    let x = new Date().getTime();
+    let items = [];
+    for (const f of files) {
+        items.push({
+            "id": x++,
+            "size": 12 / files.length,
+            "plugin": {
+                "id": "mediaPlugin",
+                "version": 1
+            },
+            "dataI18n": {
+                "default": {
+                    "files": [f],
+                    "title": "",
+                    "text": "",
+                    "width": false,
+                    "border": true,
+                    "quality": 800
+                }
+            },
+            "rows": [],
+            "inline": null
+        })
+    }
+    return {
+        "id": x++,
+        "cells": items,
+    }
+}

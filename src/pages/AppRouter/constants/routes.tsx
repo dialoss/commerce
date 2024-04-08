@@ -12,6 +12,18 @@ import React from "react";
 import Orders from "../../Orders";
 import OrderPage from "../../OrderPage";
 
+import SettingsPage from "../../SettingsPage";
+
+
+export const pages = {
+    'main': "Главная",
+    'models': "Модели",
+    'orders': "Заказы",
+    'blueprints': "Чертежи",
+    'shop': "В продаже",
+    'gallery': "Галерея",
+}
+
 export const routes = [
     {
         path: "/blueprints/", element: <div></div>
@@ -52,5 +64,9 @@ export const routes = [
     {
         path: "/profile/:id/",
         element: <UserPage/>
+    },
+    {
+        path: "/settings/",
+        element: <SettingsPage/>
     },
 ];

@@ -14,25 +14,25 @@ const schema = require("../api/schema.json");
 const map = {
     'gallery': {
         name: 'Галерея',
-        create: data => window.api.apiGalleryCreate({gallery: data})
     },
     'product': {
         name: "Продукт",
-        create: data => window.api.apiProductCreate({product: data})
     },
-    'order': {
-        name: "Заказ",
-        create: data => window.api.apiProductCreate({product: data})
-    }
 }
 
-function getFields(page) {
+function getFields(page, item) {
     let d = [];
     for (const p of schema[page]) {
-        if (p.name && p.name != 'id') d.push({...p, value: ''})
+        if (p.name && !["id",'page', 'product', 'dateCreated', 'statusChanged', 'user'].includes(p.name)) {
+            let v = "";
+            if (item) v = item[p.name]
+            d.push({...p, value: v})
+        }
     }
     return d;
 }
+
+let formType = 'create';
 
 const DataForm = () => {
     const [fields, setFields] = React.useState([]);
@@ -40,37 +40,22 @@ const DataForm = () => {
 
     function submit(data) {
         console.log(data)
-        map[form].create(data).then(d => console.log(d));
-        window.app.update(data);
+        if (formType === 'create') window.app.create(data);
+        else window.app.update({...data, id: store.getState().app.selected.id});
     }
 
     const [open, setOpen] = React.useState(false);
 
     window.app.dataForm = (create) => {
-        if (create) {
-            setFields(getFields(page));
-        } else {
-            setFields(store.getState().app.selected)
-        }
+        if (!create) formType = 'update'
+        else formType = 'create';
+        setFields(getFields(page, create ? null : store.getState().app.selected));
         setOpen(true);
     }
-
     return (
         <>
-            <Windows title={'Форма'} open={open} defaultOpened={false}>
+            <Windows callback={setOpen} width={400} title={'Форма'} open={open} defaultOpened={false}>
                 <div style={{padding: 10}}>
-                    <TextField
-                        label="Что добавить"
-                        select
-                        style={{width: 200}}
-                        onChange={e => setFields(getFields(e.target.value))}
-                    >
-                        {
-                            Object.keys(map).map(form =>
-                                <MenuItem key={form} value={form}>{map[form].name}</MenuItem>
-                            )
-                        }
-                    </TextField>
                     <Form caption={"Форма"}
                           fields={fields}
                           onSubmit={submit}

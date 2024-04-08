@@ -19,7 +19,7 @@ const ShopCard = ({data}: { data: Product }) => {
             {!!data.type && <div>
                 <Typography level="title-lg">{data.type}</Typography>
             </div>}
-            <CardImage id={data.id} url={data.cover}></CardImage>
+            <CardImage id={data.id} url={data.mediaUrl}></CardImage>
                 <div>
                     <Typography level={'body-md'}>{data.summary}</Typography>
                     <Typography fontSize="lg" fontWeight="lg">

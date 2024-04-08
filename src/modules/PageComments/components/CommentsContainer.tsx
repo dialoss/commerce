@@ -38,7 +38,7 @@ export const CommentsInput = ({callback, parent = null}: { parent?: number }) =>
         <div className="input-wrapper">
             <div className={"input-field"}>
                 <div className="editor-wrapper">
-                    <HTMLEditor clear={clear} value={message} setHTML={setMessage}></HTMLEditor>
+                    <HTMLEditor placeholder={"Напишите комментарий"} clear={clear} value={message} setHTML={setMessage}></HTMLEditor>
                 </div>
             </div>
             <Button onClick={send}>Отправить</Button>

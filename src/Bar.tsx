@@ -147,7 +147,7 @@ function UserInfo() {
                         {
                             name: "Настройки",
                             callback: () => {
-
+                                window.navigate("settings")
                             }
                         },
                         {

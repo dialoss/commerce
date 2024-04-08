@@ -5,6 +5,7 @@ import {useAppSelector} from "../store/redux";
 import ProductCard from "../components/ProductCard";
 import dayjs from "dayjs";
 import OrderCard from "../components/OrderCard";
+import {Stack} from "@mui/material";
 
 
 const UserPage = () => {
@@ -15,15 +16,14 @@ const UserPage = () => {
     useLayoutEffect(() => {
         window.api.apiOrderList({user: id}).then(d => setOrders(d.results));
     }, [])
-
     return (
         <div>
-            <h2>Профиль пользователя {user.name}</h2>
-            <h4>Заказы</h4>
+            <h2>Заказы пользователя {user.name}</h2>
+            <Stack direction={'row'} flexWrap={'wrap'}>
             {orders.map(ord =>
                 <OrderCard detailed={true} data={ord}></OrderCard>
-
             )}
+            </Stack>
         </div>
     );
 };

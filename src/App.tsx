@@ -18,6 +18,7 @@ import ContextMenu from "./components/ContextMenu";
 import {ApiApi, Configuration} from "./api";
 import {BASE_PATH} from "./config";
 import "tools/date"
+import {pages} from "./pages/AppRouter/constants/routes";
 
 interface IFilemanager {
     getFiles: () => Promise<any>;
@@ -65,15 +66,6 @@ window.app = {};
 window.api = new ApiApi(new Configuration({
     basePath: BASE_PATH
 }));
-
-const pages = {
-    'main': "Главная",
-    'models': "Модели",
-    'orders': "Заказы",
-    'blueprints': "Чертежи",
-    'shop': "В продаже",
-    'gallery': "Галерея",
-}
 
 function App() {
     return (

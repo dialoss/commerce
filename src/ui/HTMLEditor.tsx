@@ -8,7 +8,7 @@ import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 
 import htmlToDraft from 'html-to-draftjs';
 
-const HtmlEditor = ({clear, value, setHTML}) => {
+const HtmlEditor = ({placeholder="", clear, value, setHTML}) => {
     const [editor, setEditor] = useState(EditorState.createEmpty())
 
     useLayoutEffect(() => {
@@ -27,7 +27,7 @@ const HtmlEditor = ({clear, value, setHTML}) => {
     }
 
     return (
-        <Editor placeholder={"Напишите комментарий"} onContentStateChange={e => setHTML(draftToHtml(e))}
+        <Editor placeholder={placeholder} onContentStateChange={e => setHTML(draftToHtml(e))}
                 editorState={editor}
                 onEditorStateChange={setEditor}/>
     );
