@@ -1,0 +1,231 @@
+@import 'bootstrap/dist/css/bootstrap.min.css';
+
+
+/*@tailwind base;*/
+@tailwind components;
+@tailwind utilities;
+
+p {
+    margin-bottom: 0;
+}
+
+.b24-widget-button-pulse {
+    display: none;
+}
+
+.bx-livechat-head {
+    background-color: #1976D2 !important;
+}
+
+div[data-b24-crm-button-icon="crmform"] {
+    display: none;
+}
+
+.bx-ui-smiles-set:first-child {
+    display: none !important;
+}
+
+div[data-b24-crm-button-icon="openline"] {
+    opacity: 1 !important;
+}
+
+.b24-widget-button-inner-container {
+    transform: scale(0.7) !important;
+}
+
+.b24-widget-button-inner-mask {
+    display: none;
+}
+
+.bx-livechat-copyright {
+    display: none !important;
+}
+
+.bx-livechat-textarea {
+    flex: 0 0 0px !important;
+}
+
+.b24-widget-button-wrapper {
+    display: none !important;
+}
+
+.bx-livechat-position-bottom-right {
+    right: 50px !important;
+}
+
+.bx-livechat-control-btn::before {
+    display: none !important;
+}
+
+@media only screen and (min-width: 600px) {
+    .bx-livechat-position-bottom-right {
+        bottom: 50px !important;
+    }
+}
+
+.bx-livechat-user-position {
+    display: none !important;
+}
+
+.bx-livechat-control-box-active {
+    display: none !important;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+@media only screen and (max-width: 600px) {
+    .item-card {
+        width: 100%;
+    }
+}
+
+.public-DraftStyleDefault-block {
+    margin: 0 !important;
+}
+
+.rdw-editor-main {
+    border: 1px solid grey;
+    padding: 4px;
+}
+
+.windows {
+    z-index: 99;
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    display: flex;
+}
+
+.winbox.min {
+    width: 100px !important;
+    position: initial;
+}
+
+.MuiListItem-root.active {
+    background-color: rgba(0, 0, 0, 0.25);
+}
+
+@media (min-width: 576px) {
+    .modal-dialog {
+        max-width: 70vw !important;
+    }
+}
+
+.rdw-editor-toolbar {
+    position: sticky;
+    top: 0;
+    background-color: #fff;
+    z-index: 2;
+}
+
+@media only screen and (max-width: 700px) {
+    .media-item {
+        width: auto !important;
+    }
+    .winbox.min {
+        display: none;
+    }
+    .react-page-controls-mode-toggle-control-group {
+        display: none !important;
+    }
+    .resize-handle.react-draggable {
+        display: none !important;
+    }
+}
+
+.MuiDrawer-root.MuiDrawer-docked {
+    .MuiPaper-root.MuiPaper-elevation {
+        & > div:first-child {
+            margin: 0 auto !important;
+            padding: 10px !important;
+        }
+    }
+
+}
+
+.comments-section {
+    .rdw-fontfamily-wrapper, .rdw-embedded-wrapper, .rdw-image-wrapper {
+        display: none !important;
+    }
+}
+
+.react-page-row {
+    //column-gap: 4px;
+}
+
+.MuiFormControlLabel-root[aria-label="Content is visible"] {
+    display: none !important;
+}
+img, video {
+    display: block;
+}
+body {
+    overflow-y: scroll !important;
+    overflow-x: hidden !important;
+    padding-right: 0 !important;
+}
+.ui-vue-reaction {
+    display: none !important;
+}
+.react-page-row {
+    height: 100%;
+}
+
+.items-list .react-page-editable {
+    & > div {
+        display: flex;
+        flex-wrap: wrap;
+    }
+    .react-page-row-droppable-container, .react-page-row-droppable {
+        min-height: 100%;
+    }
+    @media only screen and (min-width: 1000px) {
+        .react-page-row-droppable-container,.react-page-row-droppable {
+            width: 33.3333% !important;
+        }
+    }
+
+    @media only screen and (max-width: 1000px) {
+        .react-page-row-droppable-container,.react-page-row-droppable {
+            width: 50% !important;
+        }
+    }
+
+    @media only screen and (max-width: 600px) {
+        .react-page-row-droppable-container,.react-page-row-droppable {
+            width: 100% !important;
+        }
+    }
+}
+
+.items-list:not(.editor) {
+    & > div {
+        display: flex;
+        flex-wrap: wrap;
+        @media only screen and (min-width: 1000px) {
+            & > div {
+                width: 33.3333% !important;
+            }
+        }
+
+        @media only screen and (max-width: 1000px) {
+            & > div {
+                width: 50% !important;
+            }
+        }
+
+        @media only screen and (max-width: 600px) {
+            & > div {
+                width: 100% !important;
+            }
+        }
+        & > div {
+            flex: initial !important;
+        }
+    }
+}
+

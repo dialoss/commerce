@@ -2,13 +2,12 @@ import React from 'react';
 import {Product} from "../api";
 import CardContent from '@mui/joy/CardContent';
 import Typography from '@mui/joy/Typography';
-import store from "../store";
-import {actions} from "../store/app";
-import {rub} from "../ui/tools";
 import BaseCard from "./BaseCard";
 import CardImage from "./CardImage";
+import {MediaItem} from "./MediaItems";
 
-const ProductCard = ({data, children}: {children: React.ReactElement; data: Product }) => {
+const ProductCard = ({data}: {data: Product }) => {
+    console.log(data)
     return (
         <BaseCard data={data}
             onClick={e => {
@@ -16,19 +15,9 @@ const ProductCard = ({data, children}: {children: React.ReactElement; data: Prod
                 window.navigate(`models/${data.id}-${data.model}`);
             }}>
             <>
-                <div>
-                    <Typography level="title-lg" mb={1}>{data.type + " " + data.model}</Typography>
-                </div>
-                <CardImage carousel={false} id={data.id} url={data.mediaUrl}></CardImage>
-                <CardContent orientation="horizontal">
-                    <div>
-                        <Typography level={'body-md'}>{data.summary}</Typography>
-                        <Typography fontSize="lg" fontWeight="lg">
-                            {rub.format(data.price || 0)}
-                        </Typography>
-                        {children}
-                    </div>
-                </CardContent>
+                <MediaItem data={data}></MediaItem>
+                <Typography level="title-lg">{data.productType + " " + data.model}</Typography>
+                <Typography level={'body-md'}>{data.summary}</Typography>
             </>
         </BaseCard>
     );

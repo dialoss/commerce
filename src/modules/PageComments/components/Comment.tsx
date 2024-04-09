@@ -7,6 +7,7 @@ import Avatar from "../../../ui/Avatar/Avatar";
 import CardImage from "../../../components/CardImage";
 import ItemFile from "../../../components/Items/File/ItemFile";
 import {useAppSelector} from "../../../store/redux";
+import { Link } from "react-router-dom";
 
 const Comment = ({data, depth}) => {
     const users = useAppSelector(state => state.app.users);
@@ -28,7 +29,7 @@ const Comment = ({data, depth}) => {
             <div className="comment-block">
                 <Avatar user={user} src={user.image}></Avatar>
                 <div className="comment-block__text ">
-                    <a href={"/profile/" + user.userId} className={"comment-username hover:cursor-pointer text-decoration-none"}>{user.name || 'Гость'}</a>
+                    <Link to={"/profile/" + user.userId} className={"comment-username hover:cursor-pointer text-decoration-none"}>{user.name || 'Гость'}</Link>
                     <p className={"comment-date"}>{window.formatDate(data.time)}</p>
                 </div>
             </div>
@@ -56,7 +57,7 @@ const Comment = ({data, depth}) => {
 export default Comment;
 
 const items = {
-    "image": ({data}) => <CardImage one={true} carousel={true} id={1} url={data.url}></CardImage>,
+    "image": ({data}) => <CardImage one={true} carousel={true} url={data.url}></CardImage>,
     "file": ItemFile,
 }
 

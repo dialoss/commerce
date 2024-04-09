@@ -13,7 +13,7 @@ const MediaCard = ({data}: { data: Media }) => {
     return (
         <BaseCard data={data}>
             <>
-                <CardImage carousel={true} id={data.id} url={data.mediaUrl}></CardImage>
+                <CardImage carousel={true} data={data}></CardImage>
                 {!!data.mediaTitle && <div>
                     <Typography textAlign={"center"} level="title-lg">{data.mediaTitle}</Typography>
                 </div>}

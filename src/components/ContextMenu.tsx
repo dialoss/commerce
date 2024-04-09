@@ -15,7 +15,11 @@ const actions = [
     {
         name: "Удалить",
         callback: () => {
-            window.app.remove(store.getState().app.selected);
+            window.app.dialog({
+                form: "Удалить?",
+                buttons: ['Да', "Нет"],
+                callback: (ans) => ans === 'Да' && window.app.remove(store.getState().app.selected)
+            })
         }
     },
     {
@@ -33,6 +37,11 @@ export default function ContextMenu() {
     } | null>(null);
 
     const handleContextMenu = (event: React.MouseEvent) => {
+        let found = false;
+        for (const el of [".items-list"]) {
+            if (event.srcElement.closest(el)) found = true;
+        }
+        if (!found) return
         event.preventDefault();
         setContextMenu(
             contextMenu === null
@@ -45,7 +54,6 @@ export default function ContextMenu() {
         );
     };
 
-    window.app.contextMenu = handleContextMenu;
     useLayoutEffect(() => {
         // @ts-ignore
         window.addEventListener("contextmenu", handleContextMenu);

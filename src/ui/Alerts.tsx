@@ -2,6 +2,7 @@
 import {Bounce, toast, ToastContainer} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import React from "react";
+import {MyModal} from "./MyModal";
 
 function UpdatedToast({progress}) {
     const toastId = React.useRef(null);
@@ -12,9 +13,9 @@ function UpdatedToast({progress}) {
             return;
         }
         if (toastId.current === null) {
-            toastId.current = toast('Upload in Progress', { progress });
+            toastId.current = toast('Upload in Progress', {progress});
         } else {
-            toast.update(toastId.current, { progress });
+            toast.update(toastId.current, {progress});
         }
     }, [progress]);
 
@@ -33,16 +34,27 @@ export default function Alerts() {
         return <UpdatedToast progress={d}></UpdatedToast>
     }
 
+    const [dialog, setDialog] = React.useState(null);
+    window.app.dialog = (d) => {
+        setDialog(d);
+    }
+
     return (
-        <ToastContainer
-            position="bottom-left"
-            hideProgressBar={false}
-            newestOnTop
-            rtl={false}
-            closeButton={false}
-            pauseOnFocusLoss={false}
-            pauseOnHover={false}
-            theme="colored"
-            transition={Bounce}></ToastContainer>
+        <>
+            <MyModal open={dialog != null} title={dialog ? dialog.form : ""} callback={b => {
+                setDialog(null);
+                dialog.callback(b);
+            }} buttons={dialog ? dialog.buttons : ['Закрыть']}></MyModal>
+            <ToastContainer
+                position="bottom-left"
+                hideProgressBar={false}
+                newestOnTop
+                rtl={false}
+                closeButton={false}
+                pauseOnFocusLoss={false}
+                pauseOnHover={false}
+                theme="colored"
+                transition={Bounce}></ToastContainer>
+        </>
     )
 }

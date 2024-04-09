@@ -7,7 +7,9 @@ import {rub} from "../ui/tools";
 import BaseCard from "./BaseCard";
 import CardImage from "./CardImage";
 import {useAppSelector} from "../store/redux";
-
+import { Link } from "react-router-dom";
+import {Avatar} from "@mui/material";
+import IconButton from "@mui/material/IconButton";
 export function OrderStatus({status}) {
     return <p>Статус заказа: {status.step} {status.substep.length > 1 ? `- ${status.substep}`: ''}</p>
 }
@@ -22,19 +24,21 @@ const OrderCard = ({data, detailed}: { detailed: boolean; data: Order }) => {
                   }}>
             <>
                 <div>
-                    <Typography level="title-lg">{data.product.type + " " + data.product.model}</Typography>
+                    <Typography level="title-lg">{data.product.productType + " " + data.product.model}</Typography>
                 </div>
-                <CardImage carousel={false} id={data.product.id}
-                           url={data.mediaUrl || data.product.mediaUrl}></CardImage>
+                <CardImage carousel={false}
+                           data={data.product.media}></CardImage>
                 <CardContent orientation="horizontal">
                     <div>
-                        <Typography level={'body-md'}>{data.summary}</Typography>
+                        {/*<Typography level={'body-md'}>{data.summary}</Typography>*/}
                         <Typography fontSize="lg" fontWeight="lg">
                             {rub.format(data.product.price || 0)}
                         </Typography>
                         <OrderStatus status={data.status}></OrderStatus>
                         <p>Дата заказа: {window.formatDate(data.dateCreated)}</p>
-                        <a href={`models/${data.product.id}-${data.product.model}`}>Продукт</a>
+                        <Link to={`/models/${data.product.id}-${data.product.model}`}>Продукт</Link>
+
+                        {user && <p>Заказчик {user.name}</p>}
                     </div>
                 </CardContent>
             </>

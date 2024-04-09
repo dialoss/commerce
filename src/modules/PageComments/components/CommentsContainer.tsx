@@ -16,6 +16,7 @@ export const CommentsInput = ({callback, parent = null}: { parent?: number }) =>
     const clear = React.useRef(false);
 
     function send() {
+        if (!window.app.authAction()) return;
         if (!message && !media.length) return;
         const comment = {
             id: new Date().getTime(),

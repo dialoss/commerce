@@ -8,7 +8,6 @@ import axios from 'axios';
 let manager = null;
 
 const FileManager = () => {
-    const [opened, setOpened] = useState(false);
     useEffect(() => {
         const int = setInterval(() => {
             const config = {
@@ -17,6 +16,7 @@ const FileManager = () => {
                 username: 'matthewwimsten@gmail.com',
                 button_caption: 'Добавить',
                 remove_header: true,
+                view_mode: 'list',
                 inline_container: '.filemanager',
                 language: 'ru',
                 text: {
@@ -32,11 +32,11 @@ const FileManager = () => {
             let hasCallback = false;
             window.app.filemanager = {
                 getFiles: () => {
-                    setOpened(true);
+                    window.openWindow("files")
                     return new Promise((resolve) => {
                         function selected(e) {
                             resolve(e.detail);
-                            setOpened(false);
+                            window.closeWindow("files")
                             hasCallback = false;
                             window.removeEventListener(eventName, this);
                         }
@@ -44,11 +44,16 @@ const FileManager = () => {
                         hasCallback = true;
                         window.addEventListener(eventName, selected);
                     })
+                },
+                open: () => {
+                    hasCallback = false;
+                    window.openWindow("files")
                 }
             }
             manager = window.cloudinary.createMediaLibrary(config, {
                 insertHandler: (d: any) => {
                     console.log(d.assets)
+                    window.closeWindow("files")
                     if (!hasCallback) {
                         window.app.editor.insert(formatCloudFiles(d.assets))
                     } else window.dispatchEvent(new CustomEvent(eventName, {detail: d.assets}));
@@ -161,8 +166,7 @@ const FileManager = () => {
     }, []);
 
     return (
-
-        <Windows title={'Файлы'} open={opened} callback={setOpened}>
+        <Windows key_={'files'} title={'Файлы'}>
             <div className="filemanager w-100 h-100"></div>
         </Windows>
     );

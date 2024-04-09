@@ -34,6 +34,7 @@ export default function Drawer({
 
     return (
         <SwipeableDrawer
+            swipeAreaWidth={0}
             onOpen={toggleDrawer(true)}
             open={open} onClose={toggleDrawer(false)}
         >

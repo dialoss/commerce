@@ -5,7 +5,7 @@ let url = 'https://api-metrika.yandex.net/stat/v1/data';
 
 const params = {
     'date1': '2020-01-01',
-    'id': 95613565,
+    'id': 96968383,
     'metrics': 'ym:pv:pageviews',
     'dimensions': 'ym:pv:URLPath',
 }

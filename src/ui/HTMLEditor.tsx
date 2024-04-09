@@ -8,18 +8,18 @@ import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 
 import htmlToDraft from 'html-to-draftjs';
 
-const HtmlEditor = ({placeholder="", clear, value, setHTML}) => {
+const HtmlEditor = ({placeholder="", clear, value, setHTML, updateValue=false}) => {
     const [editor, setEditor] = useState(EditorState.createEmpty())
 
     useLayoutEffect(() => {
-        if (!value) return;
+        if (!value || !updateValue) return;
         const contentBlock = htmlToDraft(value);
         if (contentBlock) {
             const contentState = ContentState.createFromBlockArray(contentBlock.contentBlocks);
             const editorState = EditorState.createWithContent(contentState);
             setEditor(editorState);
         }
-    }, []);
+    }, [value]);
 
     if (clear && clear.current) {
         setEditor(EditorState.createEmpty());

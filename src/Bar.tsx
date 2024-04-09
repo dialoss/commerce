@@ -11,24 +11,32 @@ import Drawer from "./Drawer";
 import Typography from '@mui/material/Typography';
 import Box from "@mui/material/Box";
 import MenuItem from '@mui/material/MenuItem';
-import {actions, IUser} from "./store/app";
-import {useAppSelector} from "./store/redux";
+import {actions} from "./store/app";
 import Button from "@mui/material/Button";
 import Userfront from "@userfront/toolkit/react";
 import {checkUser} from "./modules/Auth/helpers";
 import store from "./store";
+import {useNavigate} from "react-router-dom";
 
 function Bar({
                  tabs, current, onChange = () => {
     }
-             }: {tabs: string[], onChange?: (tab: number) => void }) {
+             }: { tabs: object, onChange?: (tab: number) => void }) {
     const [open, setOpen] = React.useState(false);
     const [tab, setTab] = React.useState(current);
-    const drawer = tabs.concat(['Редактор', "Файлы"])
+    let tabsNames = Object.values(tabs);
+    const drawer = tabsNames.concat(['Редактор', "Файлы", "Форма"])
+    const location = useNavigate();
+    React.useLayoutEffect(() => {
+        const page = window.location.pathname.split('/')[1];
+        if (!tabs[page]) setTab(-1);
+        else setTab(Object.keys(tabs).indexOf(page));
+        window.scrollTo(0, 0)
+    }, [location])
     return (
         <>
-            <AppBar position="fixed" sx={{zIndex: 10}}>
-                <Container maxWidth="xl" sx={{paddingRight:'5px !important'}}>
+            <AppBar position="fixed" sx={{zIndex: 3}}>
+                <Container maxWidth="xl" sx={{paddingRight: '5px !important'}}>
                     <Stack direction={'row'}>
                         <IconButton color="inherit" onClick={() => setOpen(o => !o)}>
                             <MenuIcon/>
@@ -39,14 +47,15 @@ function Bar({
                               textColor="inherit"
                         >
                             {
-                                tabs.map((t, i) => <Tab onClick={() => {
+                                tabsNames.map((t, i) => <Tab onClick={() => {
                                     onChange(i);
                                     setTab(i);
                                 }} key={t} label={t}></Tab>)
                             }
                         </Tabs>
-                        <MyTooltip sx={{marginLeft: 'auto',display:'flex',alignItems:'center'}}
-                                   element={({onClick}) => <Button startIcon={<ChatIcon/>} onClick={onClick} color="inherit">
+                        <MyTooltip sx={{marginLeft: 'auto', display: 'flex', alignItems: 'center'}}
+                                   element={({onClick}) => <Button startIcon={<ChatIcon/>} onClick={onClick}
+                                                                   color="inherit">
                                        чат
                                    </Button>}
                                    title={'Связаться со мной'} fields={[
@@ -72,7 +81,8 @@ function Bar({
             </AppBar>
             <Drawer tab={tab} callback={i => {
                 if (drawer[i] === "Редактор") store.dispatch(actions.setEditor());
-                else if (drawer[i] === "Файлы") window.app.filemanager?.getFiles();
+                else if (drawer[i] === "Файлы") window.app.filemanager?.open();
+                else if (drawer[i] === "Форма") window.app.dataForm();
                 else {
                     onChange(i);
                     setTab(i);
@@ -140,31 +150,37 @@ function UserInfo() {
     const user = Userfront.user;
     return (
         <>
-            {user.userId ? <Stack direction={'row'}>
-                    <MyTooltip element={({onClick}) => <IconButton onClick={onClick} sx={{p: "5px"}}>
-                        <Avatar src={user.image}></Avatar>
-                    </IconButton>} title={'Пользователь'} fields={[
-                        {
-                            name: "Настройки",
-                            callback: () => {
-                                window.navigate("settings")
-                            }
-                        },
-                        {
-                            name: "Мои заказы",
-                            callback: () => {
-                                window.navigate("profile")
-                            }
-                        },
-                        {
-                            name: "Выход",
-                            callback: () => {
-                                Userfront.logout({redirect: "/main/"});
-                            }
+            {user.userId ?
+                <MyTooltip
+                    element={({onClick}) => <Stack direction={'row'} onClick={onClick}>
+                        <IconButton sx={{p: "5px"}}>
+                            <Avatar src={user.image}></Avatar>
+                        </IconButton>
+                        <Typography mx={1} className={"hover:cursor-pointer text-decoration-underline"} sx={{
+                            color: '#fff',
+                            display: 'flex',
+                            alignItems: 'center'
+                        }}>{user.name}</Typography>
+                        </Stack>} title={'Пользователь'} fields={[
+                    {
+                        name: "Настройки",
+                        callback: () => {
+                            window.navigate("settings")
                         }
-                    ]}></MyTooltip>
-                    <Typography mx={1} sx={{color: '#fff', display: 'flex', alignItems: 'center'}}>{user.name}</Typography>
-                </Stack> :
+                    },
+                    {
+                        name: "Мои заказы",
+                        callback: () => {
+                            window.navigate("profile")
+                        }
+                    },
+                    {
+                        name: "Выход",
+                        callback: () => {
+                            Userfront.logout({redirect: "/main/"});
+                        }
+                    }
+                ]}></MyTooltip> :
                 <Button variant={'outlined'} sx={{color: '#fff'}} mx={1}
                         onClick={() => window.app.auth?.open()}>Вход</Button>
             }

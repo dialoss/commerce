@@ -8,9 +8,7 @@ function Likes({likes}: {likes: number}) {
         <div className={'likes'}>
             <Stack direction={'row'}>
                 {likes}
-                {/*<IconButton size={'small'}>*/}
                 <FavoriteBorderIcon></FavoriteBorderIcon>
-                {/*</IconButton>*/}
             </Stack>
         </div>
     )

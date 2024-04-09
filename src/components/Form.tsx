@@ -1,12 +1,13 @@
 // @ts-nocheck
 import {useForm} from "react-hook-form";
 import Box from "@mui/material/Box";
-import {Button, Checkbox, FormControlLabel, FormGroup, TextField} from "@mui/material";
-import React, {useEffect} from "react";
+import {Button, Checkbox, FormControlLabel, FormGroup, Stack, TextField} from "@mui/material";
+import React, {useEffect, useLayoutEffect, useState} from "react";
 import {Uploader} from "./uploader";
 import MenuItem from "@mui/material/MenuItem";
 import Typography from "@mui/material/Typography";
-import {Stack} from "@mui/material";
+import HTMLEditor from "../ui/HTMLEditor";
+
 interface Field {
     name: string;
     value: any;
@@ -37,8 +38,8 @@ export function Form({
         register, handleSubmit, setValue, reset
     } = useForm();
 
-    console.log(fields)
     useEffect(() => {
+        reset();
         for (const f of fields) {
             setValue(f.name, f.value);
         }
@@ -91,13 +92,15 @@ export function formatCloudFiles(files) {
 }
 
 export const MediaField = ({field, setValue, simple = false}) => {
-    const [files, setFiles] = React.useState(() => {
-        if (field.name === 'mediaUrl') return [{url: field.value}];
-        return field.value;
-    });
+    const [files, setFiles] = React.useState([]);
+
+    useLayoutEffect(() => {
+        if (field.name === 'media') setFiles(JSON.parse(files));
+        else setFiles(field.value);
+    }, [field])
 
     function set(files) {
-        if (field.name === 'mediaUrl') setValue(files.length ? files[0].url : '');
+        if (field.name === 'media') setValue(JSON.stringify(files));
         else setValue(files);
         setFiles(files);
     }
@@ -108,6 +111,7 @@ export const MediaField = ({field, setValue, simple = false}) => {
     }
 
     function select() {
+        if (!window.app.authAction()) return;
         if (simple) {
             window.app.filemanager?.uploadWidget().then(files => setRaw(files));
         } else {
@@ -139,15 +143,20 @@ function getFormField(field, register, setValue) {
         sx={{marginBottom: 2}}
         {...register(field.name, {value: field.value})}
         label={field.label || field.name}
+        type={field.type}
         autoFocus
     />
 }
 
-function SelectField({label, setValue, fields = [], defaultValue = ""}) {
-    const [v, setV] = React.useState(defaultValue);
+export function SelectField({field, setValue}) {
+    const [v, setV] = React.useState(field.value);
+    useEffect(() => {
+        setV(field.value)
+    }, [field])
+
     return (
         <TextField
-            label={label}
+            label={field.label}
             select
             style={{width: '100%'}}
             value={v}
@@ -157,44 +166,39 @@ function SelectField({label, setValue, fields = [], defaultValue = ""}) {
             }}
         >
             {
-                fields.map(t =>
-                    <MenuItem key={t.name} value={t.value}>{t.name}</MenuItem>
+                field.choices.map(t =>
+                    <MenuItem key={t} value={t}>{t}</MenuItem>
                 )
             }
         </TextField>
     )
 }
 
-const FormMap = {
-    "boolean": ({field, setValue}) => <FormGroup>
-        <FormControlLabel control={<Checkbox checked={field.value || false} onChange={e =>
-            setValue(e.target.checked)
-        }/>} label={field.label}/>
-    </FormGroup>,
-    "media": MediaField,
-    'productType': ({field, setValue}) =>
-        <SelectField defaultValue={field.value || 'Монтировка'}
-                     fields={[{name: "Монтировка", value: "Монтировка"}, {name: "Чертёж", value: "Чертёж"}]}
-                     setValue={setValue}
-                     label={"Тип продукта"}></SelectField>,
-    "status": ({field, setValue}) =>
-        <SelectField defaultValue={field.value || ""}
-                     fields={statuses}
-                     setValue={setValue}
-                     label={"Статус заказа"}></SelectField>,
+function CheckField({field, setValue}) {
+    const [v, setV] = useState(false);
+    useEffect(() => {
+        setV(field.value)
+    }, [field])
+    return <FormGroup>
+        <FormControlLabel control={<Checkbox checked={v} onChange={e => {
+            setValue(e.target.checked);
+            setV(e.target.checked);
+        }}/>} label={field.label}/>
+    </FormGroup>
 }
 
-const statuses = [
-    {
-        name: "Принят - Ожидает оплаты", value: 1
-    },
-    {
-        name: "Принят - Начало изготовления", value: 3
-    },
-    {
-        name: "Подготовка материала - Ожидание доставки", value: 4
-    },
-    {
-        name: "Завершён", value: 2
-    }
-]
+function Editor({field, setValue}) {
+    const [v, setV] = useState(field.value);
+    useEffect(() => {
+        setV(field.value)
+    }, [field]);
+    return <HTMLEditor updateValue={true} value={v} setHTML={d => {setV(d); setValue(d)}}></HTMLEditor>
+}
+
+const FormMap = {
+    "boolean": CheckField,
+    "media": MediaField,
+    'select': SelectField,
+    'bigtext': Editor,
+}
+

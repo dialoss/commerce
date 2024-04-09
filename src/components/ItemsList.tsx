@@ -1,14 +1,18 @@
 //@ts-nocheck
-import React, {useLayoutEffect, useState} from 'react';
+import React, {useEffect, useLayoutEffect, useState} from 'react';
 import {Pagination, Stack, Tab} from "@mui/material";
 import store from "../store";
 import {actions} from "../store/app";
 import Tabs from '@mui/material/Tabs';
+import PageEditor, {ItemsEditor} from "../pages/PageEditor";
+import {useAppSelector} from "../store/redux";
+import AspectRatio from '@mui/joy/AspectRatio';
 
 
 const limit = 30;
 
 const cache = {}
+const useCache = false;
 
 interface TabsProps {
     filter: (tab: number, item: object) => boolean;
@@ -17,10 +21,11 @@ interface TabsProps {
 
 const ItemsList = ({
                        component,
-                       key_ = "",
+                       endpoint = "",
+                       cacheKey = "",
                        tabs = {names: [], filter: () => true},
                        customPagination = {}
-                   }: { tabs: TabsProps; customPagination: object; key_: string; component: React.JSXElementConstructor<any>; }) => {
+                   }: { tabs?: TabsProps; customPagination?: object; cacheKey: string; endpoint: string; component: React.JSXElementConstructor<any>; }) => {
     const [items, setItems] = useState([]);
 
     function set(newItems) {
@@ -28,18 +33,18 @@ const ItemsList = ({
         store.dispatch(actions.setItems(newItems));
     }
 
-    const [page, setPage] = React.useState(1);
+    const [page, setPage] = React.useState(() => +(new URL(window.location.href).searchParams.get('page')) || 1);
     const [all, setAll] = React.useState(1);
-    const path = `/api/${key_}/`
+    const path = `/api/${endpoint}/`
 
     useLayoutEffect(() => {
-        store.dispatch(actions.setPage(key_));
+        store.dispatch(actions.setPage(endpoint));
     }, [])
 
     useLayoutEffect(() => {
         const pagination = {limit, offset: limit * (page - 1)};
-        const cachePage = cache[key_];
-        if (cachePage) {
+        const cachePage = cache[cacheKey];
+        if (useCache && cachePage) {
             const cacheItems = cachePage[pagination.offset];
             if (cacheItems) {
                 set(cacheItems);
@@ -47,47 +52,48 @@ const ItemsList = ({
                 return;
             }
         }
-        window.api.request({
+
+        window.request(window.api.request({
             path,
             method: 'GET',
             query: {...pagination, ...customPagination},
         }).then(r => r.json()).then(d => {
             set(d.results);
             setAll(Math.ceil(d.count / limit));
-            if (!cache[key_]) cache[key_] = {count: d.count}
-            cache[key_][pagination.offset] = d.results;
-        })
+            if (!cache[cacheKey]) cache[cacheKey] = {count: d.count}
+            cache[cacheKey][pagination.offset] = d.results;
+        }))
     }, [page]);
 
     window.app.remove = data => {
-        window.api.request({
+        window.request(window.api.request({
             path: path + data.id,
             method: 'DELETE',
-        })
+        }))
         set(items.filter(it => it.id != data.id));
     }
 
     window.app.create = (data) => {
-        window.api.request({
+        window.request(window.api.request({
             path,
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: data
-        })
+        }))
         set([...items, data])
     }
 
     window.app.update = (data) => {
-        window.api.request({
+        window.request(window.api.request({
             path: path + data.id + '/',
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: data,
-        })
+        }))
 
         let newItems = [...items];
         let i = 0;
@@ -104,9 +110,9 @@ const ItemsList = ({
 
     const [tab, setTab] = useState(0);
     let filteredItems = items.filter(it => tabs.filter(tab, it));
-    console.log(tab)
+    const editor = useAppSelector(state => state.app.editor);
     return (
-        <>
+        <div style={{minHeight: '100vh', marginBottom: 20}} className={'items-list ' + (editor ? 'editor' : '')} >
             {tabs.names.length > 0 && <Tabs
                 value={tab}
                 centered
@@ -119,13 +125,20 @@ const ItemsList = ({
                     tabs.names.map((t, i) => <Tab onClick={() => setTab(i)} label={t}/>)
                 }
             </Tabs>}
+            {editor ? <ItemsEditor endpoint={'product'} items={filteredItems}></ItemsEditor> :
             <Stack direction={'row'} flexWrap={'wrap'}>
                 {
-                    filteredItems.map(it => React.createElement(component, {data: it}))
+                    filteredItems.map(it => React.createElement(component, {data: {...it, media: JSON.parse(it.media)}}))
                 }
-            </Stack>
+            </Stack>}
             {all > 1 && <Pagination count={all}
-                                    onChange={(e, a) => setPage(a)}
+                                    page={page}
+                                    onChange={(e, a) => {
+                                        setPage(a);
+                                        let url = new URL(window.location.href);
+                                        url.searchParams.set("page", a);
+                                        window.history.pushState({},"", url.toString());
+                                    }}
                                     color="primary" sx={{
                 'ul':
                     {justifyContent: 'center'},
@@ -133,9 +146,10 @@ const ItemsList = ({
                 backgroundColor: '#fff',
                 width: 'initial',
                 position: 'sticky',
-                bottom: 0
+                bottom: 0,
+                zIndex: 3,
             }}/>}
-        </>
+        </div>
     );
 };
 

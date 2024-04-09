@@ -2,21 +2,23 @@ import Modal from "react-bootstrap/Modal";
 import {Button} from "@mui/material";
 import React from "react";
 
-export function MyModal({children,
+export function MyModal({
+                            children=<></>,
                             title,
-                            onHide,
+                            callback=()=>{},
                             open = false,
-                            style={}
-                        }: { children: React.ReactElement; style?: object; title: string; open?: boolean; onHide?: () => any }) {
+                            style = {},
+                            buttons = []
+                        }: { buttons: string[]; children?: React.ReactElement; style?: object; title: string; open?: boolean; callback?: (b: string) => any }) {
     return (
         <Modal
             show={open}
             size="lg"
-            onEscapeKeyDown={onHide}
+            onEscapeKeyDown={() => callback('')}
             aria-labelledby="contained-modal-title-vcenter"
             centered
         >
-            <Modal.Header closeButton onHide={onHide}>
+            <Modal.Header closeButton onHide={() => callback('')}>
                 <Modal.Title id="contained-modal-title-vcenter">
                     {title}
                 </Modal.Title>
@@ -25,7 +27,9 @@ export function MyModal({children,
                 {children}
             </Modal.Body>
             <Modal.Footer>
-                <Button onClick={onHide}>закрыть</Button>
+                {
+                    buttons.map(b => <Button onClick={() => callback(b)}>{b}</Button>)
+                }
             </Modal.Footer>
         </Modal>
     );

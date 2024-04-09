@@ -15,41 +15,31 @@ let itemID = null;
 
 
 function prepareImages(images) {
+    console.log(images)
     return images.map((im, i) => {
         return {
-            src: im,
+            src: im.url,
+            title: im.mediaTitle,
+            text: im.mediaText,
             index: i,
         }
     });
 }
 
-export const SimpleViewer = () => {
-    const [open, setOpen] = useState(false);
-    const [current, setCurrent] = useState(0);
-    const [images, setImages] = useState([]);
+function InfoModule({children, ...props}) {
+    const state = useLightboxState();
+    console.log(state)
+    return <>
+        {children}
 
-    // useAddEvent('images:viewer', ({detail}) => {
-    //     setImages(detail.images.map(im => ({src: im})));
-    //     setOpen(true);
-    // })
+        <div className="image-info"></div>
+    </>;
+}
 
-    function onClose() {
-        setOpen(false);
-    }
+const module = createModule("MyModule", InfoModule);
 
-    return (
-        <div className={'simple-viewer'}>
-            <Lightbox
-                noScroll
-                index={current}
-                setCurrent={setCurrent}
-                open={open}
-                plugins={[Zoom]}
-                close={onClose}
-                slides={images}
-            />
-        </div>
-    );
+function InfoPlugin({addModule}) {
+    addModule(module);
 }
 
 const Images = () => {
@@ -76,7 +66,7 @@ const Images = () => {
             index={current}
             setCurrent={setCurrent}
             open={open}
-            plugins={[Zoom, Counter]}
+            plugins={[Zoom, Counter, InfoPlugin]}
             counter={{container: {style: {top: 0, bottom: "unset"}}}}
             animation={{fade: 100, swipe: 200}}
             carousel={{

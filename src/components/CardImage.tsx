@@ -1,6 +1,5 @@
 //@ts-nocheck
 import React from 'react';
-import AspectRatio from "@mui/joy/AspectRatio";
 import store from "../store";
 
 const sizes = {
@@ -8,33 +7,31 @@ const sizes = {
     2: '1500'
 }
 
-export function scaleImage(url, size, custom=null) {
+export function scaleImage(data, size, custom = null) {
     let sz = sizes[size];
     if (custom != null) sz = custom;
-    return `https://res.cloudinary.com/drlljn0sj/image/upload/w_${sz}/v1712248757/` + url + '.jpg'
+    return {...data, url: `https://res.cloudinary.com/drlljn0sj/image/upload/w_${sz}/v1712248757/` + data.url + '.jpg'}
 }
 
-const CardImage = ({one = false, carousel = false, id=1, url}) => {
+const CardImage = ({one = false, carousel = false, data}) => {
+    const img = data.media[0]
     return (
-        <AspectRatio minHeight="200px" maxHeight="300px">
-            <img
-                onClick={() => {
-                    if (!carousel) return
-                    let images = store.getState().app.items.map(it => scaleImage(it.mediaUrl, 2));
-                    if (one) images = [scaleImage(url, 2)];
-                    window.app.images.open({
-                        images,
-                        start: images.indexOf(scaleImage(url, 2)),
-                        id
-                    })
-                }}
-                style={{objectFit: 'contain'}}
-                src={scaleImage(url, 1)}
-                loading="lazy"
-                referrerPolicy="no-referrer"
-                alt=""
-            />
-        </AspectRatio>
+        <img
+            onClick={() => {
+                if (!carousel) return
+                let images = store.getState().app.items.map(it => scaleImage(JSON.parse(it.media)[0], 2));
+                if (one) images = [scaleImage(img, 2)];
+                window.app.images.open({
+                    images,
+                    start: images.indexOf(scaleImage(img, 2)),
+                })
+            }}
+            style={{objectFit: 'contain'}}
+            src={scaleImage(img, 1).url}
+            loading="lazy"
+            referrerPolicy="no-referrer"
+            alt=""
+        />
     );
 };
 

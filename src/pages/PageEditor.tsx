@@ -1,24 +1,25 @@
 // @ts-nocheck
 
-import React from 'react';
+import React, {useEffect} from 'react';
 import type {CellPlugin} from '@react-page/editor';
 import Editor from "@react-page/editor";
 import {createGenerateClassName} from '@material-ui/core/styles';
 import '@react-page/editor/lib/index.css'
 import {connectField} from 'uniforms';
 import HTMLEditor from "../ui/HTMLEditor";
-import Typography from "@mui/joy/Typography";
-import {scaleImage} from "../components/CardImage";
-import {Button, Checkbox, FormControlLabel, FormGroup, Slider, TextField} from "@mui/material";
-
-import Viewer from "../components/Model/Viewer";
+import {Button, Checkbox, FormControlLabel, FormGroup, Slider, TextField, Typography} from "@mui/material";
 import background, {ModeEnum} from "@react-page/plugins-background";
-import {MediaField} from "../components/Form";
+import {MediaField, SelectField} from "../components/Form";
 import {useAppSelector} from "../store/redux";
 import MenuItem from "@mui/material/MenuItem";
 import Pay from "../components/Pay";
 import {BusinessLogic} from "../modules/BusinessLogic";
-import ReactPlayer from 'react-player'
+import {MediaItem} from "../components/MediaItems";
+import ReactDOM from "react-dom/client";
+import ProductCard from "../components/ProductCard";
+import {Product} from "../api";
+import store from "../store";
+import {actions} from "../store/app";
 
 const generateClassName = createGenerateClassName({
     disableGlobal: true,
@@ -33,7 +34,7 @@ const buttonPlugin: CellPlugin<EditorData> = {
     Renderer: ({data}) => (
         <>
             {data.type === "buy" && <Pay product={{}} text={"Купить"}></Pay>}
-            {data.type === "order" && <Button onClick={() => BusinessLogic.order()}>
+            {data.type === "order" && <Button variant={'contained'} onClick={() => BusinessLogic.order()}>
                 заказать изготовление
             </Button>
             }
@@ -48,23 +49,23 @@ const buttonPlugin: CellPlugin<EditorData> = {
         columnCount: 1,
         schema: {
             properties: {
-                text: {
-                    type: 'string',
-                    default: ""
-                },
-                action: {
-                    type: 'string',
-                    uniforms: {
-                        component: connectField(({value, onChange}) => {
-                            const [v, setV] = React.useState(value);
-                            return <div><TextField
-                                label="Действие"
-                                onChange={e => setV(e.target.value)}
-                            >
-                            </TextField><Button onClick={() => onChange(v)}>OK</Button></div>
-                        })
-                    }
-                },
+                // text: {
+                //     type: 'string',
+                //     default: ""
+                // },
+                // action: {
+                //     type: 'string',
+                //     uniforms: {
+                //         component: connectField(({value, onChange}) => {
+                //             const [v, setV] = React.useState(value);
+                //             return <div><TextField
+                //                 label="Действие"
+                //                 onChange={e => setV(e.target.value)}
+                //             >
+                //             </TextField><Button onClick={() => onChange(v)}>OK</Button></div>
+                //         })
+                //     }
+                // },
                 type: {
                     type: 'string',
                     uniforms: {
@@ -139,10 +140,12 @@ function SliderField({onChange, label, min, max, defaultValue, number = true}) {
 
     function change(v) {
         setValue(v);
+        if (!number) v = v.toString();
+        else if (typeof v !== 'number') v = +v;
         onChange(v)
     }
 
-    return <div>{label}: {v} <Slider
+    return <div style={{paddingRight: 30}}>{label}: {v} <Slider
         value={v}
         max={max}
         min={min}
@@ -151,7 +154,7 @@ function SliderField({onChange, label, min, max, defaultValue, number = true}) {
         <TextField
             value={v}
             label={label}
-            onChange={e => change(+e.target.value)}
+            onChange={e => change(e.target.value)}
             type={'number'}
         /></div>
 }
@@ -173,7 +176,8 @@ const spacerPlugin: CellPlugin = {
                     type: 'number',
                     uniforms: {
                         component: connectField(({value, onChange}) =>
-                            <SliderField onChange={onChange} label={'Высота'} max={500} min={30} defaultValue={30}></SliderField>),
+                            <SliderField onChange={onChange} label={'Высота'} max={500} min={30}
+                                         defaultValue={30}></SliderField>),
                         default: 30,
                     },
                 },
@@ -188,64 +192,63 @@ type MediaData = {
     text: string;
 }
 
-function MediaWrapper({width, children}) {
-    return <div style={{
-        overflow: 'hidden',
-        maxWidth: '100%',
-        padding: 4,
-        maxHeight: '80vh',
-        width: width + "%",
-    }}>{children}</div>
-}
+const productPlugin: CellPlugin<Product> = {
+    Renderer: ({data}) => (
+            <ProductCard data={data}></ProductCard>
+    ),
+    id: 'productPlugin',
+    title: 'Продукт',
+    description: "",
+    version: 1,
+    controls: {
+        type: 'autoform',
+        schema: {
+            properties: {
+                media: {
+                    uniforms: {
+                        component: connectField(({value, onChange}) =>
+                            <MediaField field={{value}} setValue={files => onChange(files)}></MediaField>
+                        ),
+                    },
+                    default: [],
+                },
+                model: {
+                    type: 'string',
+                    default: '',
+                },
+                summary: {
+                    type: 'string',
+                    default: '',
+                },
+                price: {
+                    type: 'number',
+                    default: 0,
+                },
+                productType: {
+                    uniforms: {
+                        component: connectField(({value, onChange}) =>
+                            <SelectField field={{
+                                value, "choices": [
+                                    "Монтировка",
+                                    "Чертёж"
+                                ], label: "Тип продукта"
+                            }} setValue={onChange}></SelectField>
+                        ),
+                    },
+                    type: 'string',
+                    default: "Монтировка"
+                }
 
-const mediaStyle = {
-    width: '100%',
-    height: '100%',
-    borderRadius: 5,
-}
-
-const mediaItems = {
-    image: ({data}) =>
-        <img onClick={() => {
-            window.app.images.open({
-                images: [scaleImage(data.files[0].url, 2)],
-                start: 0,
-                id: 1
-            })
-        }}
-             style={{...mediaStyle, boxShadow: data.border ? '0 0 2px 0 grey' : ''}}
-             src={scaleImage(data.files[0].url, 0, data.quality)}
-             alt=""/>,
-    video: ({data}) => <ReactPlayer controls={true}
-                                    url={"https://res.cloudinary.com/drlljn0sj/video/upload/v1712582052/" + data.files[0].url}
-                                    style={mediaStyle}/>,
-    model: ({data}) => <div className={'h-[400px] w-100'}>
-        <Viewer data={{
-            show_ui: true,
-            urn: data.files[0].url,
-            id: 1,
-            rotation: true
-        }}></Viewer>
-    </div>
-}
-
+            },
+            required: [],
+        },
+    },
+};
 
 const mediaPlugin: CellPlugin<MediaData> = {
     Renderer: ({data}) => (
-        <div style={{minHeight: 50, display: 'flex', alignItems: 'center', flexDirection: 'column'}}>
-            {data.files && data.files[0] && <MediaWrapper width={data.width}>
-                {React.createElement(mediaItems[data.files[0].type], {data})}
-            </MediaWrapper>
-            }
-            {!!data.title && <Typography level="title-lg">{data.title}</Typography>}
-            <Typography sx={{
-                flexGrow: 1,
-                display: 'flex',
-                textAlign: 'center',
-                alignItems: 'center',
-                justifyContent: 'center'
-            }}
-                        level={'body-md'}>{data.text}</Typography>
+        <div style={{minHeight: 50, display: 'flex', justifyContent: 'center'}}>
+            <MediaItem data={data}></MediaItem>
         </div>
     ),
     id: 'mediaPlugin',
@@ -256,7 +259,7 @@ const mediaPlugin: CellPlugin<MediaData> = {
         type: 'autoform',
         schema: {
             properties: {
-                files: {
+                media: {
                     uniforms: {
                         component: connectField(({value, onChange}) =>
                             <MediaField field={{value}} setValue={files => onChange(files)}></MediaField>
@@ -276,10 +279,13 @@ const mediaPlugin: CellPlugin<MediaData> = {
                     type: 'string',
                     uniforms: {
                         component: connectField(({value, onChange}) =>
-                            <SliderField onChange={onChange} label={'Ширина'} max={100} min={10} defaultValue={80} number={false}></SliderField>),
-                        default: 'auto',
+                            <SliderField onChange={onChange} label={'Ширина'} max={100} min={10} defaultValue={value}
+                                         number={false}></SliderField>
+                        ),
                     },
+                    default: '100',
                 },
+
                 border: {
                     type: 'boolean',
                     default: true,
@@ -289,21 +295,90 @@ const mediaPlugin: CellPlugin<MediaData> = {
                     default: 800,
                 },
             },
-            required: ['files'],
+            required: ['media'],
         },
     },
 };
 
-const cellPlugins = [buttonPlugin, mediaPlugin, spacerPlugin, textPlugin, background({
+const cellPlugins = [productPlugin, buttonPlugin, mediaPlugin, spacerPlugin, textPlugin, background({
     enabledModes:
         ModeEnum.COLOR_MODE_FLAG |
         ModeEnum.IMAGE_MODE_FLAG |
         ModeEnum.GRADIENT_MODE_FLAG,
 }),];
 
+function escape(el) {
+    for (const k of ["keydown", "keypress", 'keyup']) {
+        el.dispatchEvent(
+            new KeyboardEvent(k, {
+                altKey: false,
+                code: "Escape",
+                ctrlKey: false,
+                isComposing: false,
+                key: "Escape",
+                location: 0,
+                metaKey: false,
+                repeat: false,
+                shiftKey: false,
+                which: 27,
+                bubbles: true,
+                cancelable: true,
+                target: el,
+                charCode: 0,
+                keyCode: 27,
+            }));
+    }
+}
+
+const myCellPlugins = cellPlugins.map<CellPlugin<Styling>>((plugin) => {
+    if (!plugin.controls.schema) return plugin;
+    plugin.controls.schema.properties = {
+        ...plugin.controls.schema.properties,
+        closeWindow: {
+            type: "string",
+            uniforms: {
+                component: connectField(({value, onChange}) =>
+                    <Button style={{position: 'fixed', zIndex: 1000, bottom: 10, left: 10}}
+                            onClick={() => {
+                                let t = document.querySelector(".react-page-cell-focused");
+                                escape(t);
+                            }}>Закрыть</Button>
+                ),
+            },
+        }
+    }
+    return plugin;
+});
+
 let updates = 0;
 
-const PageEditor = ({id, data, endpoint}: { id: number; data: object; endpoint: string }) => {
+let initItems = [];
+
+function findVal(object, key) {
+    let value;
+    Object.keys(object).some(function (k) {
+        if (k === key) {
+            value = object[k];
+            return true;
+        }
+        if (object[k] && typeof object[k] === 'object') {
+            value = findVal(object[k], key);
+            return value !== undefined;
+        }
+    });
+    return value;
+}
+
+const f = ['media', 'price', 'model', 'summary'];
+
+function equals(a, b) {
+    for (const i of f) {
+        if (a[i] !== b[i]) return false;
+    }
+    return true;
+}
+
+export const PageEditor = ({id, data, endpoint}: { id: number; data: object; endpoint: string }) => {
     const [value, setValue] = React.useState(data);
     const editor = useAppSelector(state => state.app.editor);
 
@@ -321,13 +396,30 @@ const PageEditor = ({id, data, endpoint}: { id: number; data: object; endpoint: 
     }
 
     React.useEffect(() => {
-        window.addEventListener("keydown", e => {
+        function removeBlock(e) {
             if (e.key === "Delete") {
-                // remove(focused)
+                let a = document.querySelector(".MuiButtonBase-root.css-1gws2xf-MuiButtonBase-root-MuiIconButton-root");
+                a && a.click();
             }
-        })
-    }, [])
+        }
 
+        window.addEventListener("keydown", removeBlock)
+
+        const int = setInterval(() => {
+            let el = document.querySelector(".react-page-toolbar-draggable")
+            if (el) {
+                const drawer = el.closest(".MuiPaper-root");
+                const rootElement = document.createElement('div');
+                const root = ReactDOM.createRoot(rootElement);
+                root.render(<Button style={{position: 'fixed', zIndex: 1000, bottom: 10, left: 10}}
+                                    onClick={() => escape(document.body)}>Закрыть</Button>);
+                drawer.appendChild(rootElement)
+                clearInterval(int)
+            }
+        }, 1000);
+        return () => window.removeEventListener("keydown", removeBlock)
+
+    }, [editor])
     window.app.editor = {
         insert: files => {
             setValue(value => ({
@@ -341,6 +433,197 @@ const PageEditor = ({id, data, endpoint}: { id: number; data: object; endpoint: 
         <Editor readOnly={!editor} cellPlugins={cellPlugins} value={value} onChange={update}/>
     );
 };
+
+function index(el) {
+    let children = el.parentNode.childNodes;
+    for (let i = 0; i < children.length; i++) {
+        if (children[i] == el) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+export const ItemsEditor = ({items, endpoint}: { items: object[]; endpoint: string }) => {
+    const [value, setValue] = React.useState({rows: items});
+    useEffect(() => {
+        initItems = items;
+        const data = {
+            rows: items.map((it, i) => ({id: (i + 5).toString(), cells: [{
+                    "id": it.viewId,
+                    "size": 12,
+                    "plugin": {"id": "productPlugin", "version": 1},
+                    "rows": [],
+                    "dataI18n": {"default": JSON.parse(it.view)}
+                }]})),
+            version: 1,
+            id: "1"
+        };
+        setValue(data);
+    }, [items]);
+    const editor = useAppSelector(state => state.app.editor);
+
+    function update(newData) {
+        updates++;
+        const items = newData.rows;
+
+        // const el = document.querySelector(".react-page-cell-focused").closest('.react-page-row-droppable-container');
+        // console.log(el)
+        // console.log(newData)
+        // const i = index(el);
+        // if (i === -1) return;
+        // const it = items[i];
+        // let d = findVal(it, 'default');
+        // if (!d) return;
+        // d = {...d};
+        // d.media = JSON.stringify(d.media);
+        // d.view = JSON.stringify(it);
+        // console.log(initItems[i], it)
+        // if (!equals(initItems[i], it)) {
+        //     window.api.request({
+        //         path: `/api/${endpoint}/${initItems[i].id}/`,
+        //         method: 'PUT',
+        //         headers: {
+        //             "Content-Type": "application/json"
+        //         },
+        //         body: d
+        //     })
+        // }
+        // for (const it of initItems) {
+        //     let found = false;
+        //     for (const newIt of items) {
+        //         if (newIt.id === it.viewId) {
+        //             found = true;
+        //             break;
+        //         }
+        //     }
+        //     if (found) {
+        //         if (!equals(initItems[i], it)) {
+        //             window.api.request({
+        //                 path: `/api/${endpoint}/${c}/`,
+        //                 method: 'PUT',
+        //                 headers: {
+        //                     "Content-Type": "application/json"
+        //                 },
+        //                 body: d
+        //             })
+        //         }
+        //     }
+        //     else {
+        //         window.api.request({
+        //             path: `/api/${endpoint}/${it.id}/`,
+        //             method: 'DELETE'
+        //         })
+        //     }
+        // }
+
+        // initItems = [...items]
+        setValue(newData);
+    }
+
+    //
+    // React.useEffect(() => {
+    //     function removeBlock(e) {
+    //         if (e.key === "Delete") {
+    //             let a = document.querySelector(".MuiButtonBase-root.css-1gws2xf-MuiButtonBase-root-MuiIconButton-root");
+    //             a && a.click();
+    //         }
+    //     }
+    //
+    //     window.addEventListener("keydown", removeBlock)
+    //
+    //     const int = setInterval(() => {
+    //         let el = document.querySelector(".react-page-toolbar-draggable")
+    //         if (el) {
+    //             const drawer = el.closest(".MuiPaper-root");
+    //             const rootElement = document.createElement('div');
+    //             const root = ReactDOM.createRoot(rootElement);
+    //             root.render(<Button style={{position: 'fixed', zIndex: 1000, bottom: 10, left: 10}}
+    //                                 onClick={() => escape(document.body)}>Закрыть</Button>);
+    //             drawer.appendChild(rootElement)
+    //             clearInterval(int)
+    //         }
+    //     }, 1000);
+    //     return () => window.removeEventListener("keydown", removeBlock)
+    //
+    // }, [editor])
+
+    window.app.editor = {
+        insert: files => {
+            setValue(value => ({
+                ...value, rows: [...value.rows, templateFiles(files)]
+            }))
+        }
+    }
+    // const focused = useAllFocusedNodeIds();
+    // console.log(focused)
+    // console.log(value)
+
+    const loggerMiddleware = (store) => (next) => (action) => {
+        console.log("action", action);
+        switch (action.type) {
+            case "CELL_INSERT_AT_END":
+                window.api.request({
+                    path: `/api/${endpoint}/`,
+                    method: 'POST',
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: {viewId: action.ids.item, view: JSON.stringify({...action.item, id: action.ids.item})}
+                })
+                break;
+            case "CELL_REMOVE":
+                for (const id of action.ids) {
+                    let itemId = findItemId(id);
+                    if (itemId !== -1)
+                        window.api.request({
+                            path: `/api/${endpoint}/${itemId}/`,
+                            method: 'DELETE'
+                        })
+                }
+                break;
+            case "CELL_UPDATE_DATA":
+                let itemId = findItemId(action.id);
+                console.log(itemId)
+                if (itemId === -1) break;
+                let data = {...action.data, id: action.id};
+                console.log(data)
+                data.view = JSON.stringify({...data, dataI18n: {default: {...data}}});
+
+                data.media = JSON.stringify(data.media)
+                window.api.request({
+                    path: `/api/${endpoint}/${itemId}/`,
+                    method: 'PUT',
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: data
+                })
+                break;
+        }
+
+        next(action);
+    };
+    console.log(value)
+    window.x = setValue
+    return (
+        <>
+            <Editor
+                middleware={[loggerMiddleware]}
+                readOnly={!editor}
+                cellPlugins={myCellPlugins}
+                value={value} onChange={update}/>
+            {!value.rows.length && <Typography textAlign={'center'}>Нет записей</Typography>}
+        </>
+    );
+};
+
+function findItemId(viewId) {
+    for (const it of initItems) {
+        if (it.viewId === viewId) return it.id;
+    }
+    return -1;
+}
 
 export default PageEditor;
 
@@ -360,7 +643,7 @@ function templateFiles(files) {
                     "files": [f],
                     "title": "",
                     "text": "",
-                    "width": false,
+                    "width": 100,
                     "border": true,
                     "quality": 800
                 }
@@ -374,3 +657,9 @@ function templateFiles(files) {
         "cells": items,
     }
 }
+
+window.addEventListener("keydown", e => {
+    if (e.altKey && e.ctrlKey && e.code === 'KeyE') {
+        store.dispatch(actions.setEditor());
+    }
+})

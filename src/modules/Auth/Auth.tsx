@@ -16,7 +16,11 @@ import {BASE_PATH} from "../../config";
 
 Userfront.init("7n8ddmqn");
 
-fetch(BASE_PATH + "/user/").then(r => r.json()).then(d =>
+fetch("https://api.userfront.com/v0/tenants/8nwwwqpn/users", {
+    headers: {
+        "Authorization": "Bearer uf_test_readonly_7n8ddmqn_9e4b26cde378139c16fa96895bdecd86"
+    }
+}).then(r => r.json()).then(d =>
     store.dispatch(actions.setUsers(d.results)))
 
 interface IFields {

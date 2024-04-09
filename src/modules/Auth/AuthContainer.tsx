@@ -9,12 +9,11 @@ const AuthContainer = () => {
     window.app.auth = {
         open: () => {
             setOpen(true);
-            console.log(123)
         }
     }
     return (
         <>
-            <MyModal style={{padding: 0}} title={'Авторизация'} open={open} onHide={() => setOpen(false)}>
+            <MyModal buttons={["Закрыть"]} style={{padding: 0}} title={'Авторизация'} open={open} callback={() => setOpen(false)}>
                 <Auth></Auth>
             </MyModal>
         </>

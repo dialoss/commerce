@@ -23,9 +23,10 @@ const map = {
 function getFields(page, item) {
     let d = [];
     for (const p of schema[page]) {
-        if (p.name && !["id",'page', 'product', 'dateCreated', 'statusChanged', 'user'].includes(p.name)) {
+        if (p.name) {
             let v = "";
             if (item) v = item[p.name]
+            else v = p.default;
             d.push({...p, value: v})
         }
     }
@@ -33,35 +34,38 @@ function getFields(page, item) {
 }
 
 let formType = 'create';
+let formSelected = null;
 
 const DataForm = () => {
     const [fields, setFields] = React.useState([]);
     const page = useAppSelector(state => state.app.page);
 
     function submit(data) {
+        if (!formSelected) return;
         console.log(data)
         if (formType === 'create') window.app.create(data);
-        else window.app.update({...data, id: store.getState().app.selected.id});
+        else window.app.update({...data, id: formSelected.id});
+        window.closeWindow('form');
     }
 
-    const [open, setOpen] = React.useState(false);
-
     window.app.dataForm = (create) => {
+        window.openWindow('form');
+        if (create === undefined) return;
         if (!create) formType = 'update'
         else formType = 'create';
-        setFields(getFields(page, create ? null : store.getState().app.selected));
-        setOpen(true);
+        formSelected = store.getState().app.selected;
+        setFields(getFields(page, create ? null : formSelected));
     }
     return (
         <>
-            <Windows callback={setOpen} width={400} title={'Форма'} open={open} defaultOpened={false}>
-                <div style={{padding: 10}}>
-                    <Form caption={"Форма"}
-                          fields={fields}
-                          onSubmit={submit}
-                    ></Form>
-                </div>
-            </Windows>
+            {/*<Windows key_={'form'} width={400} title={'Форма'}>*/}
+            {/*    <div style={{padding: 10}}>*/}
+            {/*        <Form caption={"Форма"}*/}
+            {/*              fields={fields}*/}
+            {/*              onSubmit={submit}*/}
+            {/*        ></Form>*/}
+            {/*    </div>*/}
+            {/*</Windows>*/}
         </>
     );
 };
