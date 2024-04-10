@@ -24,7 +24,7 @@ const OrderCard = ({data, detailed}: { detailed: boolean; data: Order }) => {
                   }}>
             <>
                 <div>
-                    <Typography level="title-lg">{data.product.productType + " " + data.product.model}</Typography>
+                    <Typography level="title-lg">{data.product.productType + " " + data.product.name}</Typography>
                 </div>
                 <CardImage carousel={false}
                            data={data.product.media}></CardImage>
@@ -36,7 +36,7 @@ const OrderCard = ({data, detailed}: { detailed: boolean; data: Order }) => {
                         </Typography>
                         <OrderStatus status={data.status}></OrderStatus>
                         <p>Дата заказа: {window.formatDate(data.dateCreated)}</p>
-                        <Link to={`/models/${data.product.id}-${data.product.model}`}>Продукт</Link>
+                        <Link to={`/models/${data.product.id}-${data.product.name}`}>Продукт</Link>
 
                         {user && <p>Заказчик {user.name}</p>}
                     </div>

@@ -18,7 +18,7 @@ const ShopCard = ({data}: { data: Product }) => {
         <BaseCard data={data} style={"md:w-100 lg:w-1/2"}>
             <>
             {!!data.productType && <div>
-                <Typography level="title-lg">{data.productType} {data.model}</Typography>
+                <Typography level="title-lg">{data.productType} {data.name}</Typography>
             </div>}
             <CardImage data={data}></CardImage>
                 <div style={{fontSize:16, flexGrow: 1, marginTop: 5}}>

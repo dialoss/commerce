@@ -12,11 +12,11 @@ const ProductCard = ({data}: {data: Product }) => {
         <BaseCard data={data}
             onClick={e => {
                 if (e.button === 2) return;
-                window.navigate(`models/${data.id}-${data.model}`);
+                window.navigate(`models/${data.id}-${data.name}`);
             }}>
             <>
                 <MediaItem data={data}></MediaItem>
-                <Typography level="title-lg">{data.productType + " " + data.model}</Typography>
+                <Typography level="title-lg">{data.productType + " " + data.name}</Typography>
                 <Typography level={'body-md'}>{data.summary}</Typography>
             </>
         </BaseCard>

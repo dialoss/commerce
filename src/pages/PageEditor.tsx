@@ -1,8 +1,8 @@
 // @ts-nocheck
 
-import React, {useEffect} from 'react';
+import React from 'react';
 import type {CellPlugin} from '@react-page/editor';
-import Editor from "@react-page/editor";
+import Editor, {createValue, getTextContents} from "@react-page/editor";
 import {createGenerateClassName} from '@material-ui/core/styles';
 import '@react-page/editor/lib/index.css'
 import {connectField} from 'uniforms';
@@ -194,7 +194,7 @@ type MediaData = {
 
 const productPlugin: CellPlugin<Product> = {
     Renderer: ({data}) => (
-            <ProductCard data={data}></ProductCard>
+        <ProductCard data={data}></ProductCard>
     ),
     id: 'productPlugin',
     title: 'Продукт',
@@ -212,7 +212,7 @@ const productPlugin: CellPlugin<Product> = {
                     },
                     default: [],
                 },
-                model: {
+                name: {
                     type: 'string',
                     default: '',
                 },
@@ -350,33 +350,7 @@ const myCellPlugins = cellPlugins.map<CellPlugin<Styling>>((plugin) => {
     return plugin;
 });
 
-let updates = 0;
-
 let initItems = [];
-
-function findVal(object, key) {
-    let value;
-    Object.keys(object).some(function (k) {
-        if (k === key) {
-            value = object[k];
-            return true;
-        }
-        if (object[k] && typeof object[k] === 'object') {
-            value = findVal(object[k], key);
-            return value !== undefined;
-        }
-    });
-    return value;
-}
-
-const f = ['media', 'price', 'model', 'summary'];
-
-function equals(a, b) {
-    for (const i of f) {
-        if (a[i] !== b[i]) return false;
-    }
-    return true;
-}
 
 export const PageEditor = ({id, data, endpoint}: { id: number; data: object; endpoint: string }) => {
     const [value, setValue] = React.useState(data);
@@ -395,6 +369,33 @@ export const PageEditor = ({id, data, endpoint}: { id: number; data: object; end
         setValue(data);
     }
 
+    useInitCallbacks(editor)
+
+    window.app.editor = {
+        insert: files => {
+            setValue(value => ({
+                ...value, rows: [...value.rows, templateFiles(files)]
+            }))
+        }
+    }
+
+    console.log(value)
+    return (
+        <Editor readOnly={!editor} cellPlugins={cellPlugins} value={value} onChange={update}/>
+    );
+};
+
+function index(el) {
+    let children = el.parentNode.childNodes;
+    for (let i = 0; i < children.length; i++) {
+        if (children[i] == el) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+function useInitCallbacks(editor) {
     React.useEffect(() => {
         function removeBlock(e) {
             if (e.key === "Delete") {
@@ -420,133 +421,37 @@ export const PageEditor = ({id, data, endpoint}: { id: number; data: object; end
         return () => window.removeEventListener("keydown", removeBlock)
 
     }, [editor])
-    window.app.editor = {
-        insert: files => {
-            setValue(value => ({
-                ...value, rows: [...value.rows, templateFiles(files)]
-            }))
-        }
-    }
-
-    console.log(value)
-    return (
-        <Editor readOnly={!editor} cellPlugins={cellPlugins} value={value} onChange={update}/>
-    );
-};
-
-function index(el) {
-    let children = el.parentNode.childNodes;
-    for (let i = 0; i < children.length; i++) {
-        if (children[i] == el) {
-            return i;
-        }
-    }
-    return -1;
 }
+
 
 export const ItemsEditor = ({items, endpoint}: { items: object[]; endpoint: string }) => {
     const [value, setValue] = React.useState({rows: items});
-    useEffect(() => {
-        initItems = items;
-        const data = {
-            rows: items.map((it, i) => ({id: (i + 5).toString(), cells: [{
-                    "id": it.viewId,
-                    "size": 12,
-                    "plugin": {"id": "productPlugin", "version": 1},
-                    "rows": [],
-                    "dataI18n": {"default": JSON.parse(it.view)}
-                }]})),
-            version: 1,
-            id: "1"
-        };
-        setValue(data);
-    }, [items]);
+    // useEffect(() => {
+    //     initItems = items;
+    //     const data = {
+    //         rows: items.map((it, i) => ({
+    //             id: (i + 5).toString(), cells: [{
+    //                 "id": it.viewId,
+    //                 "size": 12,
+    //                 "plugin": {"id": "productPlugin", "version": 1},
+    //                 "rows": [],
+    //                 "dataI18n": {"default": JSON.parse(it.view)}
+    //             }]
+    //         })),
+    //         version: 1,
+    //         id: "1"
+    //     };
+    //     setValue(data);
+    // }, [items]);
     const editor = useAppSelector(state => state.app.editor);
 
     function update(newData) {
-        updates++;
-        const items = newData.rows;
-
-        // const el = document.querySelector(".react-page-cell-focused").closest('.react-page-row-droppable-container');
-        // console.log(el)
-        // console.log(newData)
-        // const i = index(el);
-        // if (i === -1) return;
-        // const it = items[i];
-        // let d = findVal(it, 'default');
-        // if (!d) return;
-        // d = {...d};
-        // d.media = JSON.stringify(d.media);
-        // d.view = JSON.stringify(it);
-        // console.log(initItems[i], it)
-        // if (!equals(initItems[i], it)) {
-        //     window.api.request({
-        //         path: `/api/${endpoint}/${initItems[i].id}/`,
-        //         method: 'PUT',
-        //         headers: {
-        //             "Content-Type": "application/json"
-        //         },
-        //         body: d
-        //     })
-        // }
-        // for (const it of initItems) {
-        //     let found = false;
-        //     for (const newIt of items) {
-        //         if (newIt.id === it.viewId) {
-        //             found = true;
-        //             break;
-        //         }
-        //     }
-        //     if (found) {
-        //         if (!equals(initItems[i], it)) {
-        //             window.api.request({
-        //                 path: `/api/${endpoint}/${c}/`,
-        //                 method: 'PUT',
-        //                 headers: {
-        //                     "Content-Type": "application/json"
-        //                 },
-        //                 body: d
-        //             })
-        //         }
-        //     }
-        //     else {
-        //         window.api.request({
-        //             path: `/api/${endpoint}/${it.id}/`,
-        //             method: 'DELETE'
-        //         })
-        //     }
-        // }
-
-        // initItems = [...items]
         setValue(newData);
+        let a = getTextContents(newData, {cellPlugins: myCellPlugins, lang: 'en'})
+        console.log(a)
     }
 
-    //
-    // React.useEffect(() => {
-    //     function removeBlock(e) {
-    //         if (e.key === "Delete") {
-    //             let a = document.querySelector(".MuiButtonBase-root.css-1gws2xf-MuiButtonBase-root-MuiIconButton-root");
-    //             a && a.click();
-    //         }
-    //     }
-    //
-    //     window.addEventListener("keydown", removeBlock)
-    //
-    //     const int = setInterval(() => {
-    //         let el = document.querySelector(".react-page-toolbar-draggable")
-    //         if (el) {
-    //             const drawer = el.closest(".MuiPaper-root");
-    //             const rootElement = document.createElement('div');
-    //             const root = ReactDOM.createRoot(rootElement);
-    //             root.render(<Button style={{position: 'fixed', zIndex: 1000, bottom: 10, left: 10}}
-    //                                 onClick={() => escape(document.body)}>Закрыть</Button>);
-    //             drawer.appendChild(rootElement)
-    //             clearInterval(int)
-    //         }
-    //     }, 1000);
-    //     return () => window.removeEventListener("keydown", removeBlock)
-    //
-    // }, [editor])
+    useInitCallbacks(editor);
 
     window.app.editor = {
         insert: files => {
@@ -555,68 +460,96 @@ export const ItemsEditor = ({items, endpoint}: { items: object[]; endpoint: stri
             }))
         }
     }
-    // const focused = useAllFocusedNodeIds();
-    // console.log(focused)
-    // console.log(value)
+    console.log(value)
 
     const loggerMiddleware = (store) => (next) => (action) => {
         console.log("action", action);
         switch (action.type) {
             case "CELL_INSERT_AT_END":
-                window.api.request({
-                    path: `/api/${endpoint}/`,
-                    method: 'POST',
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: {viewId: action.ids.item, view: JSON.stringify({...action.item, id: action.ids.item})}
-                })
-                break;
-            case "CELL_REMOVE":
-                for (const id of action.ids) {
-                    let itemId = findItemId(id);
-                    if (itemId !== -1)
-                        window.api.request({
-                            path: `/api/${endpoint}/${itemId}/`,
-                            method: 'DELETE'
-                        })
-                }
-                break;
-            case "CELL_UPDATE_DATA":
-                let itemId = findItemId(action.id);
-                console.log(itemId)
-                if (itemId === -1) break;
-                let data = {...action.data, id: action.id};
-                console.log(data)
-                data.view = JSON.stringify({...data, dataI18n: {default: {...data}}});
+                const id = new Date().getTime();
 
-                data.media = JSON.stringify(data.media)
-                window.api.request({
-                    path: `/api/${endpoint}/${itemId}/`,
-                    method: 'PUT',
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: data
-                })
-                break;
+                return;
+            // case "CELL_REMOVE":
+            //     for (const id of action.ids) {
+            //         let itemId = findItemId(id);
+            //         if (itemId !== -1)
+            //             window.api.request({
+            //                 path: `/api/${endpoint}/${itemId}/`,
+            //                 method: 'DELETE'
+            //             })
+            //     }
+            //     break;
+            // case "CELL_UPDATE_DATA":
+            //     let itemId = findItemId(action.id);
+            //     console.log(itemId)
+            //     if (itemId === -1) break;
+            //     let data = {...action.data, id: action.id};
+            //     console.log(data)
+            //     data.view = JSON.stringify({...data, dataI18n: {default: {...data}}});
+            //
+            //     data.media = JSON.stringify(data.media)
+            //     window.api.request({
+            //         path: `/api/${endpoint}/${itemId}/`,
+            //         method: 'PUT',
+            //         headers: {
+            //             "Content-Type": "application/json"
+            //         },
+            //         body: data
+            //     })
+            //     break;
         }
-
         next(action);
+
     };
-    console.log(value)
-    window.x = setValue
     return (
         <>
             <Editor
                 middleware={[loggerMiddleware]}
                 readOnly={!editor}
+                lang="en"
+
                 cellPlugins={myCellPlugins}
                 value={value} onChange={update}/>
             {!value.rows.length && <Typography textAlign={'center'}>Нет записей</Typography>}
         </>
     );
 };
+
+const partialValue = {
+    rows: [
+        [
+            {
+                plugin: productPlugin.id,
+                data: {
+                    id: 222,
+                    media: [],
+                    name: "qqqqq",
+                    summary: "aue",
+                    price: 123
+                },
+            }
+        ],
+        [
+            {
+                plugin: productPlugin.id,
+                data: {
+                    id: 1111,
+                    media: [],
+                    name: "privk",
+                    summary: "qqq",
+                    price: 123
+                },
+            },
+        ]
+    ],
+};
+
+const value = createValue(partialValue, {
+    lang: 'en',
+    cellPlugins: myCellPlugins,
+});
+
+console.log(value)
 
 function findItemId(viewId) {
     for (const it of initItems) {
