@@ -25,7 +25,8 @@ function Bar({
     const [open, setOpen] = React.useState(false);
     const [tab, setTab] = React.useState(current);
     let tabsNames = Object.values(tabs);
-    const drawer = tabsNames.concat(['Редактор', "Файлы"])
+    const drawer = tabsNames
+        // .concat(['Редактор', "Файлы"])
     const location = useNavigate();
     React.useLayoutEffect(() => {
         const page = window.location.pathname.split('/')[1];
@@ -80,12 +81,12 @@ function Bar({
                 </Container>
             </AppBar>
             <Drawer tab={tab} callback={i => {
-                if (drawer[i] === "Редактор") store.dispatch(actions.setEditor());
-                else if (drawer[i] === "Файлы") window.app.filemanager?.open();
-                else {
+                // if (drawer[i] === "Редактор") store.dispatch(actions.setEditor());
+                // else if (drawer[i] === "Файлы") window.app.filemanager?.open();
+                // else {
                     onChange(i);
                     setTab(i);
-                }
+                // }
             }} tabs={drawer} open={open} setOpen={setOpen}></Drawer>
         </>
     );

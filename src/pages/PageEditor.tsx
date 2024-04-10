@@ -29,8 +29,8 @@ type EditorData = {
 const buttonPlugin: CellPlugin<EditorData> = {
     Renderer: ({data}) => (
         <>
-            {data.type === "buy" && <Pay product={{}} text={"Купить"}></Pay>}
-            {data.type === "order" && <Button variant={'contained'} onClick={() => BusinessLogic.order()}>
+            {data.type === "buy" && <Pay product={store.getState().app?.selected}></Pay>}
+            {data.type === "order" && <Button style={{margin:'auto'}} variant={'contained'} onClick={() => BusinessLogic.order()}>
                 заказать изготовление
             </Button>
             }
@@ -179,8 +179,8 @@ const spacerPlugin: CellPlugin = {
 };
 
 type MediaData = {
-    title: string;
-    text: string;
+    mediaTitle: string;
+    mediaText: string;
 }
 
 
@@ -226,7 +226,7 @@ function pluginGenerator(fields, title, id, render) {
 
 const mediaPlugin: CellPlugin<MediaData> = {
     Renderer: ({data}) => (
-        <div style={{minHeight: 50, display: 'flex', justifyContent: 'center'}}>
+        <div style={{minHeight: 50}}>
             <MediaItem data={data}></MediaItem>
         </div>
     ),
@@ -246,11 +246,11 @@ const mediaPlugin: CellPlugin<MediaData> = {
                     },
                     default: [],
                 },
-                title: {
+                mediaTitle: {
                     type: 'string',
                     default: '',
                 },
-                text: {
+                mediaText: {
                     type: 'string',
                     default: '',
                 },
@@ -342,7 +342,7 @@ let initItems = [];
 
 export const PageEditor = ({id, data, endpoint}: { id: number; data: object; endpoint: string }) => {
     const [value, setValue] = React.useState(data);
-    const editor = useAppSelector(state => state.app.editor);
+    // const editor = useAppSelector(state => state.app.editor);
 
     function submit() {
         window.api.request({
@@ -355,23 +355,23 @@ export const PageEditor = ({id, data, endpoint}: { id: number; data: object; end
         })
     }
 
-    useInitCallbacks(editor)
-
-    window.app.editor = {
-        insert: files => {
-            setValue(value => ({
-                ...value, rows: [...value.rows, templateFiles(files)]
-            }))
-        }
-    }
+    // useInitCallbacks(editor)
+    //
+    // window.app.editor = {
+    //     insert: files => {
+    //         setValue(value => ({
+    //             ...value, rows: [...value.rows, templateFiles(files)]
+    //         }))
+    //     }
+    // }
     return (
         <>
-            {editor && <Button onClick={submit}>Подтвердить изменения</Button>}
+            {/*{editor && <Button onClick={submit}>Сохранить изменения</Button>}*/}
             <Editor
-                readOnly={!editor}
+                readOnly={true}
                 cellPlugins={myCellPlugins}
                 value={value} onChange={v => setValue(v)}/>
-            {!value.rows.length && <Typography textAlign={'center'}>Нет записей</Typography>}
+            {(!value.rows || !value.rows.length) && <Typography textAlign={'center'}>Нет записей</Typography>}
         </>
     );
 };
@@ -484,7 +484,7 @@ export const ItemsEditor = ({items, endpoint}: { items: object[]; endpoint: stri
 
     return (
         <>
-            {editor && <Button onClick={submit}>Подтвердить изменения</Button>}
+            {editor && <Button onClick={submit}>Сохранить изменения</Button>}
             <Editor
                 readOnly={!editor}
                 cellPlugins={myCellPlugins}
@@ -532,8 +532,8 @@ function templateFiles(files) {
             "dataI18n": {
                 "default": {
                     "files": [f],
-                    "title": "",
-                    "text": "",
+                    "mediaTitle": "",
+                    "mediaText": "",
                     "width": 100,
                     "border": true,
                     "quality": 800
@@ -549,8 +549,9 @@ function templateFiles(files) {
     }
 }
 
-window.addEventListener("keydown", e => {
-    if (e.altKey && e.ctrlKey && e.code === 'KeyE') {
-        store.dispatch(actions.setEditor());
-    }
-})
+
+// window.addEventListener("keydown", e => {
+//     if (e.altKey && e.ctrlKey && e.code === 'KeyE') {
+//         store.dispatch(actions.setEditor());
+//     }
+// })

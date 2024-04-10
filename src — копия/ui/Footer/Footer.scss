@@ -1,0 +1,38 @@
+
+$color-footer-background: rgb(54, 59, 75);
+$color-footer-text: white;
+
+.footer {
+    width: 100%;
+    background-color: $color-footer-background;
+    //padding-top: 50px;
+    &__wrapper {
+        height: 100px;
+    }
+
+    &__inner {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        height: 100%;
+        padding: 0 100px;
+    }
+
+    &__text {
+        font-weight: 300;
+        font-size: 18px;
+        color: $color-footer-text;
+
+        &--accent {
+            font-weight: 500;
+            font-size: 18px;
+        }
+    }
+
+    @media only screen and (max-width: 700px) {
+        &__inner {
+            padding: 0 30px;
+        }
+    }
+}
+

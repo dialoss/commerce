@@ -1,0 +1,57 @@
+.item__file {
+  width: 50px;
+  user-select: none;
+  position: relative;
+}
+
+.file {
+  &__download {
+    display: flex;
+    //justify-content: center;
+    position: relative;
+    width: initial;
+    justify-content: flex-start;
+
+    &:hover + .file__title {
+      opacity: 1;
+    }
+
+    &-image {
+      font-size: 4em;
+      @media only screen and (max-width: 600px) {
+        & {
+          font-size: 3em;
+        }
+      }
+    }
+
+    &-link {
+      text-decoration: none;
+      text-transform: none;
+      display: block;
+      z-index: 5;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+  }
+  &__title {
+    background-color: #fff;
+    padding: 4px;
+    border-radius: 4px;
+    box-shadow: 0 0 2px 0 grey;
+    position: absolute;
+    z-index: 100;
+    display: block;
+    opacity: 0;
+    transition: all 0.1s linear;
+    bottom: 0;
+    left: 50%;
+    transform: translate(-50%, 100%);
+  }
+}
+
+.item-list.edit {
+  .file__download-link {
+    pointer-events: none;
+  }
+}

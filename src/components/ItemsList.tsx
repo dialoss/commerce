@@ -65,54 +65,10 @@ const ItemsList = ({
         }))
     }, [page]);
 
-    window.app.remove = data => {
-        window.request(window.api.request({
-            path: path + data.id,
-            method: 'DELETE',
-        }))
-        set(items.filter(it => it.id != data.id));
-    }
-
-    window.app.create = (data) => {
-        window.request(window.api.request({
-            path,
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: data
-        }))
-        set([...items, data])
-    }
-
-    window.app.update = (data) => {
-        window.request(window.api.request({
-            path: path + data.id + '/',
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: data,
-        }))
-
-        let newItems = [...items];
-        let i = 0;
-        while (true) {
-            let it = newItems[i];
-            if (it.id === data.id) {
-                newItems[i] = data;
-                break
-            }
-            i++;
-        }
-        set(newItems)
-    }
-
     const [tab, setTab] = useState(0);
     let filteredItems = items.filter(it => tabs.filter(tab, it)).sort((a, b) => a.viewId - b.viewId);
-    const editor = useAppSelector(state => state.app.editor);
     return (
-        <div style={{minHeight: '100vh', marginBottom: 20}} className={'items-list ' + (editor ? 'editor' : '')} >
+        <div style={{minHeight: '100vh', marginBottom: 20}} className={'items-list '} >
             {tabs.names.length > 0 && <Tabs
                 value={tab}
                 centered
@@ -125,12 +81,12 @@ const ItemsList = ({
                     tabs.names.map((t, i) => <Tab onClick={() => setTab(i)} label={t}/>)
                 }
             </Tabs>}
-            {editor ? <ItemsEditor endpoint={'product'} items={filteredItems}></ItemsEditor> :
             <Stack direction={'row'} flexWrap={'wrap'}>
                 {
                     filteredItems.map(it => React.createElement(component, {data: {...it, media: JSON.parse(it.media)}}))
                 }
-            </Stack>}
+            </Stack>
+
             {all > 1 && <Pagination count={all}
                                     page={page}
                                     onChange={(e, a) => {

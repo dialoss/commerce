@@ -2,9 +2,10 @@
 import React, {useLayoutEffect} from 'react';
 
 import {Order} from "../api";
-import PageEditor from "./PageEditor";
 import store from "../store";
 import {actions} from "../store/app";
+import Editor from "@react-page/editor";
+import {Typography} from "@mui/material";
 
 export const ContentPage = ({endpoint, extra}) => {
     const [data, setData] = React.useState<Order | null>(null);
@@ -18,11 +19,16 @@ export const ContentPage = ({endpoint, extra}) => {
             store.dispatch(actions.setPageData(d))
         }))
     }, []);
+    const value = JSON.parse(data.page || '{}');
     return (
         <div style={{minHeight: '100vh'}}>
             {data && data.id && <>
                 {extra && React.createElement(extra, {data})}
-                <PageEditor endpoint={endpoint} id={data.id} data={JSON.parse(data.page || '{}')}></PageEditor>
+                <Editor
+                    readOnly={true}
+                    cellPlugins={myCellPlugins}
+                    value={value}/>
+                {(!value.rows || !value.rows.length) && <Typography textAlign={'center'}>Нет записей</Typography>}
             </>}
         </div>
     );

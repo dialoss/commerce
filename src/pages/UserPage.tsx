@@ -2,8 +2,6 @@
 import React, {useLayoutEffect} from 'react';
 import Userfront from "@userfront/toolkit/react";
 import {useAppSelector} from "../store/redux";
-import ProductCard from "../components/ProductCard";
-import dayjs from "dayjs";
 import OrderCard from "../components/OrderCard";
 import {Avatar, Stack} from "@mui/material";
 import IconButton from "@mui/material/IconButton";
@@ -23,11 +21,13 @@ const UserPage = () => {
                 <Avatar src={user.image}></Avatar>
             </IconButton></h2>
 
-            <Stack direction={'row'} flexWrap={'wrap'}>
-            {orders.map(ord =>
-                <OrderCard detailed={true} data={ord}></OrderCard>
-            )}
-            </Stack>
+            <div className="items-list">
+                <Stack direction={'row'} flexWrap={'wrap'}>
+                    {orders.map(ord =>
+                        <OrderCard detailed={true} data={{...ord, media: JSON.parse(ord.media)}}></OrderCard>
+                    )}
+                </Stack>
+            </div>
         </div>
     );
 };

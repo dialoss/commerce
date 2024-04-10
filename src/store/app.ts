@@ -5,7 +5,7 @@ import {Product} from "../api";
 interface IState {
     selected: Product;
     items: any[];
-    editor: boolean;
+    // editor: boolean;
     page: string;
     users: object;
     pageData: object;
@@ -19,7 +19,7 @@ export const appSlice = createSlice({
         page: '',
         users: {},
         pageData: {},
-        editor: true
+        // editor: true
     } as IState,
     reducers: {
         setSelected: (state, {payload: selected}) => {

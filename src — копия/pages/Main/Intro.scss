@@ -1,0 +1,51 @@
+.intro {
+    &__img {
+        &-wrapper {
+            width: 120px;
+            height: 120px;
+            margin: 20px;
+            border-radius: 50%;
+            overflow: hidden;
+            box-shadow: 0 0 7px grey;
+            position: relative;
+        }
+        &-self {
+            max-width: none;
+            width: 180px;
+            top: 50%;
+            left: 50%;
+            position: absolute;
+            transform: translate(-50%, -50%);
+        }
+    }
+    &__block {
+        max-width: 80%;
+        padding: 20px;
+
+        @media only screen and (max-width: 500px) {
+            & {
+                max-width: 95%;
+            }
+        }
+    }
+    
+    &__title {
+        font-size: 20px;
+        text-align: center;
+    }
+    
+    &__text {
+        text-indent: 40px;
+        line-height: 1.3;
+    }
+    
+    &__inner {
+        margin: 0 auto;
+        max-width: 900px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+}
+

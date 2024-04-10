@@ -4,7 +4,6 @@ import Bar from "./Bar";
 import {AppRouter} from "./pages/AppRouter";
 import {BrowserRouter} from 'react-router-dom';
 import FileManager from "./modules/FileManager";
-import DataForm from './modules/DataForm';
 import Chat from "./modules/Chat";
 import Images from './components/Photos';
 import {Container} from "./ui/Container";
@@ -13,14 +12,13 @@ import PageComments from "./modules/PageComments/PageComments";
 import AuthContainer from "./modules/Auth/AuthContainer";
 import Alerts from "./ui/Alerts";
 import Userfront, {LoginForm} from "@userfront/toolkit/react";
-import ContextMenu from "./components/ContextMenu";
-import {ApiApi, Configuration} from "./api";
+import {ApiApi, Configuration, ErrorContext} from "./api";
 import {BASE_PATH} from "./config";
 import "tools/date"
 import {pages} from "./pages/AppRouter/constants/routes";
-import { Puck } from "@measured/puck";
-import "@measured/puck/puck.css";
-import {MediaField} from "./components/Form";
+import "./notifications"
+import {UploadWidget} from "./modules/UploadWidget";
+
 interface IFilemanager {
     getFiles: () => Promise<any>;
     uploadWidget: () => Promise<any>;
@@ -87,13 +85,22 @@ window.app.authAction = () => {
     return true;
 }
 window.api = new ApiApi(new Configuration({
-    basePath: BASE_PATH
+    basePath: BASE_PATH,
+    middleware: [{
+        onError(context: ErrorContext): Promise<Response | void> {
+            console.log(context.error)
+            return new Promise(resolve => resolve({x:'y'}));
+        }
+    }],
+    headers: {
+        "Authorization": Userfront.tokens.accessToken,
+        "User": Userfront.user.userUuid,
+    }
 }));
 
 function App() {
     return (
         <div className="App">
-            {/*<Editor></Editor>*/}
             <div style={{display: 'none'}}><LoginForm></LoginForm></div>
             <BrowserRouter>
                 <Bar current={Object.keys(pages).indexOf(window.location.pathname.replace('/', ''))}
@@ -109,68 +116,15 @@ function App() {
                     <FooterContainer/>
                 </div>
             </BrowserRouter>
-            <FileManager></FileManager>
+            <UploadWidget></UploadWidget>
+            {/*<FileManager></FileManager>*/}
             <Chat></Chat>
             <AuthContainer></AuthContainer>
             <Images></Images>
             <Alerts></Alerts>
-            <ContextMenu></ContextMenu>
-            <div className="windows"></div>
+            {/*<div className="windows"></div>*/}
         </div>
     );
 }
 
 export default App;
-
-
-
-const config = {
-    components: {
-        HeadingBlock: {
-            fields: {
-                children: {
-                    type: "text",
-                },
-            },
-            render: ({ children }) => {
-                return <h1>{children}</h1>;
-            },
-        },
-        Product: {
-            fields: {
-                media: {
-                    type: "custom",
-                    render: ({ name, onChange, value }) => (
-                        <MediaField field={{value:[]}} setValue={files => onChange(files)}></MediaField>
-                    ),
-                },
-                model: {
-                    type: 'text',
-                    default: "привет"
-                },
-                summary: {
-                    type: 'text',
-                },
-                price: {
-                    type: 'number',
-                },
-            },
-            render: ({...data}) => {
-                return <h1>{JSON.stringify(data)}</h1>;
-            },
-        }
-    },
-};
-
-const initialData = {
-    content: [],
-    root: {},
-};
-
-const save = (data) => {
-    console.log(data)
-};
-
-export function Editor() {
-    return <Puck config={config} data={initialData} onPublish={save} />;
-}
