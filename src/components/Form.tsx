@@ -95,13 +95,11 @@ export const MediaField = ({field, setValue, simple = false}) => {
     const [files, setFiles] = React.useState([]);
 
     useLayoutEffect(() => {
-        if (field.name === 'media') setFiles(JSON.parse(files));
-        else setFiles(field.value);
+        setFiles(field.value);
     }, [field])
 
     function set(files) {
-        if (field.name === 'media') setValue(JSON.stringify(files));
-        else setValue(files);
+        setValue(files);
         setFiles(files);
     }
 
@@ -130,18 +128,28 @@ export const MediaField = ({field, setValue, simple = false}) => {
     )
 }
 
-function getFormField(field, register, setValue) {
-    if (FormMap[field.type]) return React.createElement(FormMap[field.type], {
-        setValue: data => setValue(field.name, data),
-        field
-    });
-    else return <TextField
+export function getFormField(field, setValue) {
+    if (FormMap[field.type]) return React.createElement(FormMap[field.type], {field, setValue});
+    else return React.createElement(Text, {field, setValue});
+}
+
+export function Text({field, setValue}) {
+    const [v, setV] = React.useState(field.value);
+    useEffect(() => {
+        setV(field.value)
+    }, [field])
+
+    return <TextField
         fullWidth
         autoComplete={field.autocomplete || ''}
         variant="standard"
         size={'small'}
         sx={{marginBottom: 2}}
-        {...register(field.name, {value: field.value})}
+        value={v}
+        onChange={e => {
+            setV(e.target.value)
+            setValue(e.target.value)
+        }}
         label={field.label || field.name}
         type={field.type}
         autoFocus
@@ -188,14 +196,10 @@ function CheckField({field, setValue}) {
 }
 
 function Editor({field, setValue}) {
-    const [v, setV] = useState(field.value);
-    useEffect(() => {
-        setV(field.value)
-    }, [field]);
-    return <HTMLEditor updateValue={true} value={v} setHTML={d => {setV(d); setValue(d)}}></HTMLEditor>
+    return <HTMLEditor updateValue={true} value={field.value} setHTML={d => setValue(d)}></HTMLEditor>
 }
 
-const FormMap = {
+export const FormMap = {
     "boolean": CheckField,
     "media": MediaField,
     'select': SelectField,

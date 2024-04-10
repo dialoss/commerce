@@ -109,14 +109,14 @@ const ItemsList = ({
     }
 
     const [tab, setTab] = useState(0);
-    let filteredItems = items.filter(it => tabs.filter(tab, it));
+    let filteredItems = items.filter(it => tabs.filter(tab, it)).sort((a, b) => a.viewId - b.viewId);
     const editor = useAppSelector(state => state.app.editor);
     return (
         <div style={{minHeight: '100vh', marginBottom: 20}} className={'items-list ' + (editor ? 'editor' : '')} >
             {tabs.names.length > 0 && <Tabs
                 value={tab}
                 centered
-                sx={{marginBottom: 2}}
+                sx={{marginBottom: 2, justifyContent:'center'}}
                 onChange={setTab}
                 textColor="secondary"
                 indicatorColor="secondary"

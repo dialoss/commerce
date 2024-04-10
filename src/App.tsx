@@ -111,7 +111,6 @@ function App() {
             </BrowserRouter>
             <FileManager></FileManager>
             <Chat></Chat>
-            <DataForm></DataForm>
             <AuthContainer></AuthContainer>
             <Images></Images>
             <Alerts></Alerts>

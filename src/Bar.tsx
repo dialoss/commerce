@@ -25,7 +25,7 @@ function Bar({
     const [open, setOpen] = React.useState(false);
     const [tab, setTab] = React.useState(current);
     let tabsNames = Object.values(tabs);
-    const drawer = tabsNames.concat(['Редактор', "Файлы", "Форма"])
+    const drawer = tabsNames.concat(['Редактор', "Файлы"])
     const location = useNavigate();
     React.useLayoutEffect(() => {
         const page = window.location.pathname.split('/')[1];
@@ -35,7 +35,7 @@ function Bar({
     }, [location])
     return (
         <>
-            <AppBar position="fixed" sx={{zIndex: 3}}>
+            <AppBar position="fixed" sx={{zIndex: 3, paddingRight:"0 !important"}}>
                 <Container maxWidth="xl" sx={{paddingRight: '5px !important'}}>
                     <Stack direction={'row'}>
                         <IconButton color="inherit" onClick={() => setOpen(o => !o)}>
@@ -82,7 +82,6 @@ function Bar({
             <Drawer tab={tab} callback={i => {
                 if (drawer[i] === "Редактор") store.dispatch(actions.setEditor());
                 else if (drawer[i] === "Файлы") window.app.filemanager?.open();
-                else if (drawer[i] === "Форма") window.app.dataForm();
                 else {
                     onChange(i);
                     setTab(i);

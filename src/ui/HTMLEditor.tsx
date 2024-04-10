@@ -9,10 +9,12 @@ import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import htmlToDraft from 'html-to-draftjs';
 
 const HtmlEditor = ({placeholder="", clear, value, setHTML, updateValue=false}) => {
-    const [editor, setEditor] = useState(EditorState.createEmpty())
+    const [editor, setEditor] = useState(EditorState.createEmpty());
+    const lastValue = React.useRef('');
 
     useLayoutEffect(() => {
-        if (!value || !updateValue) return;
+        if (!value || (!updateValue && lastValue.current)) return;
+        lastValue.current = value;
         const contentBlock = htmlToDraft(value);
         if (contentBlock) {
             const contentState = ContentState.createFromBlockArray(contentBlock.contentBlocks);

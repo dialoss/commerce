@@ -2,14 +2,12 @@
 
 import React from 'react';
 import type {CellPlugin} from '@react-page/editor';
-import Editor, {createValue, getTextContents} from "@react-page/editor";
-import {createGenerateClassName} from '@material-ui/core/styles';
+import Editor, {createValue} from "@react-page/editor";
 import '@react-page/editor/lib/index.css'
 import {connectField} from 'uniforms';
-import HTMLEditor from "../ui/HTMLEditor";
-import {Button, Checkbox, FormControlLabel, FormGroup, Slider, TextField, Typography} from "@mui/material";
+import {Button, Slider, TextField, Typography} from "@mui/material";
 import background, {ModeEnum} from "@react-page/plugins-background";
-import {MediaField, SelectField} from "../components/Form";
+import {getFormField, MediaField} from "../components/Form";
 import {useAppSelector} from "../store/redux";
 import MenuItem from "@mui/material/MenuItem";
 import Pay from "../components/Pay";
@@ -17,14 +15,12 @@ import {BusinessLogic} from "../modules/BusinessLogic";
 import {MediaItem} from "../components/MediaItems";
 import ReactDOM from "react-dom/client";
 import ProductCard from "../components/ProductCard";
-import {Product} from "../api";
 import store from "../store";
 import {actions} from "../store/app";
-
-const generateClassName = createGenerateClassName({
-    disableGlobal: true,
-    seed: 'mui-jss',
-});
+import ShopCard from "../components/ShopCard";
+import OrderCard from "../components/OrderCard";
+import MediaCard from "../components/MediaCard";
+import HTMLEditor from "../ui/HTMLEditor";
 
 type EditorData = {
     html: string;
@@ -49,23 +45,6 @@ const buttonPlugin: CellPlugin<EditorData> = {
         columnCount: 1,
         schema: {
             properties: {
-                // text: {
-                //     type: 'string',
-                //     default: ""
-                // },
-                // action: {
-                //     type: 'string',
-                //     uniforms: {
-                //         component: connectField(({value, onChange}) => {
-                //             const [v, setV] = React.useState(value);
-                //             return <div><TextField
-                //                 label="Действие"
-                //                 onChange={e => setV(e.target.value)}
-                //             >
-                //             </TextField><Button onClick={() => onChange(v)}>OK</Button></div>
-                //         })
-                //     }
-                // },
                 type: {
                     type: 'string',
                     uniforms: {
@@ -95,7 +74,7 @@ const buttonPlugin: CellPlugin<EditorData> = {
 const textPlugin: CellPlugin<EditorData> = {
     Renderer: ({data}) => (
         <div style={{minHeight: 20, padding: 10}}>
-            {data.date && <p style={{fontWeight: 600}}>{window.formatDate(+data.date)}</p>}
+            {data.showDate && <p style={{fontWeight: 600}}>{window.formatDate(+data.date)}</p>}
             <div dangerouslySetInnerHTML={{__html: data.html}}></div>
         </div>
     ),
@@ -111,21 +90,33 @@ const textPlugin: CellPlugin<EditorData> = {
                 html: {
                     type: 'string',
                     uniforms: {
-                        component: connectField(({value, onChange}) => {
-                            return <HTMLEditor value={value} setHTML={onChange}></HTMLEditor>
-                        }),
+                        component: connectField(({value, onChange}) =>
+                            <HTMLEditor value={value} setHTML={onChange}></HTMLEditor>
+                        )
                     },
+                },
+                showDate: {
+                    type: 'boolean',
+                    uniforms: {
+                        component: connectField(({value, onChange}) =>
+                                getFormField({
+                                    type: "boolean",
+                                    name: 'date',
+                                    label: "Дата создания",
+                                    value,
+                                }, onChange)
+                        )
+                    },
+                    default: false,
                 },
                 date: {
                     type: "string",
                     uniforms: {
                         component: connectField(({value, onChange}) => {
-                            return <FormGroup>
-                                <FormControlLabel control={<Checkbox onChange={e =>
-                                    onChange(e.target.checked ? new Date().getTime().toString() : "")
-                                }/>} label="Дата создания"/>
-                            </FormGroup>
-                        }),
+                            if (value) return <></>;
+                            onChange(new Date().getTime().toString());
+                            return <></>;
+                        })
                     },
                     default: ""
                 }
@@ -178,8 +169,8 @@ const spacerPlugin: CellPlugin = {
                         component: connectField(({value, onChange}) =>
                             <SliderField onChange={onChange} label={'Высота'} max={500} min={30}
                                          defaultValue={30}></SliderField>),
-                        default: 30,
                     },
+                    default: 30,
                 },
             },
             required: ['height'],
@@ -192,58 +183,46 @@ type MediaData = {
     text: string;
 }
 
-const productPlugin: CellPlugin<Product> = {
-    Renderer: ({data}) => (
-        <ProductCard data={data}></ProductCard>
-    ),
-    id: 'productPlugin',
-    title: 'Продукт',
-    description: "",
-    version: 1,
-    controls: {
-        type: 'autoform',
-        schema: {
-            properties: {
-                media: {
-                    uniforms: {
-                        component: connectField(({value, onChange}) =>
-                            <MediaField field={{value}} setValue={files => onChange(files)}></MediaField>
-                        ),
-                    },
-                    default: [],
-                },
-                name: {
-                    type: 'string',
-                    default: '',
-                },
-                summary: {
-                    type: 'string',
-                    default: '',
-                },
-                price: {
-                    type: 'number',
-                    default: 0,
-                },
-                productType: {
-                    uniforms: {
-                        component: connectField(({value, onChange}) =>
-                            <SelectField field={{
-                                value, "choices": [
-                                    "Монтировка",
-                                    "Чертёж"
-                                ], label: "Тип продукта"
-                            }} setValue={onChange}></SelectField>
-                        ),
-                    },
-                    type: 'string',
-                    default: "Монтировка"
-                }
 
+function pluginGenerator(fields, title, id, render) {
+    let props = {};
+    for (const f of fields) {
+        if (!f.type) continue;
+        props[f.name] = {
+            default: f.default,
+            uniforms: {
+                component: connectField(({value, onChange}) => getFormField({...f, value}, onChange))
+            }
+        }
+    }
+    return {
+        Renderer: ({data}) => (
+            React.createElement(render, {data})
+        ),
+        id: id + "plugin",
+        title: title,
+        description: "",
+        version: 1,
+        controls: {
+            type: 'autoform',
+            schema: {
+                properties: {
+                    ...props,
+                    viewId: {
+                        uniforms: {
+                            component: connectField(({value, onChange}) => {
+                                    if (value) return <></>
+                                    onChange(new Date().getTime());
+                                    return <></>
+                                }
+                            ),
+                        },
+                    },
+                }
             },
-            required: [],
         },
-    },
-};
+    }
+}
 
 const mediaPlugin: CellPlugin<MediaData> = {
     Renderer: ({data}) => (
@@ -279,7 +258,8 @@ const mediaPlugin: CellPlugin<MediaData> = {
                     type: 'string',
                     uniforms: {
                         component: connectField(({value, onChange}) =>
-                            <SliderField onChange={onChange} label={'Ширина'} max={100} min={10} defaultValue={value}
+                            <SliderField onChange={onChange} label={'Ширина'} max={100} min={10}
+                                         defaultValue={value}
                                          number={false}></SliderField>
                         ),
                     },
@@ -299,8 +279,16 @@ const mediaPlugin: CellPlugin<MediaData> = {
         },
     },
 };
+const schema = require("../api/schema.json");
 
-const cellPlugins = [productPlugin, buttonPlugin, mediaPlugin, spacerPlugin, textPlugin, background({
+const plugins = {
+    'product': pluginGenerator(schema.product, "Продукт", "product", ProductCard),
+    'order': pluginGenerator(schema.order, "Заказ", "order", OrderCard),
+    'shop': pluginGenerator(schema.shop, "Магазин", "shop", ShopCard),
+    'gallery': pluginGenerator(schema.gallery, "Галерея", "gallery", MediaCard),
+}
+console.log(plugins)
+const cellPlugins = [...Object.values(plugins), buttonPlugin, mediaPlugin, spacerPlugin, textPlugin, background({
     enabledModes:
         ModeEnum.COLOR_MODE_FLAG |
         ModeEnum.IMAGE_MODE_FLAG |
@@ -356,17 +344,15 @@ export const PageEditor = ({id, data, endpoint}: { id: number; data: object; end
     const [value, setValue] = React.useState(data);
     const editor = useAppSelector(state => state.app.editor);
 
-    function update(data) {
-        updates++;
+    function submit() {
         window.api.request({
             path: `/api/${endpoint}/${id}/`,
             method: 'PUT',
             headers: {
                 "Content-Type": "application/json"
             },
-            body: {page: JSON.stringify(data)}
+            body: {page: JSON.stringify(value)}
         })
-        setValue(data);
     }
 
     useInitCallbacks(editor)
@@ -378,22 +364,17 @@ export const PageEditor = ({id, data, endpoint}: { id: number; data: object; end
             }))
         }
     }
-
-    console.log(value)
     return (
-        <Editor readOnly={!editor} cellPlugins={cellPlugins} value={value} onChange={update}/>
+        <>
+            {editor && <Button onClick={submit}>Подтвердить изменения</Button>}
+            <Editor
+                readOnly={!editor}
+                cellPlugins={myCellPlugins}
+                value={value} onChange={v => setValue(v)}/>
+            {!value.rows.length && <Typography textAlign={'center'}>Нет записей</Typography>}
+        </>
     );
 };
-
-function index(el) {
-    let children = el.parentNode.childNodes;
-    for (let i = 0; i < children.length; i++) {
-        if (children[i] == el) {
-            return i;
-        }
-    }
-    return -1;
-}
 
 function useInitCallbacks(editor) {
     React.useEffect(() => {
@@ -426,88 +407,86 @@ function useInitCallbacks(editor) {
 
 export const ItemsEditor = ({items, endpoint}: { items: object[]; endpoint: string }) => {
     const [value, setValue] = React.useState({rows: items});
-    // useEffect(() => {
-    //     initItems = items;
-    //     const data = {
-    //         rows: items.map((it, i) => ({
-    //             id: (i + 5).toString(), cells: [{
-    //                 "id": it.viewId,
-    //                 "size": 12,
-    //                 "plugin": {"id": "productPlugin", "version": 1},
-    //                 "rows": [],
-    //                 "dataI18n": {"default": JSON.parse(it.view)}
-    //             }]
-    //         })),
-    //         version: 1,
-    //         id: "1"
-    //     };
-    //     setValue(data);
-    // }, [items]);
+    React.useEffect(() => {
+        initItems = items;
+        let data = {
+            rows: initItems.map(it => [{
+                plugin: plugins[endpoint].id, data: {...it, media: JSON.parse(it.media)}
+            }])
+        };
+        const value = createValue(data, {cellPlugins: myCellPlugins, lang: 'default'});
+        setValue(value);
+    }, [items]);
     const editor = useAppSelector(state => state.app.editor);
 
     function update(newData) {
         setValue(newData);
-        let a = getTextContents(newData, {cellPlugins: myCellPlugins, lang: 'en'})
-        console.log(a)
     }
 
+    console.log(value)
     useInitCallbacks(editor);
 
-    window.app.editor = {
-        insert: files => {
-            setValue(value => ({
-                ...value, rows: [...value.rows, templateFiles(files)]
-            }))
+    function submit() {
+        let values = [];
+        for (const newIt of value.rows) {
+            values.push({...findValue(newIt, 'default')});
         }
+        for (const it of initItems) {
+            let found = false;
+            for (const v of values) {
+                if (v.viewId === it.viewId) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                window.api.request({
+                    path: `/api/${endpoint}/${it.id}/`,
+                    method: 'DELETE'
+                })
+                initItems = initItems.splice(initItems.findIndex(it_ => it_.viewId === it.viewId), 1);
+            }
+        }
+        for (const it of values) {
+            let data = {...it}
+            data.media = JSON.stringify(data.media)
+            const id = findItemId(data.viewId)
+            if (id !== -1) {
+                window.api.request({
+                    path: `/api/${endpoint}/${id}/`,
+                    method: 'PUT',
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: data
+                })
+            } else {
+                window.api.request({
+                    path: `/api/${endpoint}/`,
+                    method: 'POST',
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: data
+                })
+                initItems.push(data)
+            }
+        }
+        window.api.request({
+            path: `/reorder/`,
+            method: 'POST',
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: {endpoint, order: values.map(v => v.viewId)}
+        })
     }
-    console.log(value)
 
-    const loggerMiddleware = (store) => (next) => (action) => {
-        console.log("action", action);
-        switch (action.type) {
-            case "CELL_INSERT_AT_END":
-                const id = new Date().getTime();
-
-                return;
-            // case "CELL_REMOVE":
-            //     for (const id of action.ids) {
-            //         let itemId = findItemId(id);
-            //         if (itemId !== -1)
-            //             window.api.request({
-            //                 path: `/api/${endpoint}/${itemId}/`,
-            //                 method: 'DELETE'
-            //             })
-            //     }
-            //     break;
-            // case "CELL_UPDATE_DATA":
-            //     let itemId = findItemId(action.id);
-            //     console.log(itemId)
-            //     if (itemId === -1) break;
-            //     let data = {...action.data, id: action.id};
-            //     console.log(data)
-            //     data.view = JSON.stringify({...data, dataI18n: {default: {...data}}});
-            //
-            //     data.media = JSON.stringify(data.media)
-            //     window.api.request({
-            //         path: `/api/${endpoint}/${itemId}/`,
-            //         method: 'PUT',
-            //         headers: {
-            //             "Content-Type": "application/json"
-            //         },
-            //         body: data
-            //     })
-            //     break;
-        }
-        next(action);
-
-    };
     return (
         <>
+            {editor && <Button onClick={submit}>Подтвердить изменения</Button>}
             <Editor
-                middleware={[loggerMiddleware]}
                 readOnly={!editor}
-                lang="en"
-
                 cellPlugins={myCellPlugins}
                 value={value} onChange={update}/>
             {!value.rows.length && <Typography textAlign={'center'}>Нет записей</Typography>}
@@ -515,45 +494,24 @@ export const ItemsEditor = ({items, endpoint}: { items: object[]; endpoint: stri
     );
 };
 
-const partialValue = {
-    rows: [
-        [
-            {
-                plugin: productPlugin.id,
-                data: {
-                    id: 222,
-                    media: [],
-                    name: "qqqqq",
-                    summary: "aue",
-                    price: 123
-                },
-            }
-        ],
-        [
-            {
-                plugin: productPlugin.id,
-                data: {
-                    id: 1111,
-                    media: [],
-                    name: "privk",
-                    summary: "qqq",
-                    price: 123
-                },
-            },
-        ]
-    ],
-};
+function findValue(object, key) {
+    let value;
+    Object.keys(object).some(function (k) {
+        if (k === key) {
+            value = object[k];
+            return true;
+        }
+        if (object[k] && typeof object[k] === 'object') {
+            value = findValue(object[k], key);
+            return value !== undefined;
+        }
+    });
+    return value;
+}
 
-const value = createValue(partialValue, {
-    lang: 'en',
-    cellPlugins: myCellPlugins,
-});
-
-console.log(value)
-
-function findItemId(viewId) {
+function findItemId(id) {
     for (const it of initItems) {
-        if (it.viewId === viewId) return it.id;
+        if (it.viewId === id) return it.id;
     }
     return -1;
 }
