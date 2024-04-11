@@ -6,6 +6,7 @@ import store from "../store";
 import {actions} from "../store/app";
 import Editor from "@react-page/editor";
 import {Typography} from "@mui/material";
+import {myCellPlugins} from "./PageEditor";
 
 export const ContentPage = ({endpoint, extra}) => {
     const [data, setData] = React.useState<Order | null>(null);
@@ -19,7 +20,7 @@ export const ContentPage = ({endpoint, extra}) => {
             store.dispatch(actions.setPageData(d))
         }))
     }, []);
-    const value = JSON.parse(data.page || '{}');
+    const value = data && JSON.parse(data.page || '{}');
     return (
         <div style={{minHeight: '100vh'}}>
             {data && data.id && <>

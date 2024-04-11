@@ -11,11 +11,13 @@ const Orders = () => {
     }
 
     return (
-        <>
-            <ItemsList customPagination={{type: "Монтировка"}}
-                       tabs={{names: ['Выполненные', "В работе / новые"], filter}} key={'orders'} endpoint={'order'} cacheKey={'order'}
-                       component={OrderCard}></ItemsList>
-        </>
+
+        <ItemsList customPagination={{type: "Монтировка"}}
+                   tabs={{pagination: ["done", "in-work"], names: ['Выполненные', "В работе / новые"], filter}}
+                   key={'orders'}
+                   endpoint={'order'} cacheKey={'order'}
+                   component={OrderCard}></ItemsList>
+
 
     );
 };

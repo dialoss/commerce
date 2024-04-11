@@ -87,6 +87,9 @@ window.app.authAction = () => {
 window.api = new ApiApi(new Configuration({
     basePath: BASE_PATH,
     middleware: [{
+        pre(context: RequestContext): Promise<FetchParams | void> {
+            console.log(context)
+        },
         onError(context: ErrorContext): Promise<Response | void> {
             console.log(context.error)
             return new Promise(resolve => resolve({x:'y'}));
@@ -117,12 +120,10 @@ function App() {
                 </div>
             </BrowserRouter>
             <UploadWidget></UploadWidget>
-            {/*<FileManager></FileManager>*/}
             <Chat></Chat>
             <AuthContainer></AuthContainer>
             <Images></Images>
             <Alerts></Alerts>
-            {/*<div className="windows"></div>*/}
         </div>
     );
 }

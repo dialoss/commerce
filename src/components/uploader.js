@@ -4,8 +4,6 @@ import {Button, Checkbox, FormControlLabel, MenuItem, Stack, TextField, Typograp
 import {scaleImage} from "./CardImage";
 
 export function Uploader({files, setFiles}) {
-    const maxNumber = 69;
-
     const onChange = (imageList, addUpdateIndex) => {
         setFiles(imageList);
     };
@@ -15,7 +13,7 @@ export function Uploader({files, setFiles}) {
             multiple
             value={files}
             onChange={onChange}
-            maxNumber={maxNumber}
+            maxNumber={10}
             dataURLKey="data_url"
         >
             {({
@@ -30,7 +28,6 @@ export function Uploader({files, setFiles}) {
                            style={{width: "80%"}}>
                         {imageList.map((image, index) => (
                             <div key={index} style={{margin: 5, display:'flex',flexDirection:'column', alignItems:'center'}}>
-                                {/*<p>{image}</p>*/}
                                 <img src={scaleImage(image.url, 0, 200)} alt="" width="100"/>
                                 <p>{image.filename}</p>
                                 <Stack rowGap={1} mx={1}>

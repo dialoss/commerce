@@ -3,7 +3,7 @@ import React from 'react';
 import store from "../store";
 
 const sizes = {
-    1: "400",
+    1: "800",
     2: '1500'
 }
 

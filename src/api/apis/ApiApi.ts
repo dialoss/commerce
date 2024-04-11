@@ -24,6 +24,8 @@ import type {
   PaginatedProductList,
   PaginatedShopList,
   PaginatedStatusList,
+  PatchedComment,
+  PatchedGallery,
   PatchedOrder,
   PatchedProduct,
   PatchedShop,
@@ -51,6 +53,10 @@ import {
     PaginatedShopListToJSON,
     PaginatedStatusListFromJSON,
     PaginatedStatusListToJSON,
+    PatchedCommentFromJSON,
+    PatchedCommentToJSON,
+    PatchedGalleryFromJSON,
+    PatchedGalleryToJSON,
     PatchedOrderFromJSON,
     PatchedOrderToJSON,
     PatchedProductFromJSON,
@@ -71,10 +77,19 @@ export interface ApiCommentCreateRequest {
     comment: Comment;
 }
 
+export interface ApiCommentDestroyRequest {
+    id: number;
+}
+
 export interface ApiCommentListRequest {
     page: string;
     limit?: number;
     offset?: number;
+}
+
+export interface ApiCommentPartialUpdateRequest {
+    id: number;
+    patchedComment?: PatchedComment;
 }
 
 export interface ApiCommentRetrieveRequest {
@@ -84,16 +99,24 @@ export interface ApiCommentRetrieveRequest {
 export interface ApiCommentUpdateRequest {
     id: number;
     comment: Comment;
-    like?: string;
 }
 
 export interface ApiGalleryCreateRequest {
     gallery?: Gallery;
 }
 
+export interface ApiGalleryDestroyRequest {
+    id: number;
+}
+
 export interface ApiGalleryListRequest {
     limit?: number;
     offset?: number;
+}
+
+export interface ApiGalleryPartialUpdateRequest {
+    id: number;
+    patchedGallery?: PatchedGallery;
 }
 
 export interface ApiGalleryRetrieveRequest {
@@ -261,6 +284,39 @@ export class ApiApi extends runtime.BaseAPI {
 
     /**
      */
+    async apiCommentDestroyRaw(requestParameters: ApiCommentDestroyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling apiCommentDestroy().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && (this.configuration.username !== undefined || this.configuration.password !== undefined)) {
+            headerParameters["Authorization"] = "Basic " + btoa(this.configuration.username + ":" + this.configuration.password);
+        }
+        const response = await this.request({
+            path: `/api/comment/{id}/`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
+            method: 'DELETE',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async apiCommentDestroy(requestParameters: ApiCommentDestroyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.apiCommentDestroyRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     */
     async apiCommentListRaw(requestParameters: ApiCommentListRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PaginatedCommentList>> {
         if (requestParameters['page'] == null) {
             throw new runtime.RequiredError(
@@ -302,6 +358,43 @@ export class ApiApi extends runtime.BaseAPI {
      */
     async apiCommentList(requestParameters: ApiCommentListRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PaginatedCommentList> {
         const response = await this.apiCommentListRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async apiCommentPartialUpdateRaw(requestParameters: ApiCommentPartialUpdateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Comment>> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling apiCommentPartialUpdate().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (this.configuration && (this.configuration.username !== undefined || this.configuration.password !== undefined)) {
+            headerParameters["Authorization"] = "Basic " + btoa(this.configuration.username + ":" + this.configuration.password);
+        }
+        const response = await this.request({
+            path: `/api/comment/{id}/`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
+            method: 'PATCH',
+            headers: headerParameters,
+            query: queryParameters,
+            body: PatchedCommentToJSON(requestParameters['patchedComment']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => CommentFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async apiCommentPartialUpdate(requestParameters: ApiCommentPartialUpdateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Comment> {
+        const response = await this.apiCommentPartialUpdateRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -357,10 +450,6 @@ export class ApiApi extends runtime.BaseAPI {
         }
 
         const queryParameters: any = {};
-
-        if (requestParameters['like'] != null) {
-            queryParameters['like'] = requestParameters['like'];
-        }
 
         const headerParameters: runtime.HTTPHeaders = {};
 
@@ -419,6 +508,39 @@ export class ApiApi extends runtime.BaseAPI {
 
     /**
      */
+    async apiGalleryDestroyRaw(requestParameters: ApiGalleryDestroyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling apiGalleryDestroy().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && (this.configuration.username !== undefined || this.configuration.password !== undefined)) {
+            headerParameters["Authorization"] = "Basic " + btoa(this.configuration.username + ":" + this.configuration.password);
+        }
+        const response = await this.request({
+            path: `/api/gallery/{id}/`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
+            method: 'DELETE',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async apiGalleryDestroy(requestParameters: ApiGalleryDestroyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.apiGalleryDestroyRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     */
     async apiGalleryListRaw(requestParameters: ApiGalleryListRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PaginatedGalleryList>> {
         const queryParameters: any = {};
 
@@ -449,6 +571,43 @@ export class ApiApi extends runtime.BaseAPI {
      */
     async apiGalleryList(requestParameters: ApiGalleryListRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PaginatedGalleryList> {
         const response = await this.apiGalleryListRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async apiGalleryPartialUpdateRaw(requestParameters: ApiGalleryPartialUpdateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Gallery>> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling apiGalleryPartialUpdate().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (this.configuration && (this.configuration.username !== undefined || this.configuration.password !== undefined)) {
+            headerParameters["Authorization"] = "Basic " + btoa(this.configuration.username + ":" + this.configuration.password);
+        }
+        const response = await this.request({
+            path: `/api/gallery/{id}/`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
+            method: 'PATCH',
+            headers: headerParameters,
+            query: queryParameters,
+            body: PatchedGalleryToJSON(requestParameters['patchedGallery']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => GalleryFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async apiGalleryPartialUpdate(requestParameters: ApiGalleryPartialUpdateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Gallery> {
+        const response = await this.apiGalleryPartialUpdateRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

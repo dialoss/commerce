@@ -9,6 +9,7 @@ import Button from "@mui/material/Button";
 import HTMLEditor from "../../../ui/HTMLEditor";
 import Userfront from "@userfront/toolkit/react";
 import {MediaField} from "../../../components/Form";
+import {Stack} from "@mui/material";
 
 export const CommentsInput = ({callback, parent = null}: { parent?: number }) => {
     const [message, setMessage] = useState('');
@@ -35,15 +36,19 @@ export const CommentsInput = ({callback, parent = null}: { parent?: number }) =>
         setMedia([]);
         clear.current = true;
     }
+
     return (
         <div className="input-wrapper">
             <div className={"input-field"}>
                 <div className="editor-wrapper">
-                    <HTMLEditor placeholder={"Напишите комментарий"} clear={clear} value={message} setHTML={setMessage}></HTMLEditor>
+                    <HTMLEditor simple={true} placeholder={"Напишите комментарий"} clear={clear} value={message}
+                                setHTML={setMessage}></HTMLEditor>
                 </div>
             </div>
-            <Button onClick={send}>Отправить</Button>
-            <MediaField simple={true} field={{value: media}} setValue={(_, files) => setMedia(files)}></MediaField>
+            <Stack direction={'row'} justifyContent={'space-between'}>
+                <Button onClick={send}>Отправить</Button>
+                <MediaField simple={true} field={{value: media}} setValue={setMedia}></MediaField>
+            </Stack>
         </div>
     );
 };
@@ -77,11 +82,11 @@ const CommentsContainer = ({page}) => {
         <CommentsContext.Provider value={addComment}>
             <div className={"comments-section"}>
                 <CommentsInput callback={addComment}></CommentsInput>
-                <div className="comments-section__header">
-                    <div className={"comments-tools__wrapper"}>
-                        <CommentsTools callback={(e) => setSorting(() => sortFunction(e.target.value))}></CommentsTools>
-                    </div>
-                </div>
+                {/*<div className="comments-section__header">*/}
+                {/*    <div className={"comments-tools__wrapper"}>*/}
+                        {/*<CommentsTools callback={(e) => setSorting(() => sortFunction(e.target.value))}></CommentsTools>*/}
+                    {/*</div>*/}
+                {/*</div>*/}
                 <div className={"comments"}>
                     <p id={'counter'}>Всего комментариев: {search.length}</p>
                     <Comments comments={commentsTree}></Comments>

@@ -7,7 +7,7 @@ $color-footer-text: white;
     background-color: $color-footer-background;
     //padding-top: 50px;
     &__wrapper {
-        height: 100px;
+        //height: 100px;
     }
 
     &__inner {
@@ -15,7 +15,7 @@ $color-footer-text: white;
         justify-content: space-between;
         align-items: center;
         height: 100%;
-        padding: 0 100px;
+        padding: 6px 100px;
     }
 
     &__text {

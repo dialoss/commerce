@@ -318,7 +318,7 @@ function escape(el) {
     }
 }
 
-const myCellPlugins = cellPlugins.map<CellPlugin<Styling>>((plugin) => {
+export const myCellPlugins = cellPlugins.map<CellPlugin<Styling>>((plugin) => {
     if (!plugin.controls.schema) return plugin;
     plugin.controls.schema.properties = {
         ...plugin.controls.schema.properties,

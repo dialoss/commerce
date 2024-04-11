@@ -35,7 +35,7 @@ export const mediaItems = {
     file: ({data}) => <div>file {data.media[0].url}</div>
 }
 
-export function MediaItem({data, ratio = false}) {
+export function MediaItem({data, ratio = false, callback=() => {}}) {
     if (!data.media || !data.media[0]) return <></>
     const item = <div className="media-wrapper" style={{
         margin: '0 auto',
@@ -50,7 +50,7 @@ export function MediaItem({data, ratio = false}) {
             borderRadius: 5,
             height: '100%'
         }}>
-            <div className={"media-item"} style={{
+            <div className={"media-item"} onClick={callback} style={{
                 maxWidth: '100%',
                 maxHeight: '100%',
                 overflow: 'hidden',

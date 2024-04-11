@@ -12,18 +12,19 @@ import AspectRatio from '@mui/joy/AspectRatio';
 const limit = 30;
 
 const cache = {}
-const useCache = false;
+const useCache = true;
 
 interface TabsProps {
     filter: (tab: number, item: object) => boolean;
     names: string[];
+    pagination: string[];
 }
 
 const ItemsList = ({
                        component,
                        endpoint = "",
                        cacheKey = "",
-                       tabs = {names: [], filter: () => true},
+                       tabs = {names: [], pagination: [], filter: () => true},
                        customPagination = {}
                    }: { tabs?: TabsProps; customPagination?: object; cacheKey: string; endpoint: string; component: React.JSXElementConstructor<any>; }) => {
     const [items, setItems] = useState([]);
@@ -39,9 +40,17 @@ const ItemsList = ({
 
     useLayoutEffect(() => {
         store.dispatch(actions.setPage(endpoint));
+        if (tabs.pagination.length > 0) {
+            let url = new URL(window.location.href);
+            let t = url.searchParams.get("status");
+            t = tabs.pagination.indexOf(t);
+            if (t !== -1) changeTab(t);
+            else changeTab(0);
+        }
     }, [])
 
     useLayoutEffect(() => {
+        window.scrollTo(0, 0);
         const pagination = {limit, offset: limit * (page - 1)};
         const cachePage = cache[cacheKey];
         if (useCache && cachePage) {
@@ -66,6 +75,13 @@ const ItemsList = ({
     }, [page]);
 
     const [tab, setTab] = useState(0);
+    function changeTab(t) {
+        setTab(t);
+        let url = new URL(window.location.href);
+        url.searchParams.set("status", tabs.pagination[t]);
+        window.history.pushState({},"", url.toString());
+    }
+
     let filteredItems = items.filter(it => tabs.filter(tab, it)).sort((a, b) => a.viewId - b.viewId);
     return (
         <div style={{minHeight: '100vh', marginBottom: 20}} className={'items-list '} >
@@ -78,7 +94,7 @@ const ItemsList = ({
                 indicatorColor="secondary"
             >
                 {
-                    tabs.names.map((t, i) => <Tab onClick={() => setTab(i)} label={t}/>)
+                    tabs.names.map((t, i) => <Tab onClick={() => changeTab(i)} label={t}/>)
                 }
             </Tabs>}
             <Stack direction={'row'} flexWrap={'wrap'}>

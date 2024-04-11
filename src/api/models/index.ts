@@ -9,6 +9,8 @@ export * from './PaginatedOrderList';
 export * from './PaginatedProductList';
 export * from './PaginatedShopList';
 export * from './PaginatedStatusList';
+export * from './PatchedComment';
+export * from './PatchedGallery';
 export * from './PatchedOrder';
 export * from './PatchedProduct';
 export * from './PatchedShop';

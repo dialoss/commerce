@@ -21,7 +21,6 @@ const OrderCard = ({data, detailed}: { detailed: boolean; data: Order }) => {
         Нет продукта
         <p>{data.status}</p>
     </div>
-    console.log(data)
     return (
         <BaseCard data={data}
                   onClick={e => {

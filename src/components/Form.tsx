@@ -118,13 +118,13 @@ export const MediaField = ({field, setValue, simple = false}) => {
     }
 
     return (
-        <>
+        <div>
             <Stack direction={'row'} alignItems={'center'}>
                 <Typography>Медиа</Typography>
                 <Button onClick={select}>Выбрать файлы</Button>
             </Stack>
             <Uploader files={files} setFiles={set}></Uploader>
-        </>
+        </div>
     )
 }
 

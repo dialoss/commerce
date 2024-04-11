@@ -95,7 +95,7 @@ export const MediaField = ({field, setValue, simple = false}) => {
     const [files, setFiles] = React.useState([]);
 
     useLayoutEffect(() => {
-        setFiles(field.value);
+        setFiles(field.value || []);
     }, [field])
 
     function set(files) {
@@ -116,7 +116,7 @@ export const MediaField = ({field, setValue, simple = false}) => {
             window.app.filemanager?.getFiles().then(files => setRaw(files));
         }
     }
-
+    console.log(files)
     return (
         <>
             <Stack direction={'row'} alignItems={'center'}>

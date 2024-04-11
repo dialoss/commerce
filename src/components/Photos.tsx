@@ -1,6 +1,5 @@
 //@ts-nocheck
 import React, {useState} from 'react';
-import {useTransitionStateManager} from '@mui/base/useTransition';
 
 import Zoom from "yet-another-react-lightbox/plugins/zoom";
 import "yet-another-react-lightbox/plugins/thumbnails.css";
@@ -8,14 +7,12 @@ import "yet-another-react-lightbox/plugins/counter.css";
 import Counter from "yet-another-react-lightbox/plugins/counter";
 import Lightbox, {createModule, useLightboxState} from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/styles.css";
-import {Button, Fade} from "@mui/material";
 import './Photos.scss'
 
 let itemID = null;
 
 
 function prepareImages(images) {
-    console.log(images)
     return images.map((im, i) => {
         return {
             src: im.url,
@@ -29,10 +26,16 @@ function prepareImages(images) {
 function InfoModule({children, ...props}) {
     const state = useLightboxState();
     console.log(state)
+    const slide = state.currentSlide;
     return <>
         {children}
-
-        <div className="image-info"></div>
+        <div style={{
+            minHeight: 50,
+            background: 'linear-gradient(0deg, rgba(0,0,0,0.5) 0%, rgba(255,255,255,0) 100%)'
+        }} className="image-info position-fixed bottom-0  w-100 text-white text-center z-10">
+            <p>{slide.text}</p>
+            <p>{slide.title}</p>
+        </div>
     </>;
 }
 
@@ -75,7 +78,7 @@ const Images = () => {
                 preload: 50,
                 finite: images.length < 2
             }}
-            controller={{closeOnPullDown: true, closeOnPullUp: true}}
+            controller={{closeOnPullDown: true, closeOnPullUp: true, closeOnBackdropClick: true}}
             close={onClose}
             slides={images}
         />

@@ -9,6 +9,7 @@ import Button from "@mui/material/Button";
 import HTMLEditor from "../../../ui/HTMLEditor";
 import Userfront from "@userfront/toolkit/react";
 import {MediaField} from "../../../components/Form";
+import {Stack} from "@mui/material";
 
 export const CommentsInput = ({callback, parent = null}: { parent?: number }) => {
     const [message, setMessage] = useState('');
@@ -35,15 +36,19 @@ export const CommentsInput = ({callback, parent = null}: { parent?: number }) =>
         setMedia([]);
         clear.current = true;
     }
+
     return (
         <div className="input-wrapper">
             <div className={"input-field"}>
                 <div className="editor-wrapper">
-                    <HTMLEditor placeholder={"Напишите комментарий"} clear={clear} value={message} setHTML={setMessage}></HTMLEditor>
+                    <HTMLEditor placeholder={"Напишите комментарий"} clear={clear} value={message}
+                                setHTML={setMessage}></HTMLEditor>
                 </div>
             </div>
-            <Button onClick={send}>Отправить</Button>
-            <MediaField simple={true} field={{value: media}} setValue={(_, files) => setMedia(files)}></MediaField>
+            <Stack justifyContent={'space-between'} direction={'row'}>
+                <Button onClick={send}>Отправить</Button>
+                <MediaField simple={true} setValue={setMedia}></MediaField>
+            </Stack>
         </div>
     );
 };

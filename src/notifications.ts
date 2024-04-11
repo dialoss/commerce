@@ -2,6 +2,7 @@
 import {initializeApp} from "firebase/app";
 import {getMessaging, getToken, onMessage} from "firebase/messaging";
 import Userfront from "@userfront/toolkit/react";
+import {CommentToJSON} from "../src — копия/api";
 
 const firebaseConfig = {
     apiKey: "AIzaSyBIRILz5CGXc_VnbnTXsS1ctwGAUQISN9k",
@@ -22,7 +23,18 @@ navigator.serviceWorker.register("/sw.js").then(reg => {
         serviceWorkerRegistration: reg,
     }).then((currentToken) => {
         if (currentToken) {
-            Userfront.user.update({data: {token: currentToken}})
+            const user = Userfront.user;
+            window.api.request({
+                path: `/update_user/`,
+                method: 'POST',
+                body: JSON.stringify({
+                    messageToken: currentToken,
+                    userId: user.userId,
+                    uuid: user.userUuid,
+                    name: user.name,
+                    email: user.email
+                }),
+            })
             console.log(currentToken)
         } else {
             console.log('No registration token available. Request permission to generate one.');
