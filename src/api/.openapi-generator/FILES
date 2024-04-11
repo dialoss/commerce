@@ -10,14 +10,16 @@ models/PaginatedOrderList.ts
 models/PaginatedProductList.ts
 models/PaginatedShopList.ts
 models/PaginatedStatusList.ts
-models/PatchedComment.ts
+models/PaginatedUserList.ts
 models/PatchedGallery.ts
 models/PatchedOrder.ts
 models/PatchedProduct.ts
 models/PatchedShop.ts
 models/PatchedStatus.ts
+models/PatchedUser.ts
 models/Product.ts
 models/Shop.ts
 models/Status.ts
+models/User.ts
 models/index.ts
 runtime.ts

@@ -24,15 +24,17 @@ import type {
   PaginatedProductList,
   PaginatedShopList,
   PaginatedStatusList,
-  PatchedComment,
+  PaginatedUserList,
   PatchedGallery,
   PatchedOrder,
   PatchedProduct,
   PatchedShop,
   PatchedStatus,
+  PatchedUser,
   Product,
   Shop,
   Status,
+  User,
 } from '../models/index';
 import {
     CommentFromJSON,
@@ -53,8 +55,8 @@ import {
     PaginatedShopListToJSON,
     PaginatedStatusListFromJSON,
     PaginatedStatusListToJSON,
-    PatchedCommentFromJSON,
-    PatchedCommentToJSON,
+    PaginatedUserListFromJSON,
+    PaginatedUserListToJSON,
     PatchedGalleryFromJSON,
     PatchedGalleryToJSON,
     PatchedOrderFromJSON,
@@ -65,20 +67,20 @@ import {
     PatchedShopToJSON,
     PatchedStatusFromJSON,
     PatchedStatusToJSON,
+    PatchedUserFromJSON,
+    PatchedUserToJSON,
     ProductFromJSON,
     ProductToJSON,
     ShopFromJSON,
     ShopToJSON,
     StatusFromJSON,
     StatusToJSON,
+    UserFromJSON,
+    UserToJSON,
 } from '../models/index';
 
 export interface ApiCommentCreateRequest {
     comment: Comment;
-}
-
-export interface ApiCommentDestroyRequest {
-    id: number;
 }
 
 export interface ApiCommentListRequest {
@@ -87,18 +89,8 @@ export interface ApiCommentListRequest {
     offset?: number;
 }
 
-export interface ApiCommentPartialUpdateRequest {
-    id: number;
-    patchedComment?: PatchedComment;
-}
-
 export interface ApiCommentRetrieveRequest {
     id: number;
-}
-
-export interface ApiCommentUpdateRequest {
-    id: number;
-    comment: Comment;
 }
 
 export interface ApiGalleryCreateRequest {
@@ -240,6 +232,33 @@ export interface ApiStatusUpdateRequest {
     status: Status;
 }
 
+export interface ApiUserCreateRequest {
+    user?: User;
+}
+
+export interface ApiUserDestroyRequest {
+    userId: string;
+}
+
+export interface ApiUserListRequest {
+    limit?: number;
+    offset?: number;
+}
+
+export interface ApiUserPartialUpdateRequest {
+    userId: string;
+    patchedUser?: PatchedUser;
+}
+
+export interface ApiUserRetrieveRequest {
+    userId: string;
+}
+
+export interface ApiUserUpdateRequest {
+    userId: string;
+    user?: User;
+}
+
 /**
  * 
  */
@@ -280,39 +299,6 @@ export class ApiApi extends runtime.BaseAPI {
     async apiCommentCreate(requestParameters: ApiCommentCreateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Comment> {
         const response = await this.apiCommentCreateRaw(requestParameters, initOverrides);
         return await response.value();
-    }
-
-    /**
-     */
-    async apiCommentDestroyRaw(requestParameters: ApiCommentDestroyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        if (requestParameters['id'] == null) {
-            throw new runtime.RequiredError(
-                'id',
-                'Required parameter "id" was null or undefined when calling apiCommentDestroy().'
-            );
-        }
-
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        if (this.configuration && (this.configuration.username !== undefined || this.configuration.password !== undefined)) {
-            headerParameters["Authorization"] = "Basic " + btoa(this.configuration.username + ":" + this.configuration.password);
-        }
-        const response = await this.request({
-            path: `/api/comment/{id}/`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
-            method: 'DELETE',
-            headers: headerParameters,
-            query: queryParameters,
-        }, initOverrides);
-
-        return new runtime.VoidApiResponse(response);
-    }
-
-    /**
-     */
-    async apiCommentDestroy(requestParameters: ApiCommentDestroyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.apiCommentDestroyRaw(requestParameters, initOverrides);
     }
 
     /**
@@ -363,43 +349,6 @@ export class ApiApi extends runtime.BaseAPI {
 
     /**
      */
-    async apiCommentPartialUpdateRaw(requestParameters: ApiCommentPartialUpdateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Comment>> {
-        if (requestParameters['id'] == null) {
-            throw new runtime.RequiredError(
-                'id',
-                'Required parameter "id" was null or undefined when calling apiCommentPartialUpdate().'
-            );
-        }
-
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        headerParameters['Content-Type'] = 'application/json';
-
-        if (this.configuration && (this.configuration.username !== undefined || this.configuration.password !== undefined)) {
-            headerParameters["Authorization"] = "Basic " + btoa(this.configuration.username + ":" + this.configuration.password);
-        }
-        const response = await this.request({
-            path: `/api/comment/{id}/`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
-            method: 'PATCH',
-            headers: headerParameters,
-            query: queryParameters,
-            body: PatchedCommentToJSON(requestParameters['patchedComment']),
-        }, initOverrides);
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => CommentFromJSON(jsonValue));
-    }
-
-    /**
-     */
-    async apiCommentPartialUpdate(requestParameters: ApiCommentPartialUpdateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Comment> {
-        const response = await this.apiCommentPartialUpdateRaw(requestParameters, initOverrides);
-        return await response.value();
-    }
-
-    /**
-     */
     async apiCommentRetrieveRaw(requestParameters: ApiCommentRetrieveRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Comment>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
@@ -429,50 +378,6 @@ export class ApiApi extends runtime.BaseAPI {
      */
     async apiCommentRetrieve(requestParameters: ApiCommentRetrieveRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Comment> {
         const response = await this.apiCommentRetrieveRaw(requestParameters, initOverrides);
-        return await response.value();
-    }
-
-    /**
-     */
-    async apiCommentUpdateRaw(requestParameters: ApiCommentUpdateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Comment>> {
-        if (requestParameters['id'] == null) {
-            throw new runtime.RequiredError(
-                'id',
-                'Required parameter "id" was null or undefined when calling apiCommentUpdate().'
-            );
-        }
-
-        if (requestParameters['comment'] == null) {
-            throw new runtime.RequiredError(
-                'comment',
-                'Required parameter "comment" was null or undefined when calling apiCommentUpdate().'
-            );
-        }
-
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        headerParameters['Content-Type'] = 'application/json';
-
-        if (this.configuration && (this.configuration.username !== undefined || this.configuration.password !== undefined)) {
-            headerParameters["Authorization"] = "Basic " + btoa(this.configuration.username + ":" + this.configuration.password);
-        }
-        const response = await this.request({
-            path: `/api/comment/{id}/`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
-            method: 'PUT',
-            headers: headerParameters,
-            query: queryParameters,
-            body: CommentToJSON(requestParameters['comment']),
-        }, initOverrides);
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => CommentFromJSON(jsonValue));
-    }
-
-    /**
-     */
-    async apiCommentUpdate(requestParameters: ApiCommentUpdateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Comment> {
-        const response = await this.apiCommentUpdateRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -1533,6 +1438,212 @@ export class ApiApi extends runtime.BaseAPI {
      */
     async apiStatusUpdate(requestParameters: ApiStatusUpdateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Status> {
         const response = await this.apiStatusUpdateRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async apiUserCreateRaw(requestParameters: ApiUserCreateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<User>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (this.configuration && (this.configuration.username !== undefined || this.configuration.password !== undefined)) {
+            headerParameters["Authorization"] = "Basic " + btoa(this.configuration.username + ":" + this.configuration.password);
+        }
+        const response = await this.request({
+            path: `/api/user/`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: UserToJSON(requestParameters['user']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => UserFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async apiUserCreate(requestParameters: ApiUserCreateRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<User> {
+        const response = await this.apiUserCreateRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async apiUserDestroyRaw(requestParameters: ApiUserDestroyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters['userId'] == null) {
+            throw new runtime.RequiredError(
+                'userId',
+                'Required parameter "userId" was null or undefined when calling apiUserDestroy().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && (this.configuration.username !== undefined || this.configuration.password !== undefined)) {
+            headerParameters["Authorization"] = "Basic " + btoa(this.configuration.username + ":" + this.configuration.password);
+        }
+        const response = await this.request({
+            path: `/api/user/{userId}/`.replace(`{${"userId"}}`, encodeURIComponent(String(requestParameters['userId']))),
+            method: 'DELETE',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async apiUserDestroy(requestParameters: ApiUserDestroyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.apiUserDestroyRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     */
+    async apiUserListRaw(requestParameters: ApiUserListRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PaginatedUserList>> {
+        const queryParameters: any = {};
+
+        if (requestParameters['limit'] != null) {
+            queryParameters['limit'] = requestParameters['limit'];
+        }
+
+        if (requestParameters['offset'] != null) {
+            queryParameters['offset'] = requestParameters['offset'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && (this.configuration.username !== undefined || this.configuration.password !== undefined)) {
+            headerParameters["Authorization"] = "Basic " + btoa(this.configuration.username + ":" + this.configuration.password);
+        }
+        const response = await this.request({
+            path: `/api/user/`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => PaginatedUserListFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async apiUserList(requestParameters: ApiUserListRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PaginatedUserList> {
+        const response = await this.apiUserListRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async apiUserPartialUpdateRaw(requestParameters: ApiUserPartialUpdateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<User>> {
+        if (requestParameters['userId'] == null) {
+            throw new runtime.RequiredError(
+                'userId',
+                'Required parameter "userId" was null or undefined when calling apiUserPartialUpdate().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (this.configuration && (this.configuration.username !== undefined || this.configuration.password !== undefined)) {
+            headerParameters["Authorization"] = "Basic " + btoa(this.configuration.username + ":" + this.configuration.password);
+        }
+        const response = await this.request({
+            path: `/api/user/{userId}/`.replace(`{${"userId"}}`, encodeURIComponent(String(requestParameters['userId']))),
+            method: 'PATCH',
+            headers: headerParameters,
+            query: queryParameters,
+            body: PatchedUserToJSON(requestParameters['patchedUser']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => UserFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async apiUserPartialUpdate(requestParameters: ApiUserPartialUpdateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<User> {
+        const response = await this.apiUserPartialUpdateRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async apiUserRetrieveRaw(requestParameters: ApiUserRetrieveRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<User>> {
+        if (requestParameters['userId'] == null) {
+            throw new runtime.RequiredError(
+                'userId',
+                'Required parameter "userId" was null or undefined when calling apiUserRetrieve().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && (this.configuration.username !== undefined || this.configuration.password !== undefined)) {
+            headerParameters["Authorization"] = "Basic " + btoa(this.configuration.username + ":" + this.configuration.password);
+        }
+        const response = await this.request({
+            path: `/api/user/{userId}/`.replace(`{${"userId"}}`, encodeURIComponent(String(requestParameters['userId']))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => UserFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async apiUserRetrieve(requestParameters: ApiUserRetrieveRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<User> {
+        const response = await this.apiUserRetrieveRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async apiUserUpdateRaw(requestParameters: ApiUserUpdateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<User>> {
+        if (requestParameters['userId'] == null) {
+            throw new runtime.RequiredError(
+                'userId',
+                'Required parameter "userId" was null or undefined when calling apiUserUpdate().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (this.configuration && (this.configuration.username !== undefined || this.configuration.password !== undefined)) {
+            headerParameters["Authorization"] = "Basic " + btoa(this.configuration.username + ":" + this.configuration.password);
+        }
+        const response = await this.request({
+            path: `/api/user/{userId}/`.replace(`{${"userId"}}`, encodeURIComponent(String(requestParameters['userId']))),
+            method: 'PUT',
+            headers: headerParameters,
+            query: queryParameters,
+            body: UserToJSON(requestParameters['user']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => UserFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async apiUserUpdate(requestParameters: ApiUserUpdateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<User> {
+        const response = await this.apiUserUpdateRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

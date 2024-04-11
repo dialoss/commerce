@@ -7,7 +7,8 @@ import AspectRatio from "@mui/joy/AspectRatio";
 
 const mediaStyle = {
     maxWidth: '100%',
-    width: "100%"
+    width: "100%",
+    height:'100%',
 }
 
 export const mediaItems = {
@@ -40,21 +41,22 @@ export function MediaItem({data, ratio = false, callback=() => {}}) {
     const item = <div className="media-wrapper" style={{
         margin: '0 auto',
         borderRadius: 5,
-        maxHeight: '80vh',
         padding: ratio ? 0 : 4,
     }}>
         <div style={{
-            width: !ratio ? ((data.width || 100) + "%") : "auto",
+            maxWidth: !ratio ? ((data.width || 100) + "%") : "auto",
             margin: "0 auto",
-            boxShadow: data.border ? '0 0 2px 0 grey' : '',
+            // boxShadow: data.border ? '0 0 2px 0 grey' : '',
             borderRadius: 5,
-            height: '100%'
+            height: '100%',
         }}>
             <div className={"media-item"} onClick={callback} style={{
                 maxWidth: '100%',
-                maxHeight: '100%',
+                height:'100%',
                 overflow: 'hidden',
                 borderRadius: 5,
+                maxHeight: '70vh',
+                margin: '0 auto',
                 aspectRatio: data.media[0].width / data.media[0].height,
             }}>
                 {React.createElement(mediaItems[data.media[0].type], {data})}

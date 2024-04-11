@@ -19,12 +19,14 @@ export const CommentsInput = ({callback, parent = null}: { parent?: number }) =>
     function send() {
         if (!window.app.authAction()) return;
         if (!message && !media.length) return;
+        let clearedMessage = message.replace(/<[^>]*>?/gm, '');
+        console.log(clearedMessage)
         const comment = {
             id: new Date().getTime(),
             time: new Date().getTime(),
             page: decodeURI(window.location.pathname + "/"),
             user: Userfront.user.userId,
-            text: message,
+            text: clearedMessage,
             media: JSON.stringify(media),
             parent,
         };

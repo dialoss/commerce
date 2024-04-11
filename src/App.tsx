@@ -18,7 +18,7 @@ import "tools/date"
 import {pages} from "./pages/AppRouter/constants/routes";
 import "./notifications"
 import {UploadWidget} from "./modules/UploadWidget";
-
+import "./Messages"
 interface IFilemanager {
     getFiles: () => Promise<any>;
     uploadWidget: () => Promise<any>;
@@ -88,10 +88,10 @@ window.api = new ApiApi(new Configuration({
     basePath: BASE_PATH,
     middleware: [{
         pre(context: RequestContext): Promise<FetchParams | void> {
-            console.log(context)
+            // console.log(context)
         },
         onError(context: ErrorContext): Promise<Response | void> {
-            console.log(context.error)
+            console.log(context)
             return new Promise(resolve => resolve({x:'y'}));
         }
     }],

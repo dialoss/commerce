@@ -128,7 +128,7 @@ const ItemsList = ({
             {editor ? <ItemsEditor endpoint={endpoint} items={filteredItems}></ItemsEditor> :
             <Stack direction={'row'} flexWrap={'wrap'}>
                 {
-                    filteredItems.map(it => React.createElement(component, {data: {...it, media: JSON.parse(it.media)}}))
+                    filteredItems.map(it => React.createElement(component, {data: {key: it.id, ...it, media: JSON.parse(it.media)}}))
                 }
             </Stack>}
 

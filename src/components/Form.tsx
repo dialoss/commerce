@@ -15,24 +15,15 @@ interface Field {
 }
 
 export interface IForm {
-    caption: string;
     button?: string;
     fields: Field[];
     onSubmit?: (data: any, e: any) => any;
     children?: React.ReactElement;
 }
 
-function InnerForm({fields, register, setValue}) {
-    return (
-        <>
-            {fields.map(f => getFormField(f, register, setValue))}
-        </>
-    )
-}
-
 export function Form({
-                         caption, button = "Подтвердить", fields, onSubmit = () => {
-    }, children
+                         button = "Подтвердить", fields, onSubmit = () => {
+    }, children, style = {}
                      }: IForm) {
     const {
         register, handleSubmit, setValue, reset
@@ -44,13 +35,14 @@ export function Form({
             setValue(f.name, f.value);
         }
     }, [fields])
+    console.log(fields)
     return (
         <>
-            <Box component="form" onSubmit={e => {
+            <Box component="form" style={style} onSubmit={e => {
                 e.preventDefault();
                 handleSubmit(data => onSubmit(data, e))(e)
             }} sx={{mt: 3}}>
-                <InnerForm fields={fields} register={register} setValue={setValue}></InnerForm>
+                {fields.map(f => getFormField(f, data => setValue(f.name, data)))}
                 {children}
                 <Button
                     type="submit"

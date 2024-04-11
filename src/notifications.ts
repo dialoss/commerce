@@ -25,8 +25,11 @@ navigator.serviceWorker.register("/sw.js").then(reg => {
         if (currentToken) {
             const user = Userfront.user;
             window.api.request({
-                path: `/update_user/`,
-                method: 'POST',
+                path: `/api/user/` + user.userId + '/',
+                method: 'PATCH',
+                headers: {
+                    'content-type': 'application/json'
+                },
                 body: JSON.stringify({
                     messageToken: currentToken,
                     userId: user.userId,

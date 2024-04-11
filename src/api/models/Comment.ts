@@ -42,7 +42,7 @@ export interface Comment {
      * @type {string}
      * @memberof Comment
      */
-    text: string;
+    text?: string;
     /**
      * 
      * @type {number}
@@ -75,7 +75,6 @@ export interface Comment {
 export function instanceOfComment(value: object): boolean {
     if (!('page' in value)) return false;
     if (!('time' in value)) return false;
-    if (!('text' in value)) return false;
     return true;
 }
 
@@ -92,7 +91,7 @@ export function CommentFromJSONTyped(json: any, ignoreDiscriminator: boolean): C
         'id': json['id'] == null ? undefined : json['id'],
         'page': json['page'],
         'time': (new Date(json['time'])),
-        'text': json['text'],
+        'text': json['text'] == null ? undefined : json['text'],
         'parent': json['parent'] == null ? undefined : json['parent'],
         'user': json['user'] == null ? undefined : json['user'],
         'likes': json['likes'] == null ? undefined : json['likes'],

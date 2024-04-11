@@ -44,11 +44,12 @@ export function MediaItem({data, ratio = false}) {
         padding: ratio ? 0 : 4,
     }}>
         <div style={{
-            width: !ratio ? ((data.width || 100) + "%") : "auto",
+            maxWidth: !ratio ? ((data.width || 100) + "%") : "auto",
             margin: "0 auto",
             boxShadow: data.border ? '0 0 2px 0 grey' : '',
             borderRadius: 5,
-            height: '100%'
+            // height: '100%',
+            maxHeight: '100%'
         }}>
             <div className={"media-item"} style={{
                 maxWidth: '100%',

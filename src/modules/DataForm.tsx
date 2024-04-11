@@ -20,7 +20,7 @@ const map = {
     },
 }
 
-function getFields(page, item) {
+export function getFields(page, item) {
     let d = [];
     for (const p of schema[page]) {
         if (p.name) {
