@@ -133,6 +133,7 @@ export interface ApiOrderListRequest {
     limit?: number;
     offset?: number;
     productType?: string;
+    status?: number;
     user?: number;
 }
 
@@ -669,6 +670,10 @@ export class ApiApi extends runtime.BaseAPI {
 
         if (requestParameters['productType'] != null) {
             queryParameters['productType'] = requestParameters['productType'];
+        }
+
+        if (requestParameters['status'] != null) {
+            queryParameters['status'] = requestParameters['status'];
         }
 
         if (requestParameters['user'] != null) {

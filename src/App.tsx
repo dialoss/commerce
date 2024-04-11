@@ -1,25 +1,27 @@
 //@ts-nocheck
-import React from 'react';
+import React, {useLayoutEffect, useState} from 'react';
+import Images from './components/Photos';
+import {Container} from "./ui/Container";
+
 import Bar from "./Bar";
 import {AppRouter} from "./pages/AppRouter";
 import {BrowserRouter} from 'react-router-dom';
-import FileManager from "./modules/FileManager";
 import Chat from "./modules/Chat";
-import Images from './components/Photos';
-import {Container} from "./ui/Container";
 import FooterContainer from './modules/Footer/components/FooterContainer';
-import PageComments from "./modules/PageComments/PageComments";
 import AuthContainer from "./modules/Auth/AuthContainer";
-import Alerts from "./ui/Alerts";
 import Userfront, {LoginForm} from "@userfront/toolkit/react";
 import {ApiApi, Configuration, ErrorContext} from "./api";
 import {BASE_PATH} from "./config";
 import "tools/date"
-import {pages} from "./pages/AppRouter/constants/routes";
 import "./notifications"
 // import NotificationAPI from 'notificationapi-js-client-sdk';
-
+import {Form} from "components/Form";
 import {UploadWidget} from "./modules/UploadWidget";
+import {getFields} from "./modules/DataForm";
+import PageComments from "./modules/PageComments/PageComments";
+import Alerts from "./ui/Alerts";
+import {pages} from "./pages/AppRouter/constants/routes";
+
 interface IFilemanager {
     getFiles: () => Promise<any>;
     uploadWidget: () => Promise<any>;
@@ -93,7 +95,7 @@ window.api = new ApiApi(new Configuration({
         },
         onError(context: ErrorContext): Promise<Response | void> {
             console.log(context)
-            return new Promise(resolve => resolve({x:'y'}));
+            return new Promise(resolve => resolve({x: 'y'}));
         }
     }],
     headers: {
@@ -125,11 +127,39 @@ function App() {
             <AuthContainer></AuthContainer>
             <Images></Images>
             <Alerts></Alerts>
+            {/*<OrderForm></OrderForm>*/}
         </div>
     );
 }
 
 export default App;
+
+const schema = require("api/schema.json");
+
+function OrderForm() {
+    // const order = useConnectForm('order', )
+    const [data, setData] = useState(getFields('order', null));
+    useLayoutEffect(() => {
+        window.api.apiOrderList({status: 11}).then(d => setData(data => [...data,
+            {
+                name: 'order',
+                label: 'Заказ',
+                choices: d.results.map(order => ({
+                    name: order.title,
+                    value: order.id
+                })),
+                type: 'select'
+            }]));
+    }, [])
+    return (
+        <Container>
+            <Form onSubmit={d => {
+                console.log(d)
+            }} fields={data}></Form>
+        </Container>
+    )
+}
+
 //
 //
 // const notificationapi = new NotificationAPI({

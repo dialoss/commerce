@@ -6,7 +6,7 @@ import Typography from "@mui/joy/Typography";
 
 const schema = require("../api/schema.json");
 
-function useConnectForm(name, id, fieldPrefix) {
+export function useConnectForm(name, id, fieldPrefix) {
     const [data, setD] = useState([]);
 
     function set(d) {
