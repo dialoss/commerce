@@ -74,7 +74,6 @@ const FileManager = () => {
 
             });
 
-
             clearInterval(int);
         }, 1000);
     }, [])

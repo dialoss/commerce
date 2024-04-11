@@ -11,7 +11,7 @@ const ShopCard = ({data}: { data: Product }) => {
     return (
         <BaseCard data={data} style={"md:w-100 lg:w-1/2"}>
             <>
-                <MediaItem ratio={true} data={data}></MediaItem>
+                <MediaItem ratio={true} data={data.media[0]}></MediaItem>
                 {!!data.productType && <div>
                     <Typography level="title-lg">{data.productType} {data.name}</Typography>
                 </div>}

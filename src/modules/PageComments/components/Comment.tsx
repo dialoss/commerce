@@ -1,13 +1,12 @@
 //@ts-nocheck
 import React, {useContext, useEffect, useRef, useState} from 'react';
-import dayjs from "dayjs";
 import "./Comment.scss";
 import {CommentsContext, CommentsInput} from "./CommentsContainer";
 import Avatar from "../../../ui/Avatar/Avatar";
-import CardImage from "../../../components/CardImage";
-import ItemFile from "../../../components/Items/File/ItemFile";
 import {useAppSelector} from "../../../store/redux";
-import { Link } from "react-router-dom";
+import {Link} from "react-router-dom";
+import {MediaItem} from "../../../components/MediaItems";
+import {openImages} from "../../../components/MediaCard";
 
 const Comment = ({data, depth}) => {
     const users = useAppSelector(state => state.app.users);
@@ -29,7 +28,8 @@ const Comment = ({data, depth}) => {
             <div className="comment-block">
                 <Avatar user={user} src={user.image}></Avatar>
                 <div className="comment-block__text ">
-                    <Link to={"/profile/" + user.userId} className={"comment-username hover:cursor-pointer text-decoration-none"}>{user.name || 'Гость'}</Link>
+                    <Link to={"/profile/" + user.userId}
+                          className={"comment-username hover:cursor-pointer text-decoration-none"}>{user.name || 'Гость'}</Link>
                     <p className={"comment-date"}>{window.formatDate(data.time)}</p>
                 </div>
             </div>
@@ -37,8 +37,6 @@ const Comment = ({data, depth}) => {
             <UploadPreview data={data}></UploadPreview>
 
             {data.text && <div id={data.id} type={'comment'} dangerouslySetInnerHTML={{__html: data.text}}></div>}
-
-
             {depth < 2 && <div className={"comment-reply__button"} onClick={() => {
                 if (ref.current) closeInput();
                 else setReply(r => !r)
@@ -56,17 +54,15 @@ const Comment = ({data, depth}) => {
 
 export default Comment;
 
-const items = {
-    "image": ({data}) => <CardImage one={true} carousel={true} url={data.url}></CardImage>,
-    "file": ItemFile,
-}
-
 function UploadPreview({data}) {
+    const files = JSON.parse(data.media || '[]');
     return (
         <div>
             {
-                JSON.parse(data.media || '[]').map(f =>
-                    <div style={{margin: 6, boxShadow:'0 0 1px 0 grey'}}>{React.createElement(items[f.type], {data: f})}</div>
+                files.map(f =>
+                    <div className={f.type !== 'file' && 'shadow-sm mb-2'} style={{display:'inline-block'}}>
+                        <MediaItem callback={openImages(f, files.filter(f => f.type === 'image'))} data={f}></MediaItem>
+                    </div>
                 )
             }
         </div>

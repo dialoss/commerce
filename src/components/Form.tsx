@@ -7,6 +7,7 @@ import {Uploader} from "./uploader";
 import MenuItem from "@mui/material/MenuItem";
 import Typography from "@mui/material/Typography";
 import HTMLEditor from "../ui/HTMLEditor";
+import AttachFileIcon from '@material-ui/icons/AttachFile';
 
 interface Field {
     name: string;
@@ -63,6 +64,7 @@ export function formatCloudFiles(files) {
         let url = f.public_id;
         let type = f.resource_type;
         let name = url.split('/').slice(-1)[0];
+        let ext = url.split('.').slice(-1)[0];
         if (type === "raw") {
             if (f.context && f.context.custom) {
                 url = f.context.custom.model;
@@ -73,12 +75,14 @@ export function formatCloudFiles(files) {
                 type = 'file';
             }
         }
+        console.log(f)
         return {
             url,
             type,
-            filename: name,
+            filename: f.original_filename + "." + f.original_extension,
             width: f.width,
             height: f.height,
+            size: f.bytes,
         }
     })
 }
@@ -112,8 +116,7 @@ export const MediaField = ({field, setValue, simple = false}) => {
     return (
         <div>
             <Stack direction={'row'} alignItems={'center'}>
-                <Typography>Медиа</Typography>
-                <Button onClick={select}>Выбрать файлы</Button>
+                <Button startIcon={<AttachFileIcon/>} onClick={select}>Прикрепить файлы</Button>
             </Stack>
             <Uploader files={files} setFiles={set}></Uploader>
         </div>

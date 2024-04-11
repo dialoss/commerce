@@ -227,7 +227,7 @@ function pluginGenerator(fields, title, id, render) {
 const mediaPlugin: CellPlugin<MediaData> = {
     Renderer: ({data}) => (
         <div style={{minHeight: 50}}>
-            <MediaItem data={data}></MediaItem>
+            <MediaItem data={{...data, ...data.media[0]}}></MediaItem>
         </div>
     ),
     id: 'mediaPlugin',

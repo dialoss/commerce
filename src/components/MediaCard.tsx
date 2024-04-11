@@ -7,6 +7,16 @@ import Typography from "@mui/joy/Typography";
 import store from "../store";
 import {scaleImage} from "./CardImage";
 
+export function openImages(current, images) {
+    return () => {
+        const cur = scaleImage(current, 2);
+        images = images.map(im => scaleImage(im, 2));
+        window.app.images.open({
+            images,
+            start: images.findIndex(im => im.url === cur.url)
+        })
+    }
+}
 
 const MediaCard = ({data}: { data }) => {
     const media = data.media[0];
@@ -14,17 +24,8 @@ const MediaCard = ({data}: { data }) => {
     return (
         <BaseCard data={data}>
             <div style={{display: 'flex', flexDirection: 'column', position: 'relative', height: '100%'}}>
-                <MediaItem ratio={true} data={data} callback={() => {
-                    let images = store.getState().app.items.map(it => scaleImage(JSON.parse(it.media)[0], 2));
-                    // if (one) images = [scaleImage(img, 2)];
-                    const cur = scaleImage(data.media[0], 2);
-                    console.log(images, cur)
-
-                    window.app.images.open({
-                        images,
-                        start: images.findIndex(im => im.url === cur.url)
-                    })
-                }}></MediaItem>
+                <MediaItem ratio={true} data={media} callback={openImages(media,
+                    store.getState().app.items.map(it => JSON.parse(it.media)[0]))}></MediaItem>
                 {media.mediaTitle &&
                     <Typography textAlign={'center'} level="title-lg">{media.mediaTitle}</Typography>}
                 {media.mediaText && <Typography sx={{

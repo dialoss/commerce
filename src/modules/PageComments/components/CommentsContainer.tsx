@@ -5,6 +5,8 @@ import "./Comments.scss";
 import CommentsTools from "./CommentsTools";
 import {createCommentsTree, sortFunction} from "./helpers";
 import Button from "@mui/material/Button";
+import {TextField} from "@mui/material";
+import Textarea from '@mui/joy/Textarea';
 
 import HTMLEditor from "../../../ui/HTMLEditor";
 import Userfront from "@userfront/toolkit/react";
@@ -14,7 +16,6 @@ import {Stack} from "@mui/material";
 export const CommentsInput = ({callback, parent = null}: { parent?: number }) => {
     const [message, setMessage] = useState('');
     const [media, setMedia] = useState([]);
-    const clear = React.useRef(false);
 
     function send() {
         if (!window.app.authAction()) return;
@@ -35,15 +36,21 @@ export const CommentsInput = ({callback, parent = null}: { parent?: number }) =>
         callback(comment)
         setMessage('')
         setMedia([]);
-        clear.current = true;
     }
 
     return (
         <div className="input-wrapper">
             <div className={"input-field"}>
                 <div className="editor-wrapper">
-                    <HTMLEditor simple={true} placeholder={"Напишите комментарий"} clear={clear} value={message}
-                                setHTML={setMessage}></HTMLEditor>
+                    <Textarea
+                        disabled={false}
+                        minRows={2}
+                        sx={{width: '100%'}}
+                        placeholder="Напишите комментарий"
+                        variant="outlined"
+                        value={message}
+                        onChange={e => setMessage(e.target.value)}
+                    />
                 </div>
             </div>
             <Stack direction={'row'} justifyContent={'space-between'}>

@@ -4,6 +4,10 @@ import Viewer from "./Model/Viewer";
 import React from "react";
 import Typography from "@mui/joy/Typography";
 import AspectRatio from "@mui/joy/AspectRatio";
+import InsertDriveFileIcon from '@material-ui/icons/InsertDriveFile';
+import Button from "@mui/material/Button"
+import prettyBytes from 'pretty-bytes';
+
 
 const mediaStyle = {
     maxWidth: '100%',
@@ -15,29 +19,39 @@ export const mediaItems = {
     image: ({data}) =>
         <img onClick={() => {
             window.app.images.open({
-                images: [scaleImage(data.media[0], 2)],
+                images: [scaleImage(data, 2)],
                 start: 0,
             })
         }}
              style={mediaStyle}
-             src={scaleImage(data.media[0], 1).url}
+             src={scaleImage(data, 1).url}
              alt=""/>,
     video: ({data}) => <video controls={true}
-                              src={"https://res.cloudinary.com/drlljn0sj/video/upload/v1712582052/" + data.media[0].url}
+                              src={"https://res.cloudinary.com/drlljn0sj/video/upload/v1712582052/" + data.url}
                               style={mediaStyle}/>,
     model: ({data}) => <div className={'h-[400px] w-100'}>
         <Viewer data={{
             show_ui: true,
-            urn: data.media[0].url,
+            urn: data.url,
             id: data.id,
             rotation: true
         }}></Viewer>
     </div>,
-    file: ({data}) => <div>file {data.media[0].url}</div>
+    file: ({data}) => <Button variant={'contained'} onClick={() => {
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.target = "_blank"
+        a.href = "https://res.cloudinary.com/drlljn0sj/raw/upload/fl_attachment/v1712835330/" + data.url;
+        a.download = data.filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    }} startIcon={<InsertDriveFileIcon/>}>{data.filename} {prettyBytes(data.size || 0)}</Button>
 }
 
 export function MediaItem({data, ratio = false, callback=() => {}}) {
-    if (!data.media || !data.media[0]) return <></>
+    if (!data) return <></>
+    console.log(data)
     const item = <div className="media-wrapper" style={{
         margin: '0 auto',
         borderRadius: 5,
@@ -57,9 +71,9 @@ export function MediaItem({data, ratio = false, callback=() => {}}) {
                 borderRadius: 5,
                 maxHeight: '70vh',
                 margin: '0 auto',
-                aspectRatio: data.media[0].width / data.media[0].height,
+                aspectRatio: data.width / data.height,
             }}>
-                {React.createElement(mediaItems[data.media[0].type], {data})}
+                {React.createElement(mediaItems[data.type], {data})}
             </div>
             {data.mediaTitle &&
                 <Typography textAlign={'center'} level="title-lg">{data.mediaTitle}</Typography>}

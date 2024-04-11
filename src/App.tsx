@@ -17,8 +17,9 @@ import {BASE_PATH} from "./config";
 import "tools/date"
 import {pages} from "./pages/AppRouter/constants/routes";
 import "./notifications"
+// import NotificationAPI from 'notificationapi-js-client-sdk';
+
 import {UploadWidget} from "./modules/UploadWidget";
-import "./Messages"
 interface IFilemanager {
     getFiles: () => Promise<any>;
     uploadWidget: () => Promise<any>;
@@ -129,3 +130,15 @@ function App() {
 }
 
 export default App;
+//
+//
+// const notificationapi = new NotificationAPI({
+//     clientId: '6tr2qqm45lvfe35o3dsijfsg9d',
+//     userId: 'dialoss',
+//     customServiceWorkerPath: 'notificationapi-service-worker.js'
+// });
+// // notificationapi.askForWebPushPermission()
+// notificationapi.identify({
+//     id: 'dialoss',
+//     email: 'redshock75@gmail.com'
+// });

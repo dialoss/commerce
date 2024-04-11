@@ -132,6 +132,8 @@ export interface ApiOrderDestroyRequest {
 export interface ApiOrderListRequest {
     limit?: number;
     offset?: number;
+    productType?: string;
+    user?: number;
 }
 
 export interface ApiOrderPartialUpdateRequest {
@@ -145,8 +147,6 @@ export interface ApiOrderRetrieveRequest {
 
 export interface ApiOrderUpdateRequest {
     id: number;
-    productType?: string;
-    user?: number;
     order?: Order;
 }
 
@@ -667,6 +667,14 @@ export class ApiApi extends runtime.BaseAPI {
             queryParameters['offset'] = requestParameters['offset'];
         }
 
+        if (requestParameters['productType'] != null) {
+            queryParameters['productType'] = requestParameters['productType'];
+        }
+
+        if (requestParameters['user'] != null) {
+            queryParameters['user'] = requestParameters['user'];
+        }
+
         const headerParameters: runtime.HTTPHeaders = {};
 
         if (this.configuration && (this.configuration.username !== undefined || this.configuration.password !== undefined)) {
@@ -771,14 +779,6 @@ export class ApiApi extends runtime.BaseAPI {
         }
 
         const queryParameters: any = {};
-
-        if (requestParameters['productType'] != null) {
-            queryParameters['productType'] = requestParameters['productType'];
-        }
-
-        if (requestParameters['user'] != null) {
-            queryParameters['user'] = requestParameters['user'];
-        }
 
         const headerParameters: runtime.HTTPHeaders = {};
 

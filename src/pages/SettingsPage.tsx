@@ -66,6 +66,12 @@ const SettingsPage = () => {
             <h3 className={'text-center'}>Данные для доставки</h3>
             <Form onSubmit={delivery.setData}
                   fields={delivery.data}></Form>
+            <h3 className={'text-center'}>Данные профиля</h3>
+            <Form onSubmit={d => {
+                Userfront.user.update({name: d.name});
+                window.location.reload();
+            }}
+                  fields={[{name: "name",label:'Логин', type:'text', value: Userfront.user.name}]}></Form>
         </div>
     );
 };

@@ -28,7 +28,7 @@ const OrderCard = ({data, detailed}: { detailed: boolean; data: Order }) => {
                       window.navigate(`orders/${data.id}-${user.name.replaceAll(' ', '').toLowerCase()}`);
                   }}>
             <>
-                <MediaItem ratio={true} data={data}></MediaItem>
+                <MediaItem ratio={true} data={data.media[0]}></MediaItem>
                 <CardContent orientation="horizontal">
                     <div>
                         <Typography level="title-lg">{data.title}</Typography>

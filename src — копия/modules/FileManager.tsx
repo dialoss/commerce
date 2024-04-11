@@ -120,7 +120,6 @@ const FileManager = () => {
                     window.addEventListener(widgetEvent, selected);
                 })
             }
-            window.widget = widget;
             clearInterval(int);
         }, 1000);
     }, [])

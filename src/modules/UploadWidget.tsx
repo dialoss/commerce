@@ -15,10 +15,7 @@ export function UploadWidget() {
                 //     params = [].concat(params);
                 //     Promise.all(params.map((req) => {
                 //             console.log(req)
-                //             return Object.assign({
-                //                 // signature: response.signature,
-                //                 // apiKey: response.api_key,
-                //             }, {})
+                //             return {}
                 //             // if (checkModel(file.name)) {
                 //             //     uploadAutodeskFile(files[file.id]).then(id =>
                 //             //         Object.assign({
@@ -29,12 +26,13 @@ export function UploadWidget() {
                 //             // }
                 //         }
                 //     )).then((results) =>
-                //         cb(results.length === 1 ? results[0] : results));
+                //         cb(results.length === 1 ? results[0] : results))}
+
             }, (error, result) => {
                 if (!error && result) {
                     console.log(result)
-                    if (result.event === "success")
-                        window.dispatchEvent(new CustomEvent(widgetEvent, {detail: [result.info]}));
+                    if (result.event === "queues-end")
+                        window.dispatchEvent(new CustomEvent(widgetEvent, {detail: result.info.files.map(f => f.uploadInfo)}));
                 }
             }
         )

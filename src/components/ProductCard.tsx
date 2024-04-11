@@ -1,3 +1,4 @@
+//@ts-nocheck
 import React from 'react';
 import {Product} from "../api";
 import CardContent from '@mui/joy/CardContent';
@@ -15,7 +16,7 @@ const ProductCard = ({data}: {data: Product }) => {
                 window.navigate(`models/${data.id}-${data.name}`);
             }}>
             <>
-                <MediaItem ratio={true} data={data}></MediaItem>
+                <MediaItem ratio={true} data={data.media[0]}></MediaItem>
                 <Typography level="title-lg">{data.productType + " " + data.name}</Typography>
                 <Typography level={'body-md'}>{data.summary}</Typography>
             </>

@@ -171,7 +171,7 @@ function UserInfo() {
                     {
                         name: "Мои заказы",
                         callback: () => {
-                            window.navigate("profile")
+                            window.navigate("profile/" + Userfront.user.userId)
                         }
                     },
                     {
