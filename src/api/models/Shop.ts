@@ -13,6 +13,13 @@
  */
 
 import { mapValues } from '../runtime';
+import type { Product } from './Product';
+import {
+    ProductFromJSON,
+    ProductFromJSONTyped,
+    ProductToJSON,
+} from './Product';
+
 /**
  * 
  * @export
@@ -27,16 +34,10 @@ export interface Shop {
     readonly id: number;
     /**
      * 
-     * @type {string}
+     * @type {Product}
      * @memberof Shop
      */
-    page?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Shop
-     */
-    media?: string;
+    readonly product: Product;
     /**
      * 
      * @type {number}
@@ -48,31 +49,13 @@ export interface Shop {
      * @type {string}
      * @memberof Shop
      */
-    name?: string;
+    title?: string;
     /**
      * 
      * @type {string}
      * @memberof Shop
      */
-    summary?: string;
-    /**
-     * 
-     * @type {number}
-     * @memberof Shop
-     */
-    price?: number;
-    /**
-     * 
-     * @type {string}
-     * @memberof Shop
-     */
-    productType?: string;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof Shop
-     */
-    inStock?: boolean;
+    description?: string;
 }
 
 /**
@@ -80,6 +63,7 @@ export interface Shop {
  */
 export function instanceOfShop(value: object): boolean {
     if (!('id' in value)) return false;
+    if (!('product' in value)) return false;
     return true;
 }
 
@@ -94,14 +78,10 @@ export function ShopFromJSONTyped(json: any, ignoreDiscriminator: boolean): Shop
     return {
         
         'id': json['id'],
-        'page': json['page'] == null ? undefined : json['page'],
-        'media': json['media'] == null ? undefined : json['media'],
+        'product': ProductFromJSON(json['product']),
         'viewId': json['viewId'] == null ? undefined : json['viewId'],
-        'name': json['name'] == null ? undefined : json['name'],
-        'summary': json['summary'] == null ? undefined : json['summary'],
-        'price': json['price'] == null ? undefined : json['price'],
-        'productType': json['productType'] == null ? undefined : json['productType'],
-        'inStock': json['inStock'] == null ? undefined : json['inStock'],
+        'title': json['title'] == null ? undefined : json['title'],
+        'description': json['description'] == null ? undefined : json['description'],
     };
 }
 
@@ -111,14 +91,9 @@ export function ShopToJSON(value?: Shop | null): any {
     }
     return {
         
-        'page': value['page'],
-        'media': value['media'],
         'viewId': value['viewId'],
-        'name': value['name'],
-        'summary': value['summary'],
-        'price': value['price'],
-        'productType': value['productType'],
-        'inStock': value['inStock'],
+        'title': value['title'],
+        'description': value['description'],
     };
 }
 

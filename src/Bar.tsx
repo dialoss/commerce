@@ -26,7 +26,6 @@ function Bar({
     const [tab, setTab] = React.useState(current);
     let tabsNames = Object.values(tabs);
     const drawer = tabsNames
-        // .concat(['Редактор', "Файлы"])
     const location = useNavigate();
     React.useLayoutEffect(() => {
         const page = window.location.pathname.split('/')[1];
@@ -36,8 +35,8 @@ function Bar({
     }, [location])
     return (
         <>
-            <AppBar position="fixed" sx={{zIndex: 3, paddingRight:"0 !important"}}>
-                <Container maxWidth="xl" sx={{paddingRight: '5px !important'}}>
+            <AppBar  position="fixed" sx={{zIndex: 3, paddingRight:"0 !important"}}>
+                <Container className={'app-bar'} maxWidth="xl" sx={{paddingRight: '5px !important'}}>
                     <Stack direction={'row'}>
                         <IconButton color="inherit" onClick={() => setOpen(o => !o)}>
                             <MenuIcon/>
@@ -55,9 +54,9 @@ function Bar({
                             }
                         </Tabs>
                         <MyTooltip sx={{marginLeft: 'auto', display: 'flex', alignItems: 'center'}}
-                                   element={({onClick}) => <Button startIcon={<ChatIcon/>} onClick={onClick}
+                                   element={({onClick}) => <Button className={'chat-button'} startIcon={<ChatIcon/>} onClick={onClick}
                                                                    color="inherit">
-                                       чат
+                                       <p>чат</p>
                                    </Button>}
                                    title={'Связаться со мной'} fields={[
                             {

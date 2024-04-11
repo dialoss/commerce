@@ -10,6 +10,7 @@ export * from './PaginatedProductList';
 export * from './PaginatedShopList';
 export * from './PaginatedStatusList';
 export * from './PaginatedUserList';
+export * from './PatchedComment';
 export * from './PatchedGallery';
 export * from './PatchedOrder';
 export * from './PatchedProduct';

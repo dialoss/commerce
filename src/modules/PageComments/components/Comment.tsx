@@ -60,8 +60,10 @@ function UploadPreview({data}) {
         <div>
             {
                 files.map(f =>
-                    <div className={f.type !== 'file' && 'shadow-sm mb-2'} style={{display:'inline-block'}}>
-                        <MediaItem callback={openImages(f, files.filter(f => f.type === 'image'))} data={f}></MediaItem>
+                    <div className={f.type !== 'file' && 'shadow-sm mb-2'} style={{display: 'inline-block'}}>
+                        <MediaItem
+                            callback={() => f.type === 'image' && openImages(f, files.filter(f => f.type === 'image'))}
+                            data={f}></MediaItem>
                     </div>
                 )
             }

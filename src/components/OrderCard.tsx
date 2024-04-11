@@ -21,6 +21,7 @@ const OrderCard = ({data, detailed}: { detailed: boolean; data: Order }) => {
         Нет продукта
         <p>{data.status}</p>
     </div>
+    console.log(data)
     return (
         <BaseCard data={data}
                   onClick={e => {
@@ -32,6 +33,8 @@ const OrderCard = ({data, detailed}: { detailed: boolean; data: Order }) => {
                 <CardContent orientation="horizontal">
                     <div>
                         <Typography level="title-lg">{data.title}</Typography>
+                        <Typography level="lg">{data.description}</Typography>
+
                         <Typography fontSize="lg" fontWeight="lg">
                             {rub.format(data.product.price || 0)}
                         </Typography>

@@ -3,18 +3,16 @@
 import Intro from "../../Main/Intro";
 import ItemsList from "../../../components/ItemsList";
 import MediaCard from "../../../components/MediaCard";
-
-import ProductPage from "../../ProductPage";
 import ShopCard from "../../../components/ShopCard";
-import UserPage from "../../UserPage";
 import ProductCard from "../../../components/ProductCard";
 import React from "react";
 import Orders from "../../Orders";
 import {ContentPage} from "../../ContentPage";
-
-import SettingsPage from "../../SettingsPage";
 import Typography from "@mui/material/Typography";
 import {OrderStatus} from "../../../components/OrderCard";
+import Models from "../../Models";
+import SettingsPage from "../../SettingsPage";
+import UserPage from "../../UserPage";
 
 
 export const pages = {
@@ -39,17 +37,14 @@ export const routes = [
 
     {path: "/main/", element: <Intro></Intro>},
     {
-        path: "/models/", element: <ItemsList customPagination={{productType: "Монтировка"}}
-                                              key={'products'}
-                                              cacheKey={'product'}
-                                              endpoint={'product'}
-                                              component={ProductCard}></ItemsList>
+        path: "/models/", element: <Models></Models>
     },
     {path: "/models/:id/", element: <ContentPage key={'product'} endpoint={'product'}></ContentPage>},
     {
         path: "/orders/:id/", element: <ContentPage key={'order'}
                                                     endpoint={'order'}
-                                                    extra={({data}) => <><Typography variant={'h6'} textAlign={'center'}>Дата начала
+                                                    extra={({data}) => <><Typography variant={'h6'}
+                                                                                     textAlign={'center'}>Дата начала
                                                         изготовления: {window.formatDate(data.dateCreated)}</Typography>
                                                         <OrderStatus status={data.status}></OrderStatus></>}
         ></ContentPage>

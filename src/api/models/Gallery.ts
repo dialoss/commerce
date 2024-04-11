@@ -43,6 +43,18 @@ export interface Gallery {
      * @memberof Gallery
      */
     likes?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof Gallery
+     */
+    mediaTitle?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Gallery
+     */
+    mediaText?: string;
 }
 
 /**
@@ -67,6 +79,8 @@ export function GalleryFromJSONTyped(json: any, ignoreDiscriminator: boolean): G
         'media': json['media'] == null ? undefined : json['media'],
         'viewId': json['viewId'] == null ? undefined : json['viewId'],
         'likes': json['likes'] == null ? undefined : json['likes'],
+        'mediaTitle': json['mediaTitle'] == null ? undefined : json['mediaTitle'],
+        'mediaText': json['mediaText'] == null ? undefined : json['mediaText'],
     };
 }
 
@@ -79,6 +93,8 @@ export function GalleryToJSON(value?: Gallery | null): any {
         'media': value['media'],
         'viewId': value['viewId'],
         'likes': value['likes'],
+        'mediaTitle': value['mediaTitle'],
+        'mediaText': value['mediaText'],
     };
 }
 

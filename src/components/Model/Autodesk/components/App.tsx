@@ -2,8 +2,8 @@
 import React, {useRef, useState} from 'react';
 import Viewer from './Viewer';
 import './App.scss';
-import {ReactComponent as Fullscreen} from "./fullscreen.svg";
 import Button from "@mui/material/Button";
+import {ReactComponent as Fullscreen} from "./fullscreen.svg";
 
 import IconButton from "@mui/material/IconButton";
 import FullscreenIcon from '@material-ui/icons/Fullscreen';
@@ -22,16 +22,17 @@ class App extends React.Component {
         const { token, urn } = this.props;
         const ref = React.createRef();
         return (
-            <div className={"app " + (this.state.ui ? 'default' : 'hidden')} ref={ref}>
+            <div className={"app " + (this.state.show_ui ? 'default' : 'hidden') + " " + urn} ref={ref}>
                 <IconButton onClick={() => ref.current.querySelector("#toolbar-fullscreenTool").click()} className={'fs'}>
-                    <FullscreenIcon></FullscreenIcon>
+                    <Fullscreen></Fullscreen>
                 </IconButton>
-                <Button variant={'outlined'} onClick={() => this.setState({ui: !this.state.ui})}>Управление</Button>
+                <Button variant={'outlined'} onClick={() => this.setState({show_ui: !this.state.show_ui})}>Управление</Button>
                 <div style={{ position: 'relative'}}>
                     <Viewer
                         runtime={{ accessToken: token }}
                         urn={urn}
                         {...this.state}
+                        key={urn}
                         ref={ref => this.wrapper = ref}
                     />
                 </div>

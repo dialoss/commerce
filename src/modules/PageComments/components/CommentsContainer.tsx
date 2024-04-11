@@ -90,11 +90,7 @@ const CommentsContainer = ({page}) => {
         <CommentsContext.Provider value={addComment}>
             <div className={"comments-section"}>
                 <CommentsInput callback={addComment}></CommentsInput>
-                {/*<div className="comments-section__header">*/}
-                {/*    <div className={"comments-tools__wrapper"}>*/}
-                        {/*<CommentsTools callback={(e) => setSorting(() => sortFunction(e.target.value))}></CommentsTools>*/}
-                    {/*</div>*/}
-                {/*</div>*/}
+                <CommentsTools callback={d => setSorting(() => sortFunction(d))}></CommentsTools>
                 <div className={"comments"}>
                     <p id={'counter'}>Всего комментариев: {search.length}</p>
                     <Comments comments={commentsTree}></Comments>

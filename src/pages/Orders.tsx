@@ -11,14 +11,14 @@ const Orders = () => {
     }
 
     return (
-
-        <ItemsList customPagination={{type: "Монтировка"}}
-                   tabs={{pagination: ["done", "in-work"], names: ['Выполненные', "В работе / новые"], filter}}
+        <ItemsList customPagination={{productType: "Монтировка"}}
+                   tabs={{
+                       queryField: "status",
+                       pagination: ["11", "!11"], names: ['Выполненные', "В работе / новые"], filter
+                   }}
                    key={'orders'}
                    endpoint={'order'} cacheKey={'order'}
                    component={OrderCard}></ItemsList>
-
-
     );
 };
 

@@ -1,21 +1,42 @@
 //@ts-nocheck
 import React from 'react';
 import "./CommentsTools.scss";
+import Typography from "@mui/joy/Typography";
+import {TextField} from "@mui/material";
+import MenuItem from "@mui/material/MenuItem";
+
+const items = [
+    {
+        name: "По умолчанию",
+        value: 'default'
+    },
+    {
+        name: "Старые",
+        value: 'oldest'
+    },
+    {
+        name: "Новые",
+        value: 'newest'
+    },
+]
 
 const CommentsTools = ({callback}) => {
     return (
-        <div className={"comments-tools"}>
-            <p>Сортировка</p>
-            <div className={"sort-options"}>
-                <select name="sort" id="" onChange={callback} defaultValue={'default'}>
-                    <option value="default">По умолчанию</option>
-                    {/*<option value="controversial">Обсуждаемые</option>*/}
-                    <option value="oldest">Старые</option>
-                    <option value="newest">Новые</option>
-                    {/*<option value="best">Лучшие</option>*/}
-                </select>
-            </div>
-        </div>
+        <TextField
+            label={"Сортировка"}
+            select
+            size={'small'}
+            defaultValue={'default'}
+            onChange={e => {
+                callback(e.target.value)
+            }}
+        >
+            {
+                items.map(t =>
+                    <MenuItem key={t.value} value={t.value}>{t.name}</MenuItem>
+                )
+            }
+        </TextField>
     );
 };
 

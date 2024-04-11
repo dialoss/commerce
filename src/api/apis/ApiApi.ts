@@ -25,6 +25,7 @@ import type {
   PaginatedShopList,
   PaginatedStatusList,
   PaginatedUserList,
+  PatchedComment,
   PatchedGallery,
   PatchedOrder,
   PatchedProduct,
@@ -57,6 +58,8 @@ import {
     PaginatedStatusListToJSON,
     PaginatedUserListFromJSON,
     PaginatedUserListToJSON,
+    PatchedCommentFromJSON,
+    PatchedCommentToJSON,
     PatchedGalleryFromJSON,
     PatchedGalleryToJSON,
     PatchedOrderFromJSON,
@@ -83,14 +86,28 @@ export interface ApiCommentCreateRequest {
     comment: Comment;
 }
 
+export interface ApiCommentDestroyRequest {
+    id: number;
+}
+
 export interface ApiCommentListRequest {
     page: string;
     limit?: number;
     offset?: number;
 }
 
+export interface ApiCommentPartialUpdateRequest {
+    id: number;
+    patchedComment?: PatchedComment;
+}
+
 export interface ApiCommentRetrieveRequest {
     id: number;
+}
+
+export interface ApiCommentUpdateRequest {
+    id: number;
+    comment: Comment;
 }
 
 export interface ApiGalleryCreateRequest {
@@ -304,6 +321,39 @@ export class ApiApi extends runtime.BaseAPI {
 
     /**
      */
+    async apiCommentDestroyRaw(requestParameters: ApiCommentDestroyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling apiCommentDestroy().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && (this.configuration.username !== undefined || this.configuration.password !== undefined)) {
+            headerParameters["Authorization"] = "Basic " + btoa(this.configuration.username + ":" + this.configuration.password);
+        }
+        const response = await this.request({
+            path: `/api/comment/{id}/`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
+            method: 'DELETE',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async apiCommentDestroy(requestParameters: ApiCommentDestroyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.apiCommentDestroyRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     */
     async apiCommentListRaw(requestParameters: ApiCommentListRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PaginatedCommentList>> {
         if (requestParameters['page'] == null) {
             throw new runtime.RequiredError(
@@ -350,6 +400,43 @@ export class ApiApi extends runtime.BaseAPI {
 
     /**
      */
+    async apiCommentPartialUpdateRaw(requestParameters: ApiCommentPartialUpdateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Comment>> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling apiCommentPartialUpdate().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (this.configuration && (this.configuration.username !== undefined || this.configuration.password !== undefined)) {
+            headerParameters["Authorization"] = "Basic " + btoa(this.configuration.username + ":" + this.configuration.password);
+        }
+        const response = await this.request({
+            path: `/api/comment/{id}/`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
+            method: 'PATCH',
+            headers: headerParameters,
+            query: queryParameters,
+            body: PatchedCommentToJSON(requestParameters['patchedComment']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => CommentFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async apiCommentPartialUpdate(requestParameters: ApiCommentPartialUpdateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Comment> {
+        const response = await this.apiCommentPartialUpdateRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
     async apiCommentRetrieveRaw(requestParameters: ApiCommentRetrieveRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Comment>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
@@ -379,6 +466,50 @@ export class ApiApi extends runtime.BaseAPI {
      */
     async apiCommentRetrieve(requestParameters: ApiCommentRetrieveRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Comment> {
         const response = await this.apiCommentRetrieveRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async apiCommentUpdateRaw(requestParameters: ApiCommentUpdateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Comment>> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling apiCommentUpdate().'
+            );
+        }
+
+        if (requestParameters['comment'] == null) {
+            throw new runtime.RequiredError(
+                'comment',
+                'Required parameter "comment" was null or undefined when calling apiCommentUpdate().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (this.configuration && (this.configuration.username !== undefined || this.configuration.password !== undefined)) {
+            headerParameters["Authorization"] = "Basic " + btoa(this.configuration.username + ":" + this.configuration.password);
+        }
+        const response = await this.request({
+            path: `/api/comment/{id}/`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
+            method: 'PUT',
+            headers: headerParameters,
+            query: queryParameters,
+            body: CommentToJSON(requestParameters['comment']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => CommentFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async apiCommentUpdate(requestParameters: ApiCommentUpdateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Comment> {
+        const response = await this.apiCommentUpdateRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

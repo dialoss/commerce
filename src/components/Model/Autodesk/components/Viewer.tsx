@@ -3,9 +3,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {CustomProfile} from "../config";
 import {TurnTableExtension} from "../extensions/Rotation/main";
-import * as Transform from "../extensions/Transform/main";
 
-const { Autodesk } = window;
+const {Autodesk} = window;
 
 const runtime = {
     /** @type {Autodesk.Viewing.InitializerOptions} */
@@ -23,7 +22,7 @@ const runtime = {
  */
 function initializeViewerRuntime(options) {
     if (!runtime.ready) {
-        runtime.options = { ...options };
+        runtime.options = {...options};
         runtime.ready = new Promise((resolve) => Autodesk.Viewing.Initializer(runtime.options, resolve));
     } else {
         if (['accessToken', 'getAccessToken', 'env', 'api', 'language'].some(prop => options[prop] !== runtime.options[prop])) {
@@ -49,7 +48,7 @@ class Viewer extends React.Component {
 
                 const profile = new Autodesk.Viewing.Profile(CustomProfile);
                 const config3d = {
-                    disabledExtensions: { boxSelection: true }
+                    disabledExtensions: {boxSelection: true}
                 };
 
                 this.viewer = new Autodesk.Viewing.GuiViewer3D(this.container, config3d);
@@ -64,7 +63,7 @@ class Viewer extends React.Component {
                 });
 
                 this.viewer.addEventListener(Autodesk.Viewing.GEOMETRY_LOADED_EVENT, () => {
-                }, { once: true });
+                }, {once: true});
 
                 if (!window.autodeskViewers) window.autodeskViewers = {};
                 window.autodeskViewers[this.props.id] = this.viewer;
@@ -72,24 +71,27 @@ class Viewer extends React.Component {
                 this.updateViewerState({});
             }).then(r => {
             Autodesk.Viewing.theExtensionManager.registerExtension('CameraRotation', TurnTableExtension);
-            Autodesk.ADN.Viewing.Extension.TransformTool.prototype =
-                Object.create(Autodesk.Viewing.Extension.prototype);
+            // Autodesk.ADN.Viewing.Extension.TransformTool.prototype =
+            //     Object.create(Autodesk.Viewing.Extension.prototype);
 
-            Autodesk.ADN.Viewing.Extension.TransformTool.prototype.constructor =
-                Autodesk.ADN.Viewing.Extension.TransformTool;
+            // Autodesk.ADN.Viewing.Extension.TransformTool.prototype.constructor =
+            //     Autodesk.ADN.Viewing.Extension.TransformTool;
 
-            Autodesk.Viewing.theExtensionManager.registerExtension(
-                'TransformationExtension',
-                Autodesk.ADN.Viewing.Extension.TransformTool);
+            // Autodesk.Viewing.theExtensionManager.registerExtension(
+            //     'TransformationExtension',
+            //     Autodesk.ADN.Viewing.Extension.TransformTool);
 
 
             const loader = setInterval(() => {
                 try {
-                    this.viewer.loadExtension("TransformationExtension")
+                    // this.viewer.loadExtension("TransformationExtension")
                     this.viewer.loadExtension("CameraRotation");
-                    if (this.props.rotate) document.querySelector('#turnTableButton').click();
+                    if (this.props.rotation) {
+                        document.querySelector(".app." + this.props.urn).querySelector('#turnTableButton').click();
+                    }
                     clearInterval(loader);
-                } catch (e) {}
+                } catch (e) {
+                }
             }, 3000);
         }).catch(err => console.error(err));
     }

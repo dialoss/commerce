@@ -1,7 +1,7 @@
 //@ts-nocheck
 export function createCommentsTree(comments, sorting, search, limit=null) {
-    let newComments = comments.sort((a, b) => a.parent - b.parent);
-    search = search.sort((a, b) => a.parent - b.parent);
+    let newComments = [...comments].sort(sorting).sort((a, b) => a.parent - b.parent);
+    search = [...search].sort(sorting).sort((a, b) => a.parent - b.parent);
     let tree = {};
     let links = {};
     let searchPos = 0;
@@ -46,17 +46,17 @@ export function sortFunction(type) {
     const d = (ds) => new Date(ds).getTime();
     switch (type) {
         case "newest":
-            sorting = (a, b) => d(b.timeSent) - d(a.timeSent);
+            sorting = (a, b) => d(b.time) - d(a.time);
             break;
         case "oldest":
-            sorting = (a, b) => d(a.timeSent) - d(b.timeSent);
+            sorting = (a, b) => d(a.time) - d(b.time);
             break;
         case "default":
             sorting = (a, b) => {
-                if (!a.parent && !b.parent) return d(b.timeSent) - d(a.timeSent);
+                if (!a.parent && !b.parent) return d(b.time) - d(a.time);
                 if (a.parent && !b.parent) return -1;
                 if (!a.parent && b.parent) return 1;
-                if (a.parent && b.parent) return d(a.timeSent) - d(b.timeSent);
+                if (a.parent && b.parent) return d(a.time) - d(b.time);
             }
             break;
     }

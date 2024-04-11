@@ -1,10 +1,8 @@
 //@ts-nocheck
 import React from 'react';
 import {Product} from "../api";
-import CardContent from '@mui/joy/CardContent';
 import Typography from '@mui/joy/Typography';
 import BaseCard from "./BaseCard";
-import CardImage from "./CardImage";
 import {MediaItem} from "./MediaItems";
 
 const ProductCard = ({data}: {data: Product }) => {

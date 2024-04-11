@@ -1,6 +1,6 @@
 // @ts-nocheck
 
-import React from 'react';
+import React, {useEffect, useRef} from 'react';
 import type {CellPlugin} from '@react-page/editor';
 import Editor, {createValue} from "@react-page/editor";
 import '@react-page/editor/lib/index.css'
@@ -29,10 +29,11 @@ type EditorData = {
 const buttonPlugin: CellPlugin<EditorData> = {
     Renderer: ({data}) => (
         <>
-            {data.type === "buy" && <Pay product={store.getState().app?.selected}></Pay>}
-            {data.type === "order" && <Button style={{margin:'auto'}} variant={'contained'} onClick={() => BusinessLogic.order()}>
-                заказать изготовление
-            </Button>
+            {data.type === "buy" && <Pay product={store.getState().app?.pageData}></Pay>}
+            {data.type === "order" &&
+                <Button style={{margin: 'auto'}} variant={'contained'} onClick={() => BusinessLogic.order()}>
+                    заказать изготовление
+                </Button>
             }
         </>
     ),
@@ -99,12 +100,12 @@ const textPlugin: CellPlugin<EditorData> = {
                     type: 'boolean',
                     uniforms: {
                         component: connectField(({value, onChange}) =>
-                                getFormField({
-                                    type: "boolean",
-                                    name: 'date',
-                                    label: "Дата создания",
-                                    value,
-                                }, onChange)
+                            getFormField({
+                                type: "boolean",
+                                name: 'date',
+                                label: "Дата создания",
+                                value,
+                            }, onChange)
                         )
                     },
                     default: false,
@@ -197,10 +198,10 @@ function pluginGenerator(fields, title, id, render) {
     }
     return {
         Renderer: ({data}) => (
-            React.createElement(render, {data})
+            <>{Object.values(data).length > 0 && React.createElement(render, {data})}</>
         ),
         id: id + "plugin",
-        title: title,
+        title: <p className={"plugin-item " + id}>{title}</p>,
         description: "",
         version: 1,
         controls: {
@@ -227,7 +228,7 @@ function pluginGenerator(fields, title, id, render) {
 const mediaPlugin: CellPlugin<MediaData> = {
     Renderer: ({data}) => (
         <div style={{minHeight: 50}}>
-            <MediaItem data={{...data, ...data.media[0]}}></MediaItem>
+            {data.media && data.media[0] && <MediaItem data={{...data, ...data.media[0]}}></MediaItem>}
         </div>
     ),
     id: 'mediaPlugin',
@@ -246,6 +247,16 @@ const mediaPlugin: CellPlugin<MediaData> = {
                     },
                     default: [],
                 },
+                rotation: {
+                    type: 'boolean',
+                    uniforms: {
+                        component: connectField(({value, onChange}) =>
+                            getFormField({name: 'rotation', label: "Вращать модель", value, type: 'boolean'}, onChange)
+                        ),
+                        showIf: (data) => !!data.media[0] && data.media[0].type === "model",
+                    },
+                    default: false,
+                },
                 mediaTitle: {
                     type: 'string',
                     default: '',
@@ -254,7 +265,7 @@ const mediaPlugin: CellPlugin<MediaData> = {
                     type: 'string',
                     default: '',
                 },
-                width: {
+                customWidth: {
                     type: 'string',
                     uniforms: {
                         component: connectField(({value, onChange}) =>
@@ -265,7 +276,6 @@ const mediaPlugin: CellPlugin<MediaData> = {
                     },
                     default: '100',
                 },
-
                 border: {
                     type: 'boolean',
                     default: true,
@@ -279,16 +289,35 @@ const mediaPlugin: CellPlugin<MediaData> = {
         },
     },
 };
+
+const introPlugin: CellPlugin = {
+    Renderer: ({data}) => (
+        <div style={{minHeight: data.height || 30}}>
+        </div>
+    ),
+    id: 'introPlugin',
+    title: 'Шапка',
+    description: <div>Шаблон шапки продукта
+        <div onClick={e => {
+            e.stopPropagation();
+            window.templateIntro()
+        }} style={{position: 'absolute', left: 0, top: 0, width: '100%', height: '100%'}}></div>
+    </div>,
+    version: 1,
+    controls: {
+        type: 'autoform',
+        schema: {},
+    },
+};
 const schema = require("../api/schema.json");
 
 const plugins = {
     'product': pluginGenerator(schema.product, "Продукт", "product", ProductCard),
     'order': pluginGenerator(schema.order, "Заказ", "order", OrderCard),
-    'shop': pluginGenerator(schema.shop, "Магазин", "shop", ShopCard),
+    'shop': pluginGenerator(schema.shop, "Продажа", "shop", ShopCard),
     'gallery': pluginGenerator(schema.gallery, "Галерея", "gallery", MediaCard),
 }
-console.log(plugins)
-const cellPlugins = [...Object.values(plugins), buttonPlugin, mediaPlugin, spacerPlugin, textPlugin, background({
+const cellPlugins = [...Object.values(plugins), introPlugin, buttonPlugin, mediaPlugin, spacerPlugin, textPlugin, background({
     enabledModes:
         ModeEnum.COLOR_MODE_FLAG |
         ModeEnum.IMAGE_MODE_FLAG |
@@ -326,7 +355,7 @@ export const myCellPlugins = cellPlugins.map<CellPlugin<Styling>>((plugin) => {
             type: "string",
             uniforms: {
                 component: connectField(({value, onChange}) =>
-                    <Button style={{position: 'fixed', zIndex: 1000, bottom: 10, left: 10}}
+                    <Button className={'my-btn-close'} style={{position: 'fixed', zIndex: 1000, bottom: 10, left: 10}}
                             onClick={() => {
                                 let t = document.querySelector(".react-page-cell-focused");
                                 escape(t);
@@ -337,6 +366,7 @@ export const myCellPlugins = cellPlugins.map<CellPlugin<Styling>>((plugin) => {
     }
     return plugin;
 });
+
 
 let initItems = [];
 

@@ -5,9 +5,9 @@ import {Button, Checkbox, FormControlLabel, FormGroup, Stack, TextField} from "@
 import React, {useEffect, useLayoutEffect, useState} from "react";
 import {Uploader} from "./uploader";
 import MenuItem from "@mui/material/MenuItem";
-import Typography from "@mui/material/Typography";
 import HTMLEditor from "../ui/HTMLEditor";
 import AttachFileIcon from '@material-ui/icons/AttachFile';
+import {getFields} from "../modules/DataForm";
 
 interface Field {
     name: string;
@@ -20,15 +20,29 @@ export interface IForm {
     fields: Field[];
     onSubmit?: (data: any, e: any) => any;
     children?: React.ReactElement;
+    submit?: boolean;
+    onChange?: (data: any, e: any) => any;
 }
 
+let formId = 1;
+
 export function Form({
-                         button = "Подтвердить", fields, onSubmit = () => {
-    }, children, style = {}
+                         button = "Подтвердить",
+                         fields,
+                         onSubmit = () => {
+                         },
+                         children,
+                         style = {},
+                         onChange = () => {
+                         }, submit = true
                      }: IForm) {
     const {
-        register, handleSubmit, setValue, reset
+        register, handleSubmit, setValue, reset, getValues
     } = useForm();
+
+    useEffect(() => {
+        formId++;
+    }, [])
 
     useEffect(() => {
         reset();
@@ -39,20 +53,24 @@ export function Form({
     console.log(fields)
     return (
         <>
-            <Box component="form" style={style} onSubmit={e => {
+            <Box id={formId.toString()} component="form" style={style} onSubmit={e => {
                 e.preventDefault();
                 handleSubmit(data => onSubmit(data, e))(e)
             }} sx={{mt: 3}}>
-                {fields.map(f => getFormField(f, data => setValue(f.name, data)))}
+                {fields.map(f => getFormField(f, data => {
+                    setValue(f.name, data);
+                    onChange(getValues());
+                }))}
                 {children}
-                <Button
+                {submit && <Button
+                    target={formId.toString()}
                     type="submit"
                     fullWidth
                     variant="contained"
                     sx={{mt: 3, mb: 2}}
                 >
                     {button}
-                </Button>
+                </Button>}
             </Box>
         </>
 
@@ -63,13 +81,12 @@ export function formatCloudFiles(files) {
     return files.map(f => {
         let url = f.public_id;
         let type = f.resource_type;
-        let name = url.split('/').slice(-1)[0];
-        let ext = url.split('.').slice(-1)[0];
+        let ext = url.split('.').slice(-1)[0].toLowerCase().trim();
         if (type === "raw") {
             if (f.context && f.context.custom) {
                 url = f.context.custom.model;
                 type = 'model';
-            } else if (['mp4', 'avi'].includes(name.split('.').slice(-1)[0].toLowerCase())) {
+            } else if (['mp4', 'avi'].includes(ext)) {
                 type = 'video';
             } else {
                 type = 'file';
@@ -79,7 +96,7 @@ export function formatCloudFiles(files) {
         return {
             url,
             type,
-            filename: f.original_filename + "." + f.original_extension,
+            filename: f.original_filename + "." + ext,
             width: f.width,
             height: f.height,
             size: f.bytes,
@@ -91,7 +108,10 @@ export const MediaField = ({field, setValue, simple = false}) => {
     const [files, setFiles] = React.useState([]);
 
     useLayoutEffect(() => {
-        setFiles(field.value);
+        if (typeof field.value === 'string') {
+            setFiles(JSON.parse(field.value));
+        } else setFiles(field.value);
+
     }, [field])
 
     function set(files) {
@@ -113,6 +133,7 @@ export const MediaField = ({field, setValue, simple = false}) => {
         }
     }
 
+    console.log(files)
     return (
         <div>
             <Stack direction={'row'} alignItems={'center'}>
@@ -152,10 +173,10 @@ export function Text({field, setValue}) {
 }
 
 export function SelectField({field, setValue}) {
-    const [v, setV] = React.useState(1);
-    // useEffect(() => {
-    //     setV(field.value)
-    // }, [field])
+    const [v, setV] = React.useState(field.default);
+    useEffect(() => {
+        setV(field.value.id || field.value)
+    }, [field])
 
     return (
         <TextField
@@ -165,7 +186,8 @@ export function SelectField({field, setValue}) {
             value={v}
             onChange={e => {
                 setV(e.target.value)
-                window.api.apiStatusRetrieve({id: e.target.value}).then(d => setValue(d));
+                if (field.name === 'status') window.api.apiStatusRetrieve({id: e.target.value}).then(d => setValue(d));
+                else setValue(e.target.value);
             }}
         >
             {
@@ -194,10 +216,28 @@ function Editor({field, setValue}) {
     return <HTMLEditor updateValue={true} value={field.value} setHTML={d => setValue(d)}></HTMLEditor>
 }
 
+function InnerForm({field, setValue}) {
+    const [form, setForm] = useState([]);
+    useLayoutEffect(() => {
+        setForm(getFields(field.name, field.value || null))
+    }, [field]);
+    console.log(form)
+    return (
+        <>
+            <h5>{field.label}</h5>
+            <Form submit={false} onChange={d => {
+                console.log(d)
+                setValue(d)
+            }} fields={form}></Form>
+        </>
+    )
+}
+
 export const FormMap = {
     "boolean": CheckField,
     "media": MediaField,
     'select': SelectField,
     'bigtext': Editor,
+    'foreignkey': InnerForm
 }
 

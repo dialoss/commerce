@@ -31,10 +31,10 @@ export const mediaItems = {
                               style={mediaStyle}/>,
     model: ({data}) => <div className={'h-[400px] w-100'}>
         <Viewer data={{
-            show_ui: true,
+            show_ui: false,
             urn: data.url,
             id: data.id,
-            rotation: true
+            rotation: data.rotation
         }}></Viewer>
     </div>,
     file: ({data}) => <Button variant={'contained'} onClick={() => {
@@ -58,7 +58,7 @@ export function MediaItem({data, ratio = false, callback=() => {}}) {
         padding: ratio ? 0 : 4,
     }}>
         <div style={{
-            maxWidth: !ratio ? ((data.width || 100) + "%") : "auto",
+            maxWidth: !ratio ? ((data.customWidth || 100) + "%") : "auto",
             margin: "0 auto",
             // boxShadow: data.border ? '0 0 2px 0 grey' : '',
             borderRadius: 5,
@@ -69,7 +69,7 @@ export function MediaItem({data, ratio = false, callback=() => {}}) {
                 height:'100%',
                 overflow: 'hidden',
                 borderRadius: 5,
-                maxHeight: '70vh',
+                maxHeight: '80vh',
                 margin: '0 auto',
                 aspectRatio: data.width / data.height,
             }}>

@@ -13,6 +13,13 @@
  */
 
 import { mapValues } from '../runtime';
+import type { Product } from './Product';
+import {
+    ProductFromJSON,
+    ProductFromJSONTyped,
+    ProductToJSON,
+} from './Product';
+
 /**
  * 
  * @export
@@ -27,16 +34,10 @@ export interface PatchedShop {
     readonly id?: number;
     /**
      * 
-     * @type {string}
+     * @type {Product}
      * @memberof PatchedShop
      */
-    page?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof PatchedShop
-     */
-    media?: string;
+    readonly product?: Product;
     /**
      * 
      * @type {number}
@@ -48,31 +49,13 @@ export interface PatchedShop {
      * @type {string}
      * @memberof PatchedShop
      */
-    name?: string;
+    title?: string;
     /**
      * 
      * @type {string}
      * @memberof PatchedShop
      */
-    summary?: string;
-    /**
-     * 
-     * @type {number}
-     * @memberof PatchedShop
-     */
-    price?: number;
-    /**
-     * 
-     * @type {string}
-     * @memberof PatchedShop
-     */
-    productType?: string;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof PatchedShop
-     */
-    inStock?: boolean;
+    description?: string;
 }
 
 /**
@@ -93,14 +76,10 @@ export function PatchedShopFromJSONTyped(json: any, ignoreDiscriminator: boolean
     return {
         
         'id': json['id'] == null ? undefined : json['id'],
-        'page': json['page'] == null ? undefined : json['page'],
-        'media': json['media'] == null ? undefined : json['media'],
+        'product': json['product'] == null ? undefined : ProductFromJSON(json['product']),
         'viewId': json['viewId'] == null ? undefined : json['viewId'],
-        'name': json['name'] == null ? undefined : json['name'],
-        'summary': json['summary'] == null ? undefined : json['summary'],
-        'price': json['price'] == null ? undefined : json['price'],
-        'productType': json['productType'] == null ? undefined : json['productType'],
-        'inStock': json['inStock'] == null ? undefined : json['inStock'],
+        'title': json['title'] == null ? undefined : json['title'],
+        'description': json['description'] == null ? undefined : json['description'],
     };
 }
 
@@ -110,14 +89,9 @@ export function PatchedShopToJSON(value?: PatchedShop | null): any {
     }
     return {
         
-        'page': value['page'],
-        'media': value['media'],
         'viewId': value['viewId'],
-        'name': value['name'],
-        'summary': value['summary'],
-        'price': value['price'],
-        'productType': value['productType'],
-        'inStock': value['inStock'],
+        'title': value['title'],
+        'description': value['description'],
     };
 }
 

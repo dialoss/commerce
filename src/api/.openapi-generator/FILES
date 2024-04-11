@@ -11,6 +11,7 @@ models/PaginatedProductList.ts
 models/PaginatedShopList.ts
 models/PaginatedStatusList.ts
 models/PaginatedUserList.ts
+models/PatchedComment.ts
 models/PatchedGallery.ts
 models/PatchedOrder.ts
 models/PatchedProduct.ts

@@ -1,5 +1,5 @@
 //@ts-nocheck
-import React, {useLayoutEffect, useState} from 'react';
+import React from 'react';
 import Images from './components/Photos';
 import {Container} from "./ui/Container";
 
@@ -9,17 +9,15 @@ import {BrowserRouter} from 'react-router-dom';
 import Chat from "./modules/Chat";
 import FooterContainer from './modules/Footer/components/FooterContainer';
 import AuthContainer from "./modules/Auth/AuthContainer";
-import Userfront, {LoginForm} from "@userfront/toolkit/react";
+import {LoginForm} from "@userfront/toolkit/react";
 import "tools/date"
 import "./notifications"
 import {UploadWidget} from "./modules/UploadWidget";
-import {getFields} from "./modules/DataForm";
 import PageComments from "./modules/PageComments/PageComments";
 import Alerts from "./ui/Alerts";
-import "./Types"
 import {pages} from "./pages/AppRouter/constants/routes";
 
-function App() {
+function Admin() {
     return (
         <div className="App">
             <div style={{display: 'none'}}><LoginForm></LoginForm></div>
@@ -42,9 +40,8 @@ function App() {
             <AuthContainer></AuthContainer>
             <Images></Images>
             <Alerts></Alerts>
-            {/*<OrderForm></OrderForm>*/}
         </div>
     );
 }
 
-export default App;
+export default Admin;

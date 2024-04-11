@@ -45,6 +45,18 @@ export interface Order {
     viewId?: number;
     /**
      * 
+     * @type {string}
+     * @memberof Order
+     */
+    title?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Order
+     */
+    description?: string;
+    /**
+     * 
      * @type {number}
      * @memberof Order
      */
@@ -61,18 +73,6 @@ export interface Order {
      * @memberof Order
      */
     statusChanged?: Date;
-    /**
-     * 
-     * @type {string}
-     * @memberof Order
-     */
-    title?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Order
-     */
-    description?: string;
     /**
      * 
      * @type {number}
@@ -110,11 +110,11 @@ export function OrderFromJSONTyped(json: any, ignoreDiscriminator: boolean): Ord
         'page': json['page'] == null ? undefined : json['page'],
         'media': json['media'] == null ? undefined : json['media'],
         'viewId': json['viewId'] == null ? undefined : json['viewId'],
+        'title': json['title'] == null ? undefined : json['title'],
+        'description': json['description'] == null ? undefined : json['description'],
         'user': json['user'] == null ? undefined : json['user'],
         'dateCreated': (new Date(json['dateCreated'])),
         'statusChanged': json['statusChanged'] == null ? undefined : (new Date(json['statusChanged'])),
-        'title': json['title'] == null ? undefined : json['title'],
-        'description': json['description'] == null ? undefined : json['description'],
         'product': json['product'] == null ? undefined : json['product'],
         'status': json['status'] == null ? undefined : json['status'],
     };
@@ -129,10 +129,10 @@ export function OrderToJSON(value?: Order | null): any {
         'page': value['page'],
         'media': value['media'],
         'viewId': value['viewId'],
-        'user': value['user'],
-        'statusChanged': value['statusChanged'] == null ? undefined : ((value['statusChanged'] as any).toISOString()),
         'title': value['title'],
         'description': value['description'],
+        'user': value['user'],
+        'statusChanged': value['statusChanged'] == null ? undefined : ((value['statusChanged'] as any).toISOString()),
         'product': value['product'],
         'status': value['status'],
     };
