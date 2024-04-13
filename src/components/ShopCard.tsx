@@ -10,14 +10,15 @@ import {Link} from "@mui/material";
 
 const ShopCard = ({data}: { data: Shop }) => {
     let product = {...data.product};
-    if (typeof product.media === "string")
+    if (typeof product.media === "string") {
         product.media = JSON.parse(product.media);
+    }
     return (
         <BaseCard data={data} style={"md:w-100 lg:w-1/2"}>
             <>
                 {product.media && product.media[0] && <MediaItem ratio={true} data={product.media[0]}></MediaItem>}
                 {!!data.title && <div>
-                    <Typography level="title-lg">{data.product.productType} {data.title}</Typography>
+                    <Typography level="title-lg">{data.title}</Typography>
                 </div>}
                 <div style={{fontSize: 16, flexGrow: 1, marginTop: 5}}>
                     <div dangerouslySetInnerHTML={{__html: data.description}}></div>

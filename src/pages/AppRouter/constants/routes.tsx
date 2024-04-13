@@ -46,7 +46,7 @@ export const routes = [
                                                     extra={({data}) => <><Typography variant={'h6'}
                                                                                      textAlign={'center'}>Дата начала
                                                         изготовления: {window.formatDate(data.dateCreated)}</Typography>
-                                                        <OrderStatus status={data.status}></OrderStatus></>}
+                                                        <div style={{textAlign:'center'}}><OrderStatus status={data.status}></OrderStatus></div></>}
         ></ContentPage>
     },
     {

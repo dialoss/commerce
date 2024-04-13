@@ -42,6 +42,7 @@ function processModel(id) {
 export async function uploadAutodeskFile(file) {
     const id = await uploadModel(file);
     processModel(id);
+    console.log(id)
     return id;
 }
 
@@ -68,5 +69,6 @@ export async function uploadAutodeskFile(file) {
         body: formBody,
     }).then(r => r.json()).then(data => {
         token = data.access_token;
+        console.log(token)
     });
 })();

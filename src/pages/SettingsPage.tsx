@@ -15,6 +15,7 @@ export function useConnectForm(name, id, fieldPrefix) {
             if (fieldPrefix && !f.name.includes(fieldPrefix)) continue;
             let field = {...f};
             field.value = d[field.name] || field.default;
+            field.safeUpdate = true;
             data.push(field)
         }
         setD(data);

@@ -7,7 +7,6 @@ import {Uploader} from "./uploader";
 import MenuItem from "@mui/material/MenuItem";
 import HTMLEditor from "../ui/HTMLEditor";
 import AttachFileIcon from '@material-ui/icons/AttachFile';
-import {getFields} from "../modules/DataForm";
 
 interface Field {
     name: string;
@@ -50,7 +49,7 @@ export function Form({
             setValue(f.name, f.value);
         }
     }, [fields])
-    console.log(fields)
+    console.log(fields, getValues())
     return (
         <>
             <Box id={formId.toString()} component="form" style={style} onSubmit={e => {
@@ -58,6 +57,7 @@ export function Form({
                 handleSubmit(data => onSubmit(data, e))(e)
             }} sx={{mt: 3}}>
                 {fields.map(f => getFormField(f, data => {
+                    console.log(f.name, data)
                     setValue(f.name, data);
                     onChange(getValues());
                 }))}
@@ -92,13 +92,15 @@ export function formatCloudFiles(files) {
                 type = 'file';
             }
         }
-        console.log(f)
+        let width = f.width;
+        let height = f.height;
+        if (type === 'model') width = height = 1;
         return {
             url,
             type,
             filename: f.original_filename + "." + ext,
-            width: f.width,
-            height: f.height,
+            width,
+            height,
             size: f.bytes,
         }
     })
@@ -111,8 +113,7 @@ export const MediaField = ({field, setValue, simple = false}) => {
         if (typeof field.value === 'string') {
             setFiles(JSON.parse(field.value));
         } else setFiles(field.value);
-
-    }, [field])
+    }, [])
 
     function set(files) {
         setValue(files);
@@ -133,7 +134,6 @@ export const MediaField = ({field, setValue, simple = false}) => {
         }
     }
 
-    console.log(files)
     return (
         <div>
             <Stack direction={'row'} alignItems={'center'}>
@@ -145,15 +145,18 @@ export const MediaField = ({field, setValue, simple = false}) => {
 }
 
 export function getFormField(field, setValue) {
-    if (FormMap[field.type]) return React.createElement(FormMap[field.type], {field, setValue});
-    else return React.createElement(Text, {field, setValue});
+    if (FormMap[field.type]) return React.createElement(FormMap[field.type], {key:field.name, field, setValue});
+    else return React.createElement(Text, {key:field.name, field, setValue});
 }
 
 export function Text({field, setValue}) {
-    const [v, setV] = React.useState(field.value);
+    const [v, setV] = React.useState('');
     useEffect(() => {
         setV(field.value)
-    }, [field])
+    }, [])
+    useLayoutEffect(() => {
+        !!field.safeUpdate && setV(field.value)
+    }, [field.value])
 
     return <TextField
         fullWidth
@@ -161,6 +164,7 @@ export function Text({field, setValue}) {
         variant="standard"
         size={'small'}
         sx={{marginBottom: 2}}
+        multiline
         value={v}
         onChange={e => {
             setV(e.target.value)
@@ -168,15 +172,27 @@ export function Text({field, setValue}) {
         }}
         label={field.label || field.name}
         type={field.type}
-        autoFocus
     />
 }
 
 export function SelectField({field, setValue}) {
-    const [v, setV] = React.useState(field.default);
+    console.log(field)
+    const [v, setV] = React.useState(field.value || field.default);
+
+    function set(value) {
+        setV(value)
+        if (field.name === 'status') window.api.apiStatusRetrieve({id: value}).then(d => setValue(d));
+        else setValue(value);
+    }
+
     useEffect(() => {
-        setV(field.value.id || field.value)
-    }, [field])
+        let v;
+        if (field.defaultFunction) {
+            v = window[field.defaultFunction]();
+        }
+        if (!v) v = field.value.id || field.value
+        if (field.value !== v) set(v);
+    }, [])
 
     return (
         <TextField
@@ -184,11 +200,7 @@ export function SelectField({field, setValue}) {
             select
             style={{width: '100%'}}
             value={v}
-            onChange={e => {
-                setV(e.target.value)
-                if (field.name === 'status') window.api.apiStatusRetrieve({id: e.target.value}).then(d => setValue(d));
-                else setValue(e.target.value);
-            }}
+            onChange={e => set(e.target.value)}
         >
             {
                 field.choices.map(t =>
@@ -219,16 +231,42 @@ function Editor({field, setValue}) {
 function InnerForm({field, setValue}) {
     const [form, setForm] = useState([]);
     useLayoutEffect(() => {
-        setForm(getFields(field.name, field.value || null))
-    }, [field]);
+        setForm(getFields(field.name, field.value || {inStock: true}))
+    }, []);
+    const [newForm, setNewForm] = useState({})
     console.log(form)
+    console.log(field)
     return (
         <>
             <h5>{field.label}</h5>
             <Form submit={false} onChange={d => {
-                console.log(d)
-                setValue(d)
+                console.log("!!!", d)
+                setNewForm(d);
             }} fields={form}></Form>
+            <Button onClick={() => {
+                let data = {...newForm}
+                if (typeof data.media !== 'string')
+                    data.media = JSON.stringify(data.media)
+                if (field.value === undefined) {
+                    window.api.request({
+                        method: "POST",
+                        path: "/api/" + field.name + "/",
+                        body: JSON.stringify(data),
+                        headers: {
+                            'content-type': "application/json"
+                        }
+                    }).then(r => r.json()).then(d => setValue({...d, media:JSON.parse(d.media)}));
+                } else {
+                    window.api.request({
+                        method: "PATCH",
+                        path: "/api/" + field.name + "/" + field.value.id + "/",
+                        body: JSON.stringify(data),
+                        headers: {
+                            'content-type': "application/json"
+                        }
+                    }).then(r => r.json()).then(d => setValue({...d, media:JSON.parse(d.media)}));
+                }
+            }}>Подтвердить</Button>
         </>
     )
 }
@@ -241,3 +279,18 @@ export const FormMap = {
     'foreignkey': InnerForm
 }
 
+
+const schema = require("../api/schema.json");
+
+export function getFields(page, item) {
+    let d = [];
+    for (const p of schema[page]) {
+        if (p.name) {
+            let v = "";
+            if (item) v = item[p.name]
+            if (!v) v = p.default;
+            d.push({...p, value: v})
+        }
+    }
+    return d;
+}

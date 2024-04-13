@@ -24,7 +24,7 @@ export interface PatchedComment {
      * @type {number}
      * @memberof PatchedComment
      */
-    id?: number;
+    readonly id?: number;
     /**
      * 
      * @type {string}
@@ -36,7 +36,7 @@ export interface PatchedComment {
      * @type {Date}
      * @memberof PatchedComment
      */
-    readonly time?: Date;
+    time?: Date;
     /**
      * 
      * @type {string}
@@ -55,12 +55,6 @@ export interface PatchedComment {
      * @memberof PatchedComment
      */
     user?: number;
-    /**
-     * 
-     * @type {number}
-     * @memberof PatchedComment
-     */
-    likes?: number;
     /**
      * 
      * @type {string}
@@ -92,7 +86,6 @@ export function PatchedCommentFromJSONTyped(json: any, ignoreDiscriminator: bool
         'text': json['text'] == null ? undefined : json['text'],
         'parent': json['parent'] == null ? undefined : json['parent'],
         'user': json['user'] == null ? undefined : json['user'],
-        'likes': json['likes'] == null ? undefined : json['likes'],
         'media': json['media'] == null ? undefined : json['media'],
     };
 }
@@ -103,12 +96,11 @@ export function PatchedCommentToJSON(value?: PatchedComment | null): any {
     }
     return {
         
-        'id': value['id'],
         'page': value['page'],
+        'time': value['time'] == null ? undefined : ((value['time'] as any).toISOString()),
         'text': value['text'],
         'parent': value['parent'],
         'user': value['user'],
-        'likes': value['likes'],
         'media': value['media'],
     };
 }

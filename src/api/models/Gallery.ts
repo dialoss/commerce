@@ -39,12 +39,6 @@ export interface Gallery {
     viewId?: number;
     /**
      * 
-     * @type {number}
-     * @memberof Gallery
-     */
-    likes?: number;
-    /**
-     * 
      * @type {string}
      * @memberof Gallery
      */
@@ -78,7 +72,6 @@ export function GalleryFromJSONTyped(json: any, ignoreDiscriminator: boolean): G
         'id': json['id'],
         'media': json['media'] == null ? undefined : json['media'],
         'viewId': json['viewId'] == null ? undefined : json['viewId'],
-        'likes': json['likes'] == null ? undefined : json['likes'],
         'mediaTitle': json['mediaTitle'] == null ? undefined : json['mediaTitle'],
         'mediaText': json['mediaText'] == null ? undefined : json['mediaText'],
     };
@@ -92,7 +85,6 @@ export function GalleryToJSON(value?: Gallery | null): any {
         
         'media': value['media'],
         'viewId': value['viewId'],
-        'likes': value['likes'],
         'mediaTitle': value['mediaTitle'],
         'mediaText': value['mediaText'],
     };

@@ -13,6 +13,7 @@ const AuthContainer = () => {
     }
     return (
         <>
+            <div style={{display: 'none'}}><LoginForm></LoginForm></div>
             <MyModal buttons={["Закрыть"]} style={{padding: 0}} title={'Авторизация'} open={open} callback={() => setOpen(false)}>
                 <Auth></Auth>
             </MyModal>

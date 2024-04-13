@@ -4,6 +4,9 @@
 /*@tailwind base;*/
 @tailwind components;
 @tailwind utilities;
+#App {
+    overflow: hidden;
+}
 
 p {
     margin-bottom: 0;
@@ -130,10 +133,18 @@ div[data-b24-crm-button-icon="openline"] {
         display: none;
     }
     .react-page-controls-mode-toggle-control-group {
-        display: none !important;
+        //display: none !important;
+        z-index: 10 !important;
+        bottom: 50px !important;
     }
     .resize-handle.react-draggable {
         display: none !important;
+
+    }
+    .react-page-controls-mode-toggle-control:last-child {
+        display: none;
+        //margin-bottom: 50px;
+        //pointer-events: none;
     }
 }
 
@@ -155,6 +166,10 @@ div[data-b24-crm-button-icon="openline"] {
 
 .react-page-row {
     //column-gap: 4px;
+}
+
+.react-page-cell {
+    padding: 4px !important;
 }
 
 .MuiFormControlLabel-root[aria-label="Content is visible"] {
@@ -237,7 +252,9 @@ body {
 }
 
 .aspectratio-root {
-    --AspectRatio-paddingBottom: clamp(var(--AspectRatio-minHeight), calc(100% / (16 / 9)), var(--AspectRatio-maxHeight));
+    overflow: hidden;
+    border-radius: 5px;
+    --AspectRatio-paddingBottom: clamp(var(--AspectRatio-minHeight), calc(100% / (13.5 / 9)), var(--AspectRatio-maxHeight));
     --AspectRatio-maxHeight: 600px;
     --AspectRatio-minHeight: 100px;
 }
@@ -271,9 +288,10 @@ body {
         padding: 0;
     }
 }
-@media only screen and (max-width: 400px) {
+
+@media only screen and (max-width: 450px) {
     .app-bar {
-        padding-left: 0 !important;
+        padding-left: 5px !important;
 
         .MuiTabs-flexContainer button {
             &:not(.Mui-selected) {
@@ -283,18 +301,36 @@ body {
 
     }
 }
+
 @media only screen and (max-width: 600px) {
     .chat-button {
         min-width: 30px !important;
         padding: 0 !important;
 
-        //p {
-        //    display: none;
-        //    width: 0;
-        //}
-
         span {
-            margin: 0;
+            margin: 4px;
         }
     }
+    .comment-reply.visible {
+        width: 95vw !important;
+
+    }
+}
+
+iframe {
+    //display: none !important;
+}
+
+.comments > .comments-block.comments-child {
+    margin-left: 6px !important;
+}
+
+.comments-connector {
+    //display: none;
+}
+
+.content-page > div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }

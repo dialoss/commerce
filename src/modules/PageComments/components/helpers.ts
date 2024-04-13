@@ -1,52 +1,35 @@
 //@ts-nocheck
-export function createCommentsTree(comments, sorting, search, limit=null) {
-    let newComments = [...comments].sort(sorting).sort((a, b) => a.parent - b.parent);
-    search = [...search].sort(sorting).sort((a, b) => a.parent - b.parent);
+export function createCommentsTree(comments, sorting) {
     let tree = {};
     let links = {};
-    let searchPos = 0;
-
-    newComments.forEach(c => {
-        if (!search[searchPos]) return;
-        let searched = c.id === search[searchPos].id;
-        if (searched) searchPos++;
-        const comment = {
-            searched,
-            comment: c,
+    for (let com of comments) {
+        let c = {
+            comment: com,
             comments: {},
         };
 
-        if (!!c.parent) {
-            let p = links[c.parent];
-            p.comments[c.id] = comment;
-            links[c.id] = p.comments[c.id];
-            if (searched) p.searched = true;
+        if (!com.parent) {
+            tree[com.id] = c
+            links[com.id] = tree[com.id].comments
         } else {
-            tree[c.id] = comment;
-            links[c.id] = tree[c.id];
-        }
-    });
-    let current = 0;
-    function siftTree(tree) {
-        for (const comm in tree) {
-            current += 1
-            if (!tree[comm].searched || current > limit) {
-                delete tree[comm];
-            } else {
-                siftTree(tree[comm].comments);
-            }
+            links[com.parent][com.id] = c
+            links[com.id] = links[com.parent][com.id]['comments']
         }
     }
-    siftTree(tree);
     return tree;
 }
 
 export function sortFunction(type) {
-    let sorting = () => {};
+    let sorting = () => {
+    };
     const d = (ds) => new Date(ds).getTime();
     switch (type) {
         case "newest":
-            sorting = (a, b) => d(b.time) - d(a.time);
+            sorting = (a, b) => {
+                if (a.parent && b.parent || !a.parent && !b.parent) return d(b.time) - d(a.time);
+                if (a.parent && !b.parent) return 1;
+                return -1;
+            }
             break;
         case "oldest":
             sorting = (a, b) => d(a.time) - d(b.time);

@@ -36,6 +36,12 @@ export interface Product {
      * @type {string}
      * @memberof Product
      */
+    slug?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Product
+     */
     media?: string;
     /**
      * 
@@ -95,6 +101,7 @@ export function ProductFromJSONTyped(json: any, ignoreDiscriminator: boolean): P
         
         'id': json['id'],
         'page': json['page'] == null ? undefined : json['page'],
+        'slug': json['slug'] == null ? undefined : json['slug'],
         'media': json['media'] == null ? undefined : json['media'],
         'viewId': json['viewId'] == null ? undefined : json['viewId'],
         'name': json['name'] == null ? undefined : json['name'],
@@ -112,6 +119,7 @@ export function ProductToJSON(value?: Product | null): any {
     return {
         
         'page': value['page'],
+        'slug': value['slug'],
         'media': value['media'],
         'viewId': value['viewId'],
         'name': value['name'],

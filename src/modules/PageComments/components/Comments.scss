@@ -16,7 +16,7 @@
   }
 
   #counter {
-    text-align: center;
+    text-align: left;
   }
 
   @media only screen and (max-width: 600px){
@@ -51,6 +51,9 @@
   .input-field {
     padding: 10px;
     border-top: none;
+    .rdw-editor-toolbar > div:not(.rdw-emoji-wrapper) {
+      display: none;
+    }
   }
 
   .comments-input {
@@ -122,7 +125,7 @@
 
   .comment-username {
     font-weight: 600;
-    font-size: 16px;
+    font-size: 14px;
   }
   .comment-date {
     font-size: 14px;
@@ -135,8 +138,12 @@
 
     &__text {
       display: flex;
-      flex-direction: column;
-      margin-left: 10px;
+      flex-direction: row;
+      column-gap: 5px;
+      align-items: center;
+      p {
+        margin-top: 2px;
+      }
     }
   }
 
@@ -145,12 +152,11 @@
     padding: 8px 0;
   }
   .comments-connector {
-    left: 4px;
+    left: 15px;
     position: absolute;
     width: 1px;
     background-color: #b4b4b4;
-    height: 100%;
-    padding: 10px 0;
+    height: calc(100% - 10px);
   }
   .comment-upload__wrapper {
     width: fit-content;

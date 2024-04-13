@@ -34,13 +34,13 @@ export function Uploader({files, setFiles}) {
                         style={{width: "80%"}}>
                         {imageList.map((file, index) => {
                             return <div key={index} style={{
-                                margin: 5,
-                                display: 'flex',
-                                flexDirection: 'column',
-                                alignItems: 'center',
+                                // margin: 5,
+                                // display: 'flex',
+                                // flexDirection: 'column',
+                                // alignItems: 'center',
                                 maxWidth: 200,
                             }}>
-                                <MediaItem data={file}></MediaItem>
+                                {file.type !== 'model' && <MediaItem data={file}></MediaItem>}
                                 <p className={'peer hover:cursor-pointer transition-all'}>{file.filename}</p>
                                 <Button className={'opacity-0 transition-all peer-hover:!opacity-100'} size={'small'} variant={'outlined'}
                                         onClick={() => onImageRemove(index)}>Удалить</Button>

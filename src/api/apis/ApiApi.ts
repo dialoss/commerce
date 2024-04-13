@@ -108,6 +108,7 @@ export interface ApiCommentRetrieveRequest {
 export interface ApiCommentUpdateRequest {
     id: number;
     comment: Comment;
+    like?: string;
 }
 
 export interface ApiGalleryCreateRequest {
@@ -487,6 +488,10 @@ export class ApiApi extends runtime.BaseAPI {
         }
 
         const queryParameters: any = {};
+
+        if (requestParameters['like'] != null) {
+            queryParameters['like'] = requestParameters['like'];
+        }
 
         const headerParameters: runtime.HTTPHeaders = {};
 

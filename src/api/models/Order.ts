@@ -36,6 +36,12 @@ export interface Order {
      * @type {string}
      * @memberof Order
      */
+    slug?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Order
+     */
     media?: string;
     /**
      * 
@@ -66,7 +72,7 @@ export interface Order {
      * @type {Date}
      * @memberof Order
      */
-    readonly dateCreated: Date;
+    dateCreated?: Date;
     /**
      * 
      * @type {Date}
@@ -92,7 +98,6 @@ export interface Order {
  */
 export function instanceOfOrder(value: object): boolean {
     if (!('id' in value)) return false;
-    if (!('dateCreated' in value)) return false;
     return true;
 }
 
@@ -108,12 +113,13 @@ export function OrderFromJSONTyped(json: any, ignoreDiscriminator: boolean): Ord
         
         'id': json['id'],
         'page': json['page'] == null ? undefined : json['page'],
+        'slug': json['slug'] == null ? undefined : json['slug'],
         'media': json['media'] == null ? undefined : json['media'],
         'viewId': json['viewId'] == null ? undefined : json['viewId'],
         'title': json['title'] == null ? undefined : json['title'],
         'description': json['description'] == null ? undefined : json['description'],
         'user': json['user'] == null ? undefined : json['user'],
-        'dateCreated': (new Date(json['dateCreated'])),
+        'dateCreated': json['dateCreated'] == null ? undefined : (new Date(json['dateCreated'])),
         'statusChanged': json['statusChanged'] == null ? undefined : (new Date(json['statusChanged'])),
         'product': json['product'] == null ? undefined : json['product'],
         'status': json['status'] == null ? undefined : json['status'],
@@ -127,11 +133,13 @@ export function OrderToJSON(value?: Order | null): any {
     return {
         
         'page': value['page'],
+        'slug': value['slug'],
         'media': value['media'],
         'viewId': value['viewId'],
         'title': value['title'],
         'description': value['description'],
         'user': value['user'],
+        'dateCreated': value['dateCreated'] == null ? undefined : ((value['dateCreated'] as any).toISOString()),
         'statusChanged': value['statusChanged'] == null ? undefined : ((value['statusChanged'] as any).toISOString()),
         'product': value['product'],
         'status': value['status'],

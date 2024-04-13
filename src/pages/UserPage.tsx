@@ -12,7 +12,6 @@ const UserPage = () => {
     let id = window.location.pathname.split('/').slice(-1)[0];
     if (!window.location.pathname.match(/profile\/\d*/)) id = Userfront.user.userId
     const user = useAppSelector(state => state.app.users[id] || {});
-    console.log(id, user)
     useLayoutEffect(() => {
         window.api.apiOrderList({user: id}).then(d => setOrders(d.results));
     }, [])

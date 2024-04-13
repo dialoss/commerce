@@ -155,7 +155,7 @@ function UserInfo() {
                         <IconButton sx={{p: "5px"}}>
                             <Avatar src={user.image}></Avatar>
                         </IconButton>
-                        <Typography mx={1} className={"hover:cursor-pointer text-decoration-underline"} sx={{
+                        <Typography mx={1} className={"max-[500px]:!hidden hover:cursor-pointer text-decoration-underline"} sx={{
                             color: '#fff',
                             display: 'flex',
                             alignItems: 'center'

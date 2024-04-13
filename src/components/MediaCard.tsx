@@ -19,23 +19,28 @@ export function openImages(current, images) {
 }
 
 const MediaCard = ({data}: { data }) => {
-    const media = data.media[0];
+    let media = data.media[0];
+
+    function like() {
+        window.api.apiGalleryUpdate({id: data.id, like: true});
+    }
+
     return (
         <BaseCard data={data}>
             <div style={{display: 'flex', flexDirection: 'column', position: 'relative', height: '100%'}}>
                 {media && <MediaItem ratio={true} data={media} callback={openImages(media,
-                    store.getState().app.items.map(it => JSON.parse(it.media)[0]))}></MediaItem>}
-                {media.mediaTitle &&
-                    <Typography textAlign={'center'} level="title-lg">{media.mediaTitle}</Typography>}
-                {media.mediaText && <Typography sx={{
+                    store.getState().app.items.map(it => ({...JSON.parse(it.media)[0],...data})))}></MediaItem>}
+                {data.mediaTitle &&
+                    <Typography textAlign={'center'} level="title-lg">{data.mediaTitle}</Typography>}
+                {data.mediaText && <Typography sx={{
                     flexGrow: 1,
                     display: 'flex',
                     textAlign: 'center',
                     alignItems: 'center',
                     justifyContent: 'center',
                 }}
-                                                level={'body-md'}>{media.mediaText}</Typography>}
-                <Likes likes={data.likes || 0}></Likes>
+                                                level={'body-md'}>{data.mediaText}</Typography>}
+                <Likes like={like} likes={data.likes || []}></Likes>
             </div>
         </BaseCard>
     );

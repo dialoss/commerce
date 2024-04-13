@@ -1,4 +1,7 @@
 apis/ApiApi.ts
+apis/ReorderApi.ts
+apis/TestApi.ts
+apis/UploadModelApi.ts
 apis/index.ts
 index.ts
 models/Comment.ts

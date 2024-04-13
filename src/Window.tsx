@@ -41,6 +41,7 @@ const Windows = ({title, key_, width = 800, children}: {
             {...{width: Math.min(width, windowW)}}
             {...(windowW > 1000 ? {height: 800} : {})}
             y='bottom'
+            onMinimize={() => window.dispatchEvent(new CustomEvent(key_ + ":close"))}
             title={title}
         >
             {children}

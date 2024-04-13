@@ -15,12 +15,24 @@ import {actions} from "../../store/app";
 
 Userfront.init("7n8ddmqn");
 
-fetch("https://api.userfront.com/v0/tenants/8nwwwqpn/users", {
-    headers: {
-        "Authorization": "Bearer uf_test_readonly_7n8ddmqn_9e4b26cde378139c16fa96895bdecd86"
+async function fetchUsers() {
+    let users = [];
+    let p = 1
+    while (true) {
+        let data = null;
+        await fetch("https://api.userfront.com/v0/tenants/8nwwwqpn/users?page=" + p, {
+            headers: {
+                "Authorization": "Bearer uf_test_readonly_7n8ddmqn_9e4b26cde378139c16fa96895bdecd86"
+            }
+        }).then(r => r.json()).then(d => data = d);
+        if (data.meta.count === 0) break;
+        users = users.concat(data.results);
+        p += 1;
     }
-}).then(r => r.json()).then(d =>
-    store.dispatch(actions.setUsers(d.results)))
+    store.dispatch(actions.setUsers(users));
+}
+
+fetchUsers();
 
 interface IFields {
     [key: number]: string[];
@@ -62,10 +74,10 @@ export default function Auth() {
 
     function submit(data: any, e: any) {
         if (stage === 1) {
-            if (window.PasswordCredential) {
-                let c = new PasswordCredential(e.target);
-                navigator.credentials.store(c);
-            }
+            // if (window.PasswordCredential) {
+            //     let c = new PasswordCredential(e.target);
+            //     navigator.credentials.store(c);
+            // }
             auth(Userfront.signup({
                 method: 'password',
                 email: data.email,

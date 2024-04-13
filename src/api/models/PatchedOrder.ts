@@ -36,6 +36,12 @@ export interface PatchedOrder {
      * @type {string}
      * @memberof PatchedOrder
      */
+    slug?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PatchedOrder
+     */
     media?: string;
     /**
      * 
@@ -66,7 +72,7 @@ export interface PatchedOrder {
      * @type {Date}
      * @memberof PatchedOrder
      */
-    readonly dateCreated?: Date;
+    dateCreated?: Date;
     /**
      * 
      * @type {Date}
@@ -106,6 +112,7 @@ export function PatchedOrderFromJSONTyped(json: any, ignoreDiscriminator: boolea
         
         'id': json['id'] == null ? undefined : json['id'],
         'page': json['page'] == null ? undefined : json['page'],
+        'slug': json['slug'] == null ? undefined : json['slug'],
         'media': json['media'] == null ? undefined : json['media'],
         'viewId': json['viewId'] == null ? undefined : json['viewId'],
         'title': json['title'] == null ? undefined : json['title'],
@@ -125,11 +132,13 @@ export function PatchedOrderToJSON(value?: PatchedOrder | null): any {
     return {
         
         'page': value['page'],
+        'slug': value['slug'],
         'media': value['media'],
         'viewId': value['viewId'],
         'title': value['title'],
         'description': value['description'],
         'user': value['user'],
+        'dateCreated': value['dateCreated'] == null ? undefined : ((value['dateCreated'] as any).toISOString()),
         'statusChanged': value['statusChanged'] == null ? undefined : ((value['statusChanged'] as any).toISOString()),
         'product': value['product'],
         'status': value['status'],

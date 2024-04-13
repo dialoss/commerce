@@ -39,12 +39,6 @@ export interface PatchedGallery {
     viewId?: number;
     /**
      * 
-     * @type {number}
-     * @memberof PatchedGallery
-     */
-    likes?: number;
-    /**
-     * 
      * @type {string}
      * @memberof PatchedGallery
      */
@@ -77,7 +71,6 @@ export function PatchedGalleryFromJSONTyped(json: any, ignoreDiscriminator: bool
         'id': json['id'] == null ? undefined : json['id'],
         'media': json['media'] == null ? undefined : json['media'],
         'viewId': json['viewId'] == null ? undefined : json['viewId'],
-        'likes': json['likes'] == null ? undefined : json['likes'],
         'mediaTitle': json['mediaTitle'] == null ? undefined : json['mediaTitle'],
         'mediaText': json['mediaText'] == null ? undefined : json['mediaText'],
     };
@@ -91,7 +84,6 @@ export function PatchedGalleryToJSON(value?: PatchedGallery | null): any {
         
         'media': value['media'],
         'viewId': value['viewId'],
-        'likes': value['likes'],
         'mediaTitle': value['mediaTitle'],
         'mediaText': value['mediaText'],
     };

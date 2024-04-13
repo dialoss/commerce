@@ -14,7 +14,7 @@ const PageComments = () => {
             setPage(null);
             return;
         }
-        setPage(window.location.pathname + "/")
+        setPage(window.location.pathname.slice(1));
     }, [location]);
     return (
         <div className={"comments"} id={'comments'} style={{marginTop: 50, display: page ? 'block' : 'none'}}>

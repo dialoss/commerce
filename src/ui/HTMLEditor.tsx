@@ -13,7 +13,7 @@ const HtmlEditor = ({placeholder="", clear, value, setHTML, updateValue=false, s
     const lastValue = React.useRef('');
 
     useLayoutEffect(() => {
-        if (!value || (!updateValue && lastValue.current) || simple) return;
+        if (!value) return;
         lastValue.current = value;
         const contentBlock = htmlToDraft(value);
         if (contentBlock) {
@@ -21,7 +21,7 @@ const HtmlEditor = ({placeholder="", clear, value, setHTML, updateValue=false, s
             const editorState = EditorState.createWithContent(contentState);
             setEditor(editorState);
         }
-    }, [value]);
+    }, []);
 
     if (clear && clear.current) {
         setEditor(EditorState.createEmpty());

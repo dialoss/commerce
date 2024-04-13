@@ -24,7 +24,7 @@ export interface Comment {
      * @type {number}
      * @memberof Comment
      */
-    id?: number;
+    readonly id: number;
     /**
      * 
      * @type {string}
@@ -36,7 +36,7 @@ export interface Comment {
      * @type {Date}
      * @memberof Comment
      */
-    readonly time: Date;
+    time?: Date;
     /**
      * 
      * @type {string}
@@ -57,12 +57,6 @@ export interface Comment {
     user?: number;
     /**
      * 
-     * @type {number}
-     * @memberof Comment
-     */
-    likes?: number;
-    /**
-     * 
      * @type {string}
      * @memberof Comment
      */
@@ -73,8 +67,8 @@ export interface Comment {
  * Check if a given object implements the Comment interface.
  */
 export function instanceOfComment(value: object): boolean {
+    if (!('id' in value)) return false;
     if (!('page' in value)) return false;
-    if (!('time' in value)) return false;
     return true;
 }
 
@@ -88,13 +82,12 @@ export function CommentFromJSONTyped(json: any, ignoreDiscriminator: boolean): C
     }
     return {
         
-        'id': json['id'] == null ? undefined : json['id'],
+        'id': json['id'],
         'page': json['page'],
-        'time': (new Date(json['time'])),
+        'time': json['time'] == null ? undefined : (new Date(json['time'])),
         'text': json['text'] == null ? undefined : json['text'],
         'parent': json['parent'] == null ? undefined : json['parent'],
         'user': json['user'] == null ? undefined : json['user'],
-        'likes': json['likes'] == null ? undefined : json['likes'],
         'media': json['media'] == null ? undefined : json['media'],
     };
 }
@@ -105,12 +98,11 @@ export function CommentToJSON(value?: Comment | null): any {
     }
     return {
         
-        'id': value['id'],
         'page': value['page'],
+        'time': value['time'] == null ? undefined : ((value['time'] as any).toISOString()),
         'text': value['text'],
         'parent': value['parent'],
         'user': value['user'],
-        'likes': value['likes'],
         'media': value['media'],
     };
 }

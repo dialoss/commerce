@@ -8,11 +8,9 @@ import {ItemsEditor} from "../pages/PageEditor";
 import {useAppSelector} from "../store/redux";
 import Box from "@mui/material/Box";
 
-
 const limit = 30;
 
 const cache = {}
-const useCache = true;
 
 interface TabsProps {
     filter: (tab: number, item: object) => boolean;
@@ -59,7 +57,9 @@ const ItemsList = ({
         } else return 0;
     }
 
-    function changeState(e) {
+    window.getTab = () => tabs.names[getTab()];
+
+    function changeState() {
         setTab(getTab())
     }
 
@@ -70,8 +70,10 @@ const ItemsList = ({
         return () => window.removeEventListener("popstate", changeState)
     }, [])
 
+    const useCache = useAppSelector(state => state.app.editor);
+
     useLayoutEffect(() => {
-        window.scrollTo(0, 0);
+        window.scrollTop = 0;
         const pagination = {limit, offset: limit * (page - 1)};
         const cachePage = cache[cacheKey];
         if (useCache && cachePage) {
@@ -95,12 +97,16 @@ const ItemsList = ({
         }))
     }, [page, tab]);
 
+    const editor = useAppSelector(state => state.app.editor);
 
     let filteredItems = [...items].sort((a, b) => a.viewId - b.viewId);
+    console.log(filteredItems)
     return (
-        <div style={{minHeight: '100vh', marginBottom: 20}} className={'items-list '}>
+        <div style={{minHeight: '100vh', marginBottom: 20}} className={'items-list ' + (editor ? 'editor' : '')}>
             {tabs.names.length > 0 && <Box display="flex" justifyContent="center" width="100%">
                 <Tabs
+                    scrollButtons
+                    allowScrollButtonsMobile
                     value={tab}
                     centered
                     variant={'scrollable'}

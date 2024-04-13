@@ -1,6 +1,6 @@
 // @ts-nocheck
 
-import React, {useEffect, useRef} from 'react';
+import React, {useEffect} from 'react';
 import type {CellPlugin} from '@react-page/editor';
 import Editor, {createValue} from "@react-page/editor";
 import '@react-page/editor/lib/index.css'
@@ -19,8 +19,10 @@ import store from "../store";
 import {actions} from "../store/app";
 import ShopCard from "../components/ShopCard";
 import OrderCard from "../components/OrderCard";
-import MediaCard from "../components/MediaCard";
+import MediaCard, {openImages} from "../components/MediaCard";
 import HTMLEditor from "../ui/HTMLEditor";
+import CloseIcon from '@material-ui/icons/Close';
+import IconButton from "@mui/material/IconButton";
 
 type EditorData = {
     html: string;
@@ -31,7 +33,7 @@ const buttonPlugin: CellPlugin<EditorData> = {
         <>
             {data.type === "buy" && <Pay product={store.getState().app?.pageData}></Pay>}
             {data.type === "order" &&
-                <Button style={{margin: 'auto'}} variant={'contained'} onClick={() => BusinessLogic.order()}>
+                <Button style={{margin: 'auto', padding:10}} variant={'contained'} onClick={() => BusinessLogic.order()}>
                     заказать изготовление
                 </Button>
             }
@@ -189,6 +191,9 @@ function pluginGenerator(fields, title, id, render) {
     let props = {};
     for (const f of fields) {
         if (!f.type) continue;
+        if (f.name === 'productType') {
+            f.defaultFunction = 'getTab'
+        }
         props[f.name] = {
             default: f.default,
             uniforms: {
@@ -211,12 +216,7 @@ function pluginGenerator(fields, title, id, render) {
                     ...props,
                     viewId: {
                         uniforms: {
-                            component: connectField(({value, onChange}) => {
-                                    if (value) return <></>
-                                    onChange(new Date().getTime());
-                                    return <></>
-                                }
-                            ),
+                            component: connectField(({value, onChange}) => <></>),
                         },
                     },
                 }
@@ -225,10 +225,38 @@ function pluginGenerator(fields, title, id, render) {
     }
 }
 
+function getMediaCallback(data) {
+    if (data.media[0].type !== 'image') return
+    return openImages(data.media[0], [data.media[0]])
+    // if (data.media[0].type === 'image')
+    //
+}
+
+const fields = [
+    {name:'media',type:'media',label:'Медиа',default:[]},
+    {name:'mediaTitle',type:'text',label:'Медиа заголовок',default:''},
+    {name:'mediaText',type:'text',label:'Медиа текст'},
+    {name:'border',type:'boolean',label:'Показывать рамку',default:true},
+    {name:'quality',type:'number',label:'Качество картинки (в пикселях)',default:800},
+]
+
+let props = {};
+for (const f of fields) {
+    props[f.name] = {
+        default: f.default,
+        uniforms: {
+            component: connectField(({value, onChange}) => getFormField({...f, value}, onChange))
+        }
+    }
+}
+
 const mediaPlugin: CellPlugin<MediaData> = {
     Renderer: ({data}) => (
-        <div style={{minHeight: 50}}>
-            {data.media && data.media[0] && <MediaItem data={{...data, ...data.media[0]}}></MediaItem>}
+        <div style={{minHeight: 50, height:'100%'}}>
+            {data.media && data.media[0] &&
+                <MediaItem
+                    callback={getMediaCallback(data)}
+                    data={{...data, ...data.media[0]}}></MediaItem>}
         </div>
     ),
     id: 'mediaPlugin',
@@ -239,31 +267,16 @@ const mediaPlugin: CellPlugin<MediaData> = {
         type: 'autoform',
         schema: {
             properties: {
-                media: {
-                    uniforms: {
-                        component: connectField(({value, onChange}) =>
-                            <MediaField field={{value}} setValue={files => onChange(files)}></MediaField>
-                        ),
-                    },
-                    default: [],
-                },
+                ...props,
                 rotation: {
                     type: 'boolean',
                     uniforms: {
                         component: connectField(({value, onChange}) =>
                             getFormField({name: 'rotation', label: "Вращать модель", value, type: 'boolean'}, onChange)
                         ),
-                        showIf: (data) => !!data.media[0] && data.media[0].type === "model",
+                        showIf: (data) => data.media && !!data.media[0] && data.media[0].type === "model",
                     },
                     default: false,
-                },
-                mediaTitle: {
-                    type: 'string',
-                    default: '',
-                },
-                mediaText: {
-                    type: 'string',
-                    default: '',
                 },
                 customWidth: {
                     type: 'string',
@@ -276,13 +289,15 @@ const mediaPlugin: CellPlugin<MediaData> = {
                     },
                     default: '100',
                 },
-                border: {
-                    type: 'boolean',
-                    default: true,
-                },
-                quality: {
-                    type: 'number',
-                    default: 800,
+                viewId: {
+                    uniforms: {
+                        component: connectField(({value, onChange}) => {
+                                if (value) return <></>
+                                onChange(new Date().getTime());
+                                return <></>
+                            }
+                        ),
+                    },
                 },
             },
             required: ['media'],
@@ -300,7 +315,7 @@ const introPlugin: CellPlugin = {
     description: <div>Шаблон шапки продукта
         <div onClick={e => {
             e.stopPropagation();
-            window.templateIntro()
+            window.templateIntro(store.getState().app?.pageData)
         }} style={{position: 'absolute', left: 0, top: 0, width: '100%', height: '100%'}}></div>
     </div>,
     version: 1,
@@ -354,12 +369,22 @@ export const myCellPlugins = cellPlugins.map<CellPlugin<Styling>>((plugin) => {
         closeWindow: {
             type: "string",
             uniforms: {
-                component: connectField(({value, onChange}) =>
-                    <Button className={'my-btn-close'} style={{position: 'fixed', zIndex: 1000, bottom: 10, left: 10}}
-                            onClick={() => {
-                                let t = document.querySelector(".react-page-cell-focused");
-                                escape(t);
-                            }}>Закрыть</Button>
+                component: connectField(({value, onChange}) => <IconButton size={'small'}
+                                                                           style={{
+                                                                               color: "#000",
+                                                                               position: 'fixed',
+                                                                               zIndex: 1000,
+                                                                               top: 10,
+                                                                               right: 10
+                                                                           }} onClick={() => {
+                        let t = document.querySelector(".react-page-cell-focused");
+                        escape(t);
+                    }}><CloseIcon style={{fontSize: 40}}></CloseIcon></IconButton>
+                    // <Button startIcon={<CloseIcon></CloseIcon>} className={'my-btn-close'} style={{position: 'fixed', zIndex: 1000, top: 10, right: 10}}
+                    //         onClick={() => {
+                    //             let t = document.querySelector(".react-page-cell-focused");
+                    //             escape(t);
+                    //         }}>Закрыть</Button>
                 ),
             },
         }
@@ -367,36 +392,11 @@ export const myCellPlugins = cellPlugins.map<CellPlugin<Styling>>((plugin) => {
     return plugin;
 });
 
-
-let initItems = [];
-
 export const PageEditor = ({id, data, endpoint}: { id: number; data: object; endpoint: string }) => {
     const [value, setValue] = React.useState(data);
-    // const editor = useAppSelector(state => state.app.editor);
 
-    function submit() {
-        window.api.request({
-            path: `/api/${endpoint}/${id}/`,
-            method: 'PUT',
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: {page: JSON.stringify(value)}
-        })
-    }
-
-    // useInitCallbacks(editor)
-    //
-    // window.app.editor = {
-    //     insert: files => {
-    //         setValue(value => ({
-    //             ...value, rows: [...value.rows, templateFiles(files)]
-    //         }))
-    //     }
-    // }
     return (
         <>
-            {/*{editor && <Button onClick={submit}>Сохранить изменения</Button>}*/}
             <Editor
                 readOnly={true}
                 cellPlugins={myCellPlugins}
@@ -405,183 +405,3 @@ export const PageEditor = ({id, data, endpoint}: { id: number; data: object; end
         </>
     );
 };
-
-function useInitCallbacks(editor) {
-    React.useEffect(() => {
-        function removeBlock(e) {
-            if (e.key === "Delete") {
-                let a = document.querySelector(".MuiButtonBase-root.css-1gws2xf-MuiButtonBase-root-MuiIconButton-root");
-                a && a.click();
-            }
-        }
-
-        window.addEventListener("keydown", removeBlock)
-
-        const int = setInterval(() => {
-            let el = document.querySelector(".react-page-toolbar-draggable")
-            if (el) {
-                const drawer = el.closest(".MuiPaper-root");
-                const rootElement = document.createElement('div');
-                const root = ReactDOM.createRoot(rootElement);
-                root.render(<Button style={{position: 'fixed', zIndex: 1000, bottom: 10, left: 10}}
-                                    onClick={() => escape(document.body)}>Закрыть</Button>);
-                drawer.appendChild(rootElement)
-                clearInterval(int)
-            }
-        }, 1000);
-        return () => window.removeEventListener("keydown", removeBlock)
-
-    }, [editor])
-}
-
-
-export const ItemsEditor = ({items, endpoint}: { items: object[]; endpoint: string }) => {
-    const [value, setValue] = React.useState({rows: items});
-    React.useEffect(() => {
-        initItems = items;
-        let data = {
-            rows: initItems.map(it => [{
-                plugin: plugins[endpoint].id, data: {...it, media: JSON.parse(it.media)}
-            }])
-        };
-        const value = createValue(data, {cellPlugins: myCellPlugins, lang: 'default'});
-        setValue(value);
-    }, [items]);
-    const editor = useAppSelector(state => state.app.editor);
-
-    function update(newData) {
-        setValue(newData);
-    }
-
-    console.log(value)
-    useInitCallbacks(editor);
-
-    function submit() {
-        let values = [];
-        for (const newIt of value.rows) {
-            values.push({...findValue(newIt, 'default')});
-        }
-        for (const it of initItems) {
-            let found = false;
-            for (const v of values) {
-                if (v.viewId === it.viewId) {
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) {
-                window.api.request({
-                    path: `/api/${endpoint}/${it.id}/`,
-                    method: 'DELETE'
-                })
-                initItems = initItems.splice(initItems.findIndex(it_ => it_.viewId === it.viewId), 1);
-            }
-        }
-        for (const it of values) {
-            let data = {...it}
-            data.media = JSON.stringify(data.media)
-            const id = findItemId(data.viewId)
-            if (id !== -1) {
-                window.api.request({
-                    path: `/api/${endpoint}/${id}/`,
-                    method: 'PUT',
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: data
-                })
-            } else {
-                window.api.request({
-                    path: `/api/${endpoint}/`,
-                    method: 'POST',
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: data
-                })
-                initItems.push(data)
-            }
-        }
-        window.api.request({
-            path: `/reorder/`,
-            method: 'POST',
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: {endpoint, order: values.map(v => v.viewId)}
-        })
-    }
-
-    return (
-        <>
-            {editor && <Button onClick={submit}>Сохранить изменения</Button>}
-            <Editor
-                readOnly={!editor}
-                cellPlugins={myCellPlugins}
-                value={value} onChange={update}/>
-            {!value.rows.length && <Typography textAlign={'center'}>Нет записей</Typography>}
-        </>
-    );
-};
-
-function findValue(object, key) {
-    let value;
-    Object.keys(object).some(function (k) {
-        if (k === key) {
-            value = object[k];
-            return true;
-        }
-        if (object[k] && typeof object[k] === 'object') {
-            value = findValue(object[k], key);
-            return value !== undefined;
-        }
-    });
-    return value;
-}
-
-function findItemId(id) {
-    for (const it of initItems) {
-        if (it.viewId === id) return it.id;
-    }
-    return -1;
-}
-
-export default PageEditor;
-
-function templateFiles(files) {
-    let x = new Date().getTime();
-    let items = [];
-    for (const f of files) {
-        items.push({
-            "id": x++,
-            "size": 12 / files.length,
-            "plugin": {
-                "id": "mediaPlugin",
-                "version": 1
-            },
-            "dataI18n": {
-                "default": {
-                    "files": [f],
-                    "mediaTitle": "",
-                    "mediaText": "",
-                    "width": 100,
-                    "border": true,
-                    "quality": 800
-                }
-            },
-            "rows": [],
-            "inline": null
-        })
-    }
-    return {
-        "id": x++,
-        "cells": items,
-    }
-}
-
-
-// window.addEventListener("keydown", e => {
-//     if (e.altKey && e.ctrlKey && e.code === 'KeyE') {
-//         store.dispatch(actions.setEditor());
-//     }
-// })

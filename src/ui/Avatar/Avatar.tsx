@@ -6,7 +6,7 @@ import Jdenticon from "react-jdenticon";
 const Avatar = ({user={}, extraInfo=false, symbol='', children, ...props}) => {
     let src = props.src;
     return (
-        <div className={`avatar__wrapper `}>
+        <div className={`avatar__wrapper `} style={props.style || {}}>
             <div className={"avatar"}>
                 {!!src ?
                     <img src={src} alt=""/> :

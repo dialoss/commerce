@@ -12,7 +12,7 @@ const tabs = {
 };
 for (const f of schema.product.find(f => f.name === 'productType').choices) {
     tabs.pagination.push(f.name.toLowerCase());
-    tabs.names.push(f.name.toLowerCase());
+    tabs.names.push(f.name);
 }
 
 const Models = () => {

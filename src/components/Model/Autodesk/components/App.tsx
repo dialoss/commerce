@@ -30,7 +30,6 @@ class App extends React.Component {
                 <div style={{ position: 'relative'}}>
                     <Viewer
                         runtime={{ accessToken: token }}
-                        urn={urn}
                         {...this.state}
                         key={urn}
                         ref={ref => this.wrapper = ref}
