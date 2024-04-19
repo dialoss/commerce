@@ -12,6 +12,7 @@
 + Built-in file manager using Cloudinary and Google Drive.
 + Built-in comments.
 + User sign-in through Google or Email/Password.
++ Notifications: Web push, Telegram, Email
 
 # Frontend
 + React 
