@@ -13,6 +13,7 @@
 + Built-in comments.
 + User sign-in through Google or Email/Password.
 + Notifications: Web push, Telegram, Email
++ 3D Models preview
 
 # Frontend
 + React 
@@ -28,5 +29,6 @@
 + Userfront (auth)
 + React page
 + YooMoney and Boosty (payment)
++ Autodesk
 
 All project is driven on completely free services
