@@ -22,3 +22,10 @@
 + Django Rest Framework
 + MySQL
 + Hosting on pythonanywhere.com
+
+# Tools and services used 
++ Userfront (auth)
++ React page
++ YooMoney and Boosty (payment)
+
+All project is driven on completely free services
