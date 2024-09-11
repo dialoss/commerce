@@ -1,6 +1,6 @@
 # Simple Blog / Online-Shop
 
-[Visit website](https://www.mymountmt.ru/main/)
+[Visit website](https://famounts.ru)
 
 ## Features
 
