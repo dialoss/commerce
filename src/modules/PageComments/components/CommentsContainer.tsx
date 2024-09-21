@@ -20,7 +20,7 @@ export const CommentsInput = ({callback, parent = null}: { parent?: number }) =>
         if (!message && !media.length) return;
         let clearedMessage = message.replace(/<[^>]*>?/gm, '');
         const comment = {
-            page: decodeURI(window.location.pathname + "/"),
+            page: decodeURI(window.location.pathname.slice(1)),
             text: clearedMessage,
             media: JSON.stringify(media),
             parent,
